@@ -8,24 +8,18 @@ public class InMemoryUserRepository : IUserRepository
 
     public InMemoryUserRepository()
     {
-        _users = new List<User>
-        {
-            new()
+        _users =
+        [
+            new User
             {
-                Id = Guid.NewGuid(),
-                Email = "admin@bmb.com",
-                Password = "Password123!",
-                Role = Role.Administrativo
+                Id = Guid.NewGuid(), Email = "admin@bmb.com", Password = "Password123!", Role = Role.Administrativo
             },
-            new()
+            new User
             {
-                Id = Guid.NewGuid(),
-                Email = "preparador@bmb.com",
-                Password = "Password123!",
-                Role = Role.Preparador
+                Id = Guid.NewGuid(), Email = "preparador@bmb.com", Password = "Password123!", Role = Role.Preparador
             },
-            new() { Id = Guid.NewGuid(), Email = "cliente@bmb.com", Password = "Password123!", Role = Role.Cliente }
-        };
+            new User { Id = Guid.NewGuid(), Email = "cliente@bmb.com", Password = "Password123!", Role = Role.Cliente }
+        ];
     }
 
     public User? GetUserByEmail(string email)

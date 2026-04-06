@@ -10,10 +10,12 @@ namespace DarkKitchen.WebApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ITokenService _tokenService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ITokenService tokenService)
     {
         _authService = authService;
+        _tokenService = tokenService;
     }
 
     [HttpPost("login")]
@@ -22,9 +24,9 @@ public class AuthController : ControllerBase
         try
         {
             User user = _authService.Login(request.Email, request.Password);
+            var token = _tokenService.GenerateToken(user);
 
-            // TODO: temporarily we send a 200
-            return Ok(new { Message = "Login exitoso", Role = user.Role.ToString() });
+            return Ok(new { Token = token, Role = user.Role.ToString() });
         }
         catch(UnauthorizedAccessException ex)
         {
