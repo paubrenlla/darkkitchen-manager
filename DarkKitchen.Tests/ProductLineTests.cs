@@ -15,7 +15,7 @@ public class ProductLineTests
     [ExpectedException(typeof(ArgumentException))]
     public void CreateProductLine_WithEmptyName_ShouldThrowException()
     {
-        new Domain.ProductLine("");
+        new Domain.ProductLine(string.Empty);
     }
 
     [TestMethod]
