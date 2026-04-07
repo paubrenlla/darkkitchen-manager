@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\DarkKitchen.IBusinessLogic\DarkKitchen.IBusinessLogic.csproj" />
+        <ProjectReference Include="..\DarkKitchen.IDataAccess\DarkKitchen.IDataAccess.csproj" />
     </ItemGroup>
 
     <ItemGroup>

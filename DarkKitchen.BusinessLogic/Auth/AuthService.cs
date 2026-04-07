@@ -1,16 +1,12 @@
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic.IAuth;
+using DarkKitchen.IDataAccess;
 
 namespace DarkKitchen.BusinessLogic.Auth;
 
-public class AuthService : IAuthService
+public class AuthService(IUserRepository userRepository) : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-
-    public AuthService(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
+    private readonly IUserRepository _userRepository = userRepository;
 
     public User Login(string email, string password)
     {

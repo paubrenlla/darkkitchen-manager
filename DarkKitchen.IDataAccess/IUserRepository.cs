@@ -1,4 +1,6 @@
-namespace DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users;
+
+namespace DarkKitchen.IDataAccess;
 
 public interface IUserRepository
 {

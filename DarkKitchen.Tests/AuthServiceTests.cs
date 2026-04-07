@@ -1,5 +1,6 @@
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.IDataAccess;
 using Moq;
 
 namespace DarkKitchen.Tests;

@@ -1,22 +1,16 @@
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic.IAuth;
-using DarkKitchen.WebApi.DTOs;
+using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DarkKitchen.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
 {
-    private readonly IAuthService _authService;
-    private readonly ITokenService _tokenService;
-
-    public AuthController(IAuthService authService, ITokenService tokenService)
-    {
-        _authService = authService;
-        _tokenService = tokenService;
-    }
+    private readonly IAuthService _authService = authService;
+    private readonly ITokenService _tokenService = tokenService;
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)

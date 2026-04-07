@@ -7,15 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.25"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.25"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.25" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.25" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DarkKitchen.IBusinessLogic\DarkKitchen.IBusinessLogic.csproj"/>
-        <ProjectReference Include="..\DarkKitchen.BusinessLogic\DarkKitchen.BusinessLogic.csproj"/>
-        <ProjectReference Include="..\DarkKitchen.DataAccess\DarkKitchen.DataAccess.csproj"/>
+        <ProjectReference Include="..\DarkKitchen.IBusinessLogic\DarkKitchen.IBusinessLogic.csproj" />
+        <ProjectReference Include="..\DarkKitchen.ServiceFactory\DarkKitchen.ServiceFactory.csproj" />
+        <ProjectReference Include="..\DarkKitchen.Models\DarkKitchen.Models.csproj" />
     </ItemGroup>
 
 </Project>

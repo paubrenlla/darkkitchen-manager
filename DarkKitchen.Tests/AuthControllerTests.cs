@@ -1,8 +1,8 @@
 using System.Reflection;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic.IAuth;
+using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
-using DarkKitchen.WebApi.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 

@@ -1,4 +1,4 @@
-namespace DarkKitchen.WebApi.DTOs;
+namespace DarkKitchen.Models.DTOs;
 
 public class LoginRequest(string email, string password)
 {

@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Users;
+using DarkKitchen.IDataAccess;
 
 namespace DarkKitchen.DataAccess;
 
@@ -12,11 +13,17 @@ public class InMemoryUserRepository : IUserRepository
         [
             new User
             {
-                Id = Guid.NewGuid(), Email = "admin@bmb.com", Password = "Password123!", Role = Role.Administrativo
+                Id = Guid.NewGuid(),
+                Email = "admin@bmb.com",
+                Password = "Password123!",
+                Role = Role.Administrativo
             },
             new User
             {
-                Id = Guid.NewGuid(), Email = "preparador@bmb.com", Password = "Password123!", Role = Role.Preparador
+                Id = Guid.NewGuid(),
+                Email = "preparador@bmb.com",
+                Password = "Password123!",
+                Role = Role.Preparador
             },
             new User { Id = Guid.NewGuid(), Email = "cliente@bmb.com", Password = "Password123!", Role = Role.Cliente }
         ];
