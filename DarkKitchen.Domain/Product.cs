@@ -34,12 +34,12 @@ public class Product
 
     private static void ValidateCode(string code)
     {
-        if (string.IsNullOrWhiteSpace(code) || code.Length < 5 || code.Length > 20)
+        if(string.IsNullOrWhiteSpace(code) || code.Length < 5 || code.Length > 20)
         {
             throw new ArgumentException("Code must be between 5 and 20 alphanumeric characters.");
         }
 
-        if (!Regex.IsMatch(code, @"^[a-zA-Z0-9]+$"))
+        if(!Regex.IsMatch(code, @"^[a-zA-Z0-9]+$"))
         {
             throw new ArgumentException("Code must contain only alphanumeric characters.");
         }
@@ -47,7 +47,7 @@ public class Product
 
     private static void ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name) || name.Length < 10 || name.Length > 50)
+        if(string.IsNullOrWhiteSpace(name) || name.Length < 10 || name.Length > 50)
         {
             throw new ArgumentException("Name must be between 10 and 50 characters.");
         }
@@ -55,7 +55,7 @@ public class Product
 
     private static void ValidateDescription(string description)
     {
-        if (string.IsNullOrWhiteSpace(description) || description.Length < 20 || description.Length > 500)
+        if(string.IsNullOrWhiteSpace(description) || description.Length < 20 || description.Length > 500)
         {
             throw new ArgumentException("Description must be between 20 and 500 characters.");
         }
@@ -71,7 +71,7 @@ public class Product
 
     private static void ValidateCategory(ProductCategory category)
     {
-        if (category == null)
+        if(category == null)
         {
             throw new ArgumentException("Product category is required.");
         }
@@ -79,7 +79,7 @@ public class Product
 
     private static void ValidatePrice(decimal price)
     {
-        if (price <= 0)
+        if(price <= 0)
         {
             throw new ArgumentException("Price must be greater than zero.");
         }

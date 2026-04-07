@@ -14,7 +14,7 @@ public class ProductCategory
 
     private static void ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if(string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Product category name is required.");
         }

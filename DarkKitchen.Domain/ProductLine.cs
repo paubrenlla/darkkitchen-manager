@@ -14,7 +14,7 @@ public class ProductLine
 
     private static void ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if(string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Product line name is required.");
         }
