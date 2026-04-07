@@ -63,7 +63,7 @@ public class Product
 
     private static void ValidateLine(ProductLine line)
     {
-        if (line == null)
+        if(line == null)
         {
             throw new ArgumentException("Product line is required.");
         }
