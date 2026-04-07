@@ -1,10 +1,12 @@
-﻿namespace DarkKitchen.Tests;
+﻿using DarkKitchen.Domain;
+
+namespace DarkKitchen.Tests;
 
 [TestClass]
 public class ProductTests
 {
-    private ProductLine defaultLine;
-    private ProductCategory defaultCategory;
+    private ProductLine defaultLine = null!;
+    private ProductCategory defaultCategory = null!;
 
     [TestInitialize]
     public void Setup()
@@ -18,15 +20,15 @@ public class ProductTests
     {
         var product = new Product(
             "ABC12",
-            "Hamburguesa Clasica",
-            "Hamburguesa clasica con queso cheddar",
+            "Hamburguesa",
+            "Hamburguesa con queso cheddar",
             defaultLine,
             defaultCategory,
             150.50m);
 
         Assert.AreEqual("ABC12", product.Code);
-        Assert.AreEqual("Hamburguesa Clasica", product.Name);
-        Assert.AreEqual("Hamburguesa clasica con queso cheddar", product.Description);
+        Assert.AreEqual("Hamburguesa", product.Name);
+        Assert.AreEqual("Hamburguesa con queso cheddar", product.Description);
         Assert.AreEqual(defaultLine, product.Line);
         Assert.AreEqual(defaultCategory, product.Category);
         Assert.AreEqual(150.50m, product.Price);
