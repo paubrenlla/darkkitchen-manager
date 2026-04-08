@@ -95,24 +95,24 @@ public class User
         {
             throw new ArgumentException("Password cannot contain sequences.");
         }
+    }
 
-        bool HasSequentialChars(string text)
+    private static bool HasSequentialChars(string text)
+    {
+        for (var i = 0; i < text.Length - 2; i++)
         {
-            for(var i = 0; i < text.Length - 2; i++)
+            if (text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
             {
-                if(text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
-                {
-                    return true;
-                }
-
-                if(text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
-                {
-                    return true;
-                }
+                return true;
             }
 
-            return false;
+            if (text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
+            {
+                return true;
+            }
         }
+
+        return false;
     }
 
     private static void ValidatePhone(string phone, IPhoneValidationStrategy strategy)
