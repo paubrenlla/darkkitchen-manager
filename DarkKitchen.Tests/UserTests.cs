@@ -50,6 +50,22 @@ public class UserTests
     public void CreateUser_WithLongSurname_ThrowsArgumentException()
     {
         var longSurname = new string('a', 26);
-        new User("Juan", longSurname, ValidEmail, ValidPhone, ValidPassword);
+        new User(ValidName, longSurname, ValidEmail, ValidPhone, ValidPassword);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Invalid email format.")]
+    public void CreateUser_WithEmptyEmail_ThrowsArgumentException()
+    {
+        var email = string.Empty;
+        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Invalid email format.")]
+    public void CreateUser_WithInvalidEmailFormat_ThrowsArgumentException()
+    {
+        var email = "invalid.email.com";
+        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword);
     }
 }
