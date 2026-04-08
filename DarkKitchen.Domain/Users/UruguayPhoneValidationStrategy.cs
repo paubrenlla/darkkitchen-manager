@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace DarkKitchen.Domain.Users;
 
-public class UruguayPhoneValidationStrategy
+public class UruguayPhoneValidationStrategy : IPhoneValidationStrategy
 {
     public bool IsValid(string phone)
     {
