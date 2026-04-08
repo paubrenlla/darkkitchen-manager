@@ -8,6 +8,7 @@ public class User
         ValidateName(name);
         ValidateSurname(surname);
         ValidateEmail(email);
+        ValidatePassword(password);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -54,6 +55,57 @@ public class User
         if(string.IsNullOrWhiteSpace(email) || !emailRegex.IsMatch(email))
         {
             throw new ArgumentException("Invalid email format.");
+        }
+    }
+
+    private static void ValidatePassword(string password)
+    {
+        if(string.IsNullOrWhiteSpace(password) || password.Length < 15 || password.Length > 25)
+        {
+            throw new ArgumentException("Password must be between 15 and 25 characters.");
+        }
+
+        if(!Regex.IsMatch(password, @"[A-Z]"))
+        {
+            throw new ArgumentException("Password must contain at least one uppercase letter.");
+        }
+
+        if(!Regex.IsMatch(password, @"[a-z]"))
+        {
+            throw new ArgumentException("Password must contain at least one lowercase letter.");
+        }
+
+        if(!Regex.IsMatch(password, @"[0-9]"))
+        {
+            throw new ArgumentException("Password must contain at least one number.");
+        }
+
+        if(!Regex.IsMatch(password, @"[^a-zA-Z0-9]"))
+        {
+            throw new ArgumentException("Password must contain at least one symbol.");
+        }
+
+        if(HasSequentialChars(password))
+        {
+            throw new ArgumentException("Password cannot contain sequences.");
+        }
+
+        bool HasSequentialChars(string text)
+        {
+            for(var i = 0; i < text.Length - 2; i++)
+            {
+                if(text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
+                {
+                    return true;
+                }
+
+                if(text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
