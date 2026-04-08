@@ -51,4 +51,14 @@ public class UruguayPhoneValidationTests
         var result = strategy.IsValid("123456789");
         Assert.IsFalse(result);
     }
+
+    [TestMethod]
+    public void IsValid_NullPhone_ReturnsFalse()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+
+        var res = strategy.IsValid(null!);
+
+        Assert.IsFalse(res);
+    }
 }
