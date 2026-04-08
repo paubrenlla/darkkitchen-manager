@@ -7,6 +7,8 @@ public class User
     public User(string name, string surname, string email, string phone, string password,
         Role role, IPhoneValidationStrategy phoneStrategy)
     {
+        ArgumentNullException.ThrowIfNull(phoneStrategy);
+
         ValidateName(name);
         ValidateSurname(surname);
         ValidateEmail(email);
