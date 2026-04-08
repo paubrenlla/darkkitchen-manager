@@ -8,21 +8,21 @@ public class User
         Role role, IPhoneValidationStrategy phoneStrategy)
     {
         ArgumentNullException.ThrowIfNull(phoneStrategy);
+        var cleanPhone = NormalizeInput(phone);
 
         ValidateName(name);
         ValidateSurname(surname);
         ValidateEmail(email);
         ValidatePassword(password);
-        ValidatePhone(phone, phoneStrategy);
+        ValidatePhone(cleanPhone, phoneStrategy);
 
         Id = Guid.NewGuid();
         Name = name;
         Surname = surname;
         Email = email;
-        Phone = phone;
         Password = password;
         Role = role;
-        Phone = phoneStrategy.CountryPrefix + phone;
+        Phone = phoneStrategy.CountryPrefix + cleanPhone;
     }
 
     public User(string name, string surname, string email, string phone, string password, IPhoneValidationStrategy phoneStrategy)
@@ -121,5 +121,17 @@ public class User
         {
             throw new ArgumentException("Invalid phone format.");
         }
+    }
+
+    private static string NormalizeInput(string input)
+    {
+        if(string.IsNullOrWhiteSpace(input))
+        {
+            return string.Empty;
+        }
+
+        return input.Replace(" ", string.Empty)
+            .Replace("-", string.Empty)
+            .Replace(".", string.Empty);
     }
 }
