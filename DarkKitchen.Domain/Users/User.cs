@@ -4,29 +4,26 @@ namespace DarkKitchen.Domain.Users;
 
 public class User
 {
-    public User(string name, string surname, string email, string phone, string password,
+    public User(string name, string surname, string email, PhoneNumber phone, string password,
         Role role, IPhoneValidationStrategy phoneStrategy)
     {
-        ArgumentNullException.ThrowIfNull(phoneStrategy);
-        var cleanPhone = NormalizeInput(phone);
-
         ValidateName(name);
         ValidateSurname(surname);
         ValidateEmail(email);
         ValidatePassword(password);
-        ValidatePhone(cleanPhone, phoneStrategy);
 
         Id = Guid.NewGuid();
         Name = name;
         Surname = surname;
         Email = email;
+        Phone = phone;
         Password = password;
         Role = role;
-        Phone = phoneStrategy.CountryPrefix + cleanPhone;
     }
 
-    public User(string name, string surname, string email, string phone, string password, IPhoneValidationStrategy phoneStrategy)
-        : this(name, surname, email, phone, password, Role.Cliente, phoneStrategy)
+    public User(string name, string surname, string email, PhoneNumber phoneNumber, string password,
+        IPhoneValidationStrategy phoneStrategy)
+        : this(name, surname, email, phoneNumber, password, Role.Cliente, phoneStrategy)
     {
     }
 
@@ -34,7 +31,7 @@ public class User
     public string Name { get; private set; }
     public string Surname { get; private set; }
     public string Email { get; private set; }
-    public string Phone { get; private set; }
+    public PhoneNumber Phone { get; private set; }
     public string Password { get; private set; }
     public Role Role { get; private set; }
 
@@ -99,39 +96,19 @@ public class User
 
     private static bool HasSequentialChars(string text)
     {
-        for (var i = 0; i < text.Length - 2; i++)
+        for(var i = 0; i < text.Length - 2; i++)
         {
-            if (text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
+            if(text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
             {
                 return true;
             }
 
-            if (text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
+            if(text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
             {
                 return true;
             }
         }
 
         return false;
-    }
-
-    private static void ValidatePhone(string phone, IPhoneValidationStrategy strategy)
-    {
-        if (!strategy.IsValid(phone))
-        {
-            throw new ArgumentException("Invalid phone format.");
-        }
-    }
-
-    private static string NormalizeInput(string input)
-    {
-        if(string.IsNullOrWhiteSpace(input))
-        {
-            return string.Empty;
-        }
-
-        return input.Replace(" ", string.Empty)
-            .Replace("-", string.Empty)
-            .Replace(".", string.Empty);
     }
 }
