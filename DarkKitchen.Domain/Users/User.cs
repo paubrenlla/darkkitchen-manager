@@ -5,7 +5,7 @@ namespace DarkKitchen.Domain.Users;
 public class User
 {
     public User(string name, string surname, string email, PhoneNumber phone, string password,
-        Role role, IPhoneValidationStrategy phoneStrategy)
+        Role role)
     {
         ValidateName(name);
         ValidateSurname(surname);
@@ -21,9 +21,8 @@ public class User
         Role = role;
     }
 
-    public User(string name, string surname, string email, PhoneNumber phoneNumber, string password,
-        IPhoneValidationStrategy phoneStrategy)
-        : this(name, surname, email, phoneNumber, password, Role.Cliente, phoneStrategy)
+    public User(string name, string surname, string email, PhoneNumber phoneNumber, string password)
+        : this(name, surname, email, phoneNumber, password, Role.Cliente)
     {
     }
 

@@ -17,25 +17,22 @@ public class InMemoryUserRepository : IUserRepository
                 "Admin",
                 "Jefe",
                 "admin@bmb.com",
-                "099123456",
+                new PhoneNumber("094222333", uruguayStrategy),
                 mockPassword,
-                Role.Administrativo,
-                uruguayStrategy),
+                Role.Administrativo),
             new User(
                 "Pepe",
                 "Ruiz",
                 "preparador@bmb.com",
-                "098765432",
+                new PhoneNumber("094333444", uruguayStrategy),
                 mockPassword,
-                Role.Preparador,
-                uruguayStrategy),
+                Role.Preparador),
             new User(
                 "Juan",
                 "Sosa",
                 "cliente@bmb.com",
-                "091234567",
-                mockPassword,
-                uruguayStrategy)
+                new PhoneNumber("094444555", uruguayStrategy),
+                mockPassword)
         ];
     }
 

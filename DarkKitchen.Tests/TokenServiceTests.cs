@@ -11,12 +11,13 @@ public class TokenServiceTests
     private const string ValidName = "Juan";
     private const string ValidSurname = "Perez";
     private const string ValidEmail = "test@domain.com";
-    private const string ValidPhone = "094123456";
     private const string ValidPassword = "Valid1Password!@";
+    private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = new("094123456", uruguayStrategy);
 
     private Mock<IConfiguration> _configurationMock = null!;
-    private TokenService _tokenService = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
+    private TokenService _tokenService = null!;
 
     [TestInitialize]
     public void Setup()
@@ -37,7 +38,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsNonEmptyString()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 
@@ -47,7 +48,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsJwtFormat()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 

@@ -11,12 +11,13 @@ public class AuthServiceTests
     private const string ValidName = "Juan";
     private const string ValidSurname = "Perez";
     private const string ValidEmail = "test@domain.com";
-    private const string ValidPhone = "094123456";
     private const string ValidPassword = "Valid1Password!@";
+    private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = new("094123456", uruguayStrategy);
 
     private AuthService _authService = null!;
-    private Mock<IUserRepository> _userRepositoryMock = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
+    private Mock<IUserRepository> _userRepositoryMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -30,7 +31,7 @@ public class AuthServiceTests
     [TestMethod]
     public void LoginWithValidCredentials_ReturnsUser()
     {
-        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
+        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
             .Returns(expectedUser);
@@ -49,7 +50,7 @@ public class AuthServiceTests
     public void LoginWithInvalidPassword_ThrowsUnauthorized()
     {
         var invalidPassword = "WrongPassword";
-        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
+        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
             .Returns(existingUser);

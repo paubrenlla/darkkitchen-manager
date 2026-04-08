@@ -14,13 +14,14 @@ public class AuthControllerTests
     private const string ValidName = "Juan";
     private const string ValidSurname = "Perez";
     private const string ValidEmail = "test@domain.com";
-    private const string ValidPhone = "094123456";
     private const string ValidPassword = "Valid1Password!@";
+    private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = new("094123456", uruguayStrategy);
 
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;
-    private Mock<ITokenService> _tokenServiceMock = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
+    private Mock<ITokenService> _tokenServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -36,7 +37,7 @@ public class AuthControllerTests
     public void LoginSuccessful_ReturnsOkAndToken()
     {
         var request = new LoginRequest(ValidEmail, ValidPassword);
-        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente, _phoneStrategyMock.Object);
+        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente);
         var generatedToken = "mocked.jwt.token";
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
@@ -78,7 +79,7 @@ public class AuthControllerTests
     public void LoginSuccessful_ReturnsCorrectRole()
     {
         var request = new LoginRequest("admin@bmb.com", "Valid1Password!@");
-        var user = new User("Juan", "Perez", request.Email, "094123456", request.Password, Role.Administrativo, _phoneStrategyMock.Object);
+        var user = new User("Juan", "Perez", request.Email, ValidPhone, request.Password, Role.Administrativo);
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Returns(user);
