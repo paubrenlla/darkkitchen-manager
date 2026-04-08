@@ -136,4 +136,11 @@ public class UserTests
 
         new User(ValidName, ValidSurname, ValidEmail, invalidPhone, ValidPassword, Role.Cliente, strategy);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void CreateUser_NullStrategy_ThrowsArgumentNullException()
+    {
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, null!);
+    }
 }
