@@ -8,6 +8,12 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class TokenServiceTests
 {
+    private const string ValidName = "Juan";
+    private const string ValidSurname = "Perez";
+    private const string ValidEmail = "test@domain.com";
+    private const string ValidPhone = "094123456";
+    private const string ValidPassword = "Valid1Password!@";
+
     private Mock<IConfiguration> _configurationMock = null!;
     private TokenService _tokenService = null!;
 
@@ -28,7 +34,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsNonEmptyString()
     {
-        var user = new User { Id = Guid.NewGuid(), Email = "test@bmb.com", Password = "Pass", Role = Role.Cliente };
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 
@@ -38,7 +44,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsJwtFormat()
     {
-        var user = new User { Id = Guid.NewGuid(), Email = "test@bmb.com", Password = "Pass", Role = Role.Cliente };
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 

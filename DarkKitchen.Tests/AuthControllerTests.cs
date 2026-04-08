@@ -11,6 +11,12 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class AuthControllerTests
 {
+    private const string ValidName = "Juan";
+    private const string ValidSurname = "Perez";
+    private const string ValidEmail = "test@domain.com";
+    private const string ValidPhone = "094123456";
+    private const string ValidPassword = "Valid1Password!@";
+
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;
     private Mock<ITokenService> _tokenServiceMock = null!;
@@ -26,14 +32,8 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginSuccessful_ReturnsOkAndToken()
     {
-        var request = new LoginRequest("test@bmb.com", "Password123!");
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = request.Email,
-            Password = request.Password,
-            Role = Role.Cliente
-        };
+        var request = new LoginRequest(ValidEmail, ValidPassword);
+        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente);
         var generatedToken = "mocked.jwt.token";
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
@@ -60,7 +60,7 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginFailed_ReturnsUnauthorized()
     {
-        var request = new LoginRequest("test@bmb.com", "WrongPassword");
+        var request = new LoginRequest(ValidEmail, "WrongPassword");
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Throws(new UnauthorizedAccessException("Invalid Credentials."));
@@ -74,14 +74,8 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginSuccessful_ReturnsCorrectRole()
     {
-        var request = new LoginRequest("admin@bmb.com", "Password123!");
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = request.Email,
-            Password = request.Password,
-            Role = Role.Administrativo
-        };
+        var request = new LoginRequest("admin@bmb.com", "Valid1Password!@");
+        var user = new User("Juan", "Perez", request.Email, "094123456", request.Password, Role.Administrativo);
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Returns(user);

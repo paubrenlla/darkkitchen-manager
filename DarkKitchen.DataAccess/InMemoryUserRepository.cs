@@ -9,23 +9,29 @@ public class InMemoryUserRepository : IUserRepository
 
     public InMemoryUserRepository()
     {
+        var mockPassword = "ValidP@ssw0rd!8X";
         _users =
         [
-            new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "admin@bmb.com",
-                Password = "Password123!",
-                Role = Role.Administrativo
-            },
-            new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "preparador@bmb.com",
-                Password = "Password123!",
-                Role = Role.Preparador
-            },
-            new User { Id = Guid.NewGuid(), Email = "cliente@bmb.com", Password = "Password123!", Role = Role.Cliente }
+            new User(
+                "Admin",
+                "Jefe",
+                "admin@bmb.com",
+                "099123456",
+                mockPassword,
+                Role.Administrativo),
+            new User(
+                "Pepe",
+                "Ruiz",
+                "preparador@bmb.com",
+                "098765432",
+                mockPassword,
+                Role.Preparador),
+            new User(
+                "Juan",
+                "Sosa",
+                "cliente@bmb.com",
+                "091234567",
+                mockPassword)
         ];
     }
 
