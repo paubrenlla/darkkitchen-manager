@@ -71,4 +71,14 @@ public class UruguayPhoneValidationTests
 
         Assert.IsFalse(res);
     }
+
+    [TestMethod]
+    public void IsValid_ContainsLetters_ReturnsFalse()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+
+        var res = strategy.IsValid("099ABC123");
+
+        Assert.IsFalse(res, "Phone number cannot contain letters.");
+    }
 }
