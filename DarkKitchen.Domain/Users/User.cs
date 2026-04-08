@@ -7,6 +7,11 @@ public class User
     public User(string name, string surname, string email, string phone, string password,
         Role role, IPhoneValidationStrategy phoneStrategy)
     {
+        if (!phoneStrategy.IsValid(phone))
+        {
+            throw new ArgumentException("Invalid phone format.");
+        }
+
         ValidateName(name);
         ValidateSurname(surname);
         ValidateEmail(email);
