@@ -16,18 +16,21 @@ public class AuthServiceTests
 
     private AuthService _authService = null!;
     private Mock<IUserRepository> _userRepositoryMock = null!;
+    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
+        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
         _authService = new AuthService(_userRepositoryMock.Object);
     }
 
     [TestMethod]
     public void LoginWithValidCredentials_ReturnsUser()
     {
-        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
             .Returns(expectedUser);
@@ -46,7 +49,7 @@ public class AuthServiceTests
     public void LoginWithInvalidPassword_ThrowsUnauthorized()
     {
         var invalidPassword = "WrongPassword";
-        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
             .Returns(existingUser);

@@ -16,11 +16,14 @@ public class TokenServiceTests
 
     private Mock<IConfiguration> _configurationMock = null!;
     private TokenService _tokenService = null!;
+    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _configurationMock = new Mock<IConfiguration>();
+        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
 
         // Set up the mock configuration to return a dummy secret key
         var configSectionMock = new Mock<IConfigurationSection>();
@@ -34,7 +37,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsNonEmptyString()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
 
         var token = _tokenService.GenerateToken(user);
 
@@ -44,7 +47,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsJwtFormat()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _phoneStrategyMock.Object);
 
         var token = _tokenService.GenerateToken(user);
 

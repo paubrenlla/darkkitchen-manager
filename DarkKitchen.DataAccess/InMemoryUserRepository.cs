@@ -9,6 +9,7 @@ public class InMemoryUserRepository : IUserRepository
 
     public InMemoryUserRepository()
     {
+        var uruguayStrategy = new UruguayPhoneValidationStrategy();
         var mockPassword = "ValidP@ssw0rd!8X";
         _users =
         [
@@ -18,20 +19,23 @@ public class InMemoryUserRepository : IUserRepository
                 "admin@bmb.com",
                 "099123456",
                 mockPassword,
-                Role.Administrativo),
+                Role.Administrativo,
+                uruguayStrategy),
             new User(
                 "Pepe",
                 "Ruiz",
                 "preparador@bmb.com",
                 "098765432",
                 mockPassword,
-                Role.Preparador),
+                Role.Preparador,
+                uruguayStrategy),
             new User(
                 "Juan",
                 "Sosa",
                 "cliente@bmb.com",
                 "091234567",
-                mockPassword)
+                mockPassword,
+                uruguayStrategy)
         ];
     }
 

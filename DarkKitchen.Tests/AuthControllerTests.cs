@@ -20,12 +20,15 @@ public class AuthControllerTests
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;
     private Mock<ITokenService> _tokenServiceMock = null!;
+    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _authServiceMock = new Mock<IAuthService>();
         _tokenServiceMock = new Mock<ITokenService>();
+        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
         _authController = new AuthController(_authServiceMock.Object, _tokenServiceMock.Object);
     }
 
@@ -33,7 +36,7 @@ public class AuthControllerTests
     public void LoginSuccessful_ReturnsOkAndToken()
     {
         var request = new LoginRequest(ValidEmail, ValidPassword);
-        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente);
+        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente, _phoneStrategyMock.Object);
         var generatedToken = "mocked.jwt.token";
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
@@ -75,7 +78,7 @@ public class AuthControllerTests
     public void LoginSuccessful_ReturnsCorrectRole()
     {
         var request = new LoginRequest("admin@bmb.com", "Valid1Password!@");
-        var user = new User("Juan", "Perez", request.Email, "094123456", request.Password, Role.Administrativo);
+        var user = new User("Juan", "Perez", request.Email, "094123456", request.Password, Role.Administrativo, _phoneStrategyMock.Object);
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Returns(user);
