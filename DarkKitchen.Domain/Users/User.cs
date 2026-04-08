@@ -7,6 +7,7 @@ public class User
     {
         ValidateName(name);
         ValidateSurname(surname);
+        ValidateEmail(email);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -43,6 +44,16 @@ public class User
         if(string.IsNullOrWhiteSpace(surname) || surname.Length < 3 || surname.Length > 25)
         {
             throw new ArgumentException("Surname must be between 3 and 25 characters.");
+        }
+    }
+
+    private static void ValidateEmail(string email)
+    {
+        var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$");
+
+        if(string.IsNullOrWhiteSpace(email) || !emailRegex.IsMatch(email))
+        {
+            throw new ArgumentException("Invalid email format.");
         }
     }
 }
