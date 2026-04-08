@@ -43,4 +43,12 @@ public class UruguayPhoneValidationTests
 
         Assert.IsFalse(res);
     }
+
+    [TestMethod]
+    public void IsValid_DoesNotStartWith09_ReturnsFalse()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var result = strategy.IsValid("123456789");
+        Assert.IsFalse(result);
+    }
 }
