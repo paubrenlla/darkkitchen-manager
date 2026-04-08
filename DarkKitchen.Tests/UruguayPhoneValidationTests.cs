@@ -32,4 +32,15 @@ public class UruguayPhoneValidationTests
 
         Assert.IsFalse(res);
     }
+
+    [TestMethod]
+    public void IsValid_NumberTooLong_ReturnsFalse()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var phone = "094123123123";
+
+        var res = strategy.IsValid(phone);
+
+        Assert.IsFalse(res);
+    }
 }
