@@ -22,6 +22,7 @@ public class User
         Phone = phone;
         Password = password;
         Role = role;
+        Phone = phoneStrategy.CountryPrefix + phone;
     }
 
     public User(string name, string surname, string email, string phone, string password, IPhoneValidationStrategy phoneStrategy)
