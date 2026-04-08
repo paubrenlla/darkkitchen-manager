@@ -4,6 +4,13 @@ public class UruguayPhoneValidationStrategy
 {
     public bool IsValid(string phone)
     {
-        return true;
+        if(phone.Length < 9)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
