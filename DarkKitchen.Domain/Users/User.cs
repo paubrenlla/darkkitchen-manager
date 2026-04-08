@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace DarkKitchen.Domain.Users;
 
 public class User
