@@ -14,11 +14,22 @@ public class UruguayPhoneValidationTests
     [TestMethod]
     public void IsValid_UruguayMobile_ReturnsTrue()
     {
-        var strategy = new UruguayPhoneValidationStrategy(); 
+        var strategy = new UruguayPhoneValidationStrategy();
         var phone = "094123456";
-        
+
         var res = strategy.IsValid(phone);
-        
+
         Assert.IsTrue(res);
+    }
+
+    [TestMethod]
+    public void IsValid_InvalidLength_ReturnsFalse()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var phone = "094123";
+
+        var res = strategy.IsValid(phone);
+
+        Assert.IsFalse(res);
     }
 }
