@@ -126,4 +126,14 @@ public class UserTests
         var withSequence = "Valid1Password!@123";
         new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence, _strategy);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Invalid phone format.")]
+    public void CreateUser_InvalidUruguayPhone_ThrowsArgumentException()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var invalidPhone = "123";
+
+        new User(ValidName, ValidSurname, ValidEmail, invalidPhone, ValidPassword, Role.Cliente, strategy);
+    }
 }
