@@ -68,4 +68,60 @@ public class UserTests
         var email = "invalid.email.com";
         new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must be between 15 and 25 characters.")]
+    public void CreateUser_WithShortPassword_ThrowsArgumentException()
+    {
+        var shortPassword = "Short1!pass";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, shortPassword);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must be between 15 and 25 characters.")]
+    public void CreateUser_WithLongPassword_ThrowsArgumentException()
+    {
+        var longPassword = "Valid1Password!@1234567890ABC";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, longPassword);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must contain at least one uppercase letter.")]
+    public void CreateUser_PasswordWithoutUppercase_ThrowsArgumentException()
+    {
+        var noUpper = "valid1password!@";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noUpper);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must contain at least one lowercase letter.")]
+    public void CreateUser_PasswordWithoutLowercase_ThrowsArgumentException()
+    {
+        var noLower = "VALID1PASSWORD!@";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noLower);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must contain at least one number.")]
+    public void CreateUser_PasswordWithoutNumber_ThrowsArgumentException()
+    {
+        var noNumber = "ValidPassword!@#";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noNumber);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password must contain at least one symbol.")]
+    public void CreateUser_PasswordWithoutSymbol_ThrowsArgumentException()
+    {
+        var noSymbol = "Valid1PasswordAA";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noSymbol);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password cannot contain sequences.")]
+    public void CreateUser_PasswordWithSequence_ThrowsArgumentException()
+    {
+        var withSequence = "Valid1Password!@123";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence);
+    }
 }
