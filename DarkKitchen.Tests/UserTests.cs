@@ -155,4 +155,16 @@ public class UserTests
 
         Assert.AreEqual(expectedPhone, user.Phone);
     }
+
+    [TestMethod]
+    public void CreateUser_WithSpacesAndDashes_ShouldStoreNormalizedPhone()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var inputPhone = "094-123 456";
+        var expected = "+598094123456";
+
+        var user = new User(ValidName, ValidSurname, ValidEmail, inputPhone, ValidPassword, strategy);
+
+        Assert.AreEqual(expected, user.Phone);
+    }
 }
