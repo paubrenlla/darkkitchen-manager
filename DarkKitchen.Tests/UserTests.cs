@@ -36,4 +36,20 @@ public class UserTests
         string name = null!;
         new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Surname must be between 3 and 25 characters.")]
+    public void CreateUser_WithShortSurname_ThrowsArgumentException()
+    {
+        var shortSurname = "Al";
+        new User("Juan", shortSurname, ValidEmail, ValidPhone, ValidPassword);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Surname must be between 3 and 25 characters.")]
+    public void CreateUser_WithLongSurname_ThrowsArgumentException()
+    {
+        var longSurname = new string('a', 26);
+        new User("Juan", longSurname, ValidEmail, ValidPhone, ValidPassword);
+    }
 }
