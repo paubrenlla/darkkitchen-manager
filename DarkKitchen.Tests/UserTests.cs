@@ -143,4 +143,16 @@ public class UserTests
     {
         new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, null!);
     }
+
+    [TestMethod]
+    public void CreateUser_ShouldStorePhoneWithCountryPrefix()
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var inputPhone = "094123456";
+        var expectedPhone = "+598094123456";
+
+        var user = new User(ValidName, ValidSurname, ValidEmail, inputPhone, ValidPassword, strategy);
+
+        Assert.AreEqual(expectedPhone, user.Phone);
+    }
 }
