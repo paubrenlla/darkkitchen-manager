@@ -6,6 +6,7 @@ public class User
         Role role)
     {
         ValidateName(name);
+        ValidateSurname(surname);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -34,6 +35,14 @@ public class User
         if(string.IsNullOrWhiteSpace(name) || name.Length < 1)
         {
             throw new ArgumentException("Name must have at least 1 character.");
+        }
+    }
+
+    private static void ValidateSurname(string surname)
+    {
+        if(string.IsNullOrWhiteSpace(surname) || surname.Length < 3 || surname.Length > 25)
+        {
+            throw new ArgumentException("Surname must be between 3 and 25 characters.");
         }
     }
 }
