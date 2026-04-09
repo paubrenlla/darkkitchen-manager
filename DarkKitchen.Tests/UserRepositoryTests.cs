@@ -46,4 +46,22 @@ public class UserRepositoryTests
         Assert.IsNotNull(result);
         Assert.AreEqual("admin@bmb.com", result.Email);
     }
+
+    [TestMethod]
+    public void Add_ValidUser_ShouldInsertIntoRepository()
+    {
+        var user = new User(
+            "Marta",
+            "Suarez",
+            "marta@test.com",
+            PhoneNumber.Create("+598", "094444555", new UruguayPhoneValidationStrategy()),
+            "Valid1Password!@",
+            Role.Cliente);
+
+        _userRepository.Add(user);
+
+        var retrievedUser = _userRepository.GetUserByEmail("marta@test.com");
+        Assert.IsNotNull(retrievedUser);
+        Assert.AreEqual("Marta", retrievedUser.Name);
+    }
 }
