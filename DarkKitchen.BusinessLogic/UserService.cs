@@ -6,16 +6,10 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class UserService : IUserService
+public class UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory) : IUserService
 {
-    private readonly IPhoneStrategyFactory _strategyFactory;
-    private readonly IUserRepository _userRepository;
-
-    public UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory)
-    {
-        _userRepository = userRepository;
-        _strategyFactory = strategyFactory;
-    }
+    private readonly IPhoneStrategyFactory _strategyFactory = strategyFactory;
+    private readonly IUserRepository _userRepository = userRepository;
 
     public User CreateUser(UserCreateRequest request)
     {
