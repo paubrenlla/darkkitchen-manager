@@ -40,4 +40,9 @@ public class InMemoryUserRepository : IUserRepository
     {
         return _users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
     }
+
+    public void Add(User user)
+    {
+        _users.Add(user);
+    }
 }
