@@ -8,13 +8,23 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class TokenServiceTests
 {
+    private const string ValidName = "Juan";
+    private const string ValidSurname = "Perez";
+    private const string ValidEmail = "test@domain.com";
+    private const string ValidPassword = "Valid1Password!@";
+    private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", UruguayStrategy);
+
     private Mock<IConfiguration> _configurationMock = null!;
+    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
     private TokenService _tokenService = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _configurationMock = new Mock<IConfiguration>();
+        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
 
         // Set up the mock configuration to return a dummy secret key
         var configSectionMock = new Mock<IConfigurationSection>();
@@ -28,7 +38,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsNonEmptyString()
     {
-        var user = new User { Id = Guid.NewGuid(), Email = "test@bmb.com", Password = "Pass", Role = Role.Cliente };
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 
@@ -38,7 +48,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsJwtFormat()
     {
-        var user = new User { Id = Guid.NewGuid(), Email = "test@bmb.com", Password = "Pass", Role = Role.Cliente };
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
         var token = _tokenService.GenerateToken(user);
 

@@ -1,8 +1,11 @@
 using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
+using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
+using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,8 +17,13 @@ public static class DependencyResolution
     {
         services.AddScoped<IProductService, ProductService>();
         services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+        services.AddSingleton<IProductRepository, InMemoryProductRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
+        services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

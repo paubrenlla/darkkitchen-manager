@@ -9,28 +9,40 @@ public class InMemoryUserRepository : IUserRepository
 
     public InMemoryUserRepository()
     {
+        var uruguayStrategy = new UruguayPhoneValidationStrategy();
+        var mockPassword = "ValidP@ssw0rd!8X";
         _users =
         [
-            new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "admin@bmb.com",
-                Password = "Password123!",
-                Role = Role.Administrativo
-            },
-            new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "preparador@bmb.com",
-                Password = "Password123!",
-                Role = Role.Preparador
-            },
-            new User { Id = Guid.NewGuid(), Email = "cliente@bmb.com", Password = "Password123!", Role = Role.Cliente }
+            new User(
+                "Admin",
+                "Jefe",
+                "admin@bmb.com",
+                PhoneNumber.Create("+598", "094222333", uruguayStrategy),
+                mockPassword,
+                Role.Administrativo),
+            new User(
+                "Pepe",
+                "Ruiz",
+                "preparador@bmb.com",
+                PhoneNumber.Create("+598", "094333444", uruguayStrategy),
+                mockPassword,
+                Role.Preparador),
+            new User(
+                "Juan",
+                "Sosa",
+                "cliente@bmb.com",
+                PhoneNumber.Create("+598", "094444555", uruguayStrategy),
+                mockPassword)
         ];
     }
 
     public User? GetUserByEmail(string email)
     {
         return _users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public void Add(User user)
+    {
+        _users.Add(user);
     }
 }

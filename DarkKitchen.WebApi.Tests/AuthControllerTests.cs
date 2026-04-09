@@ -11,8 +11,16 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class AuthControllerTests
 {
+    private const string ValidName = "Juan";
+    private const string ValidSurname = "Perez";
+    private const string ValidEmail = "test@domain.com";
+    private const string ValidPassword = "Valid1Password!@";
+    private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", UruguayStrategy);
+
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;
+    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
     private Mock<ITokenService> _tokenServiceMock = null!;
 
     [TestInitialize]
@@ -20,20 +28,16 @@ public class AuthControllerTests
     {
         _authServiceMock = new Mock<IAuthService>();
         _tokenServiceMock = new Mock<ITokenService>();
+        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
         _authController = new AuthController(_authServiceMock.Object, _tokenServiceMock.Object);
     }
 
     [TestMethod]
     public void LoginSuccessful_ReturnsOkAndToken()
     {
-        var request = new LoginRequest("test@bmb.com", "Password123!");
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = request.Email,
-            Password = request.Password,
-            Role = Role.Cliente
-        };
+        var request = new LoginRequest { Email = ValidEmail, Password = ValidPassword };
+        var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente);
         var generatedToken = "mocked.jwt.token";
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
@@ -60,7 +64,7 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginFailed_ReturnsUnauthorized()
     {
-        var request = new LoginRequest("test@bmb.com", "WrongPassword");
+        var request = new LoginRequest { Email = ValidEmail, Password = "WrongPassword" };
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Throws(new UnauthorizedAccessException("Invalid Credentials."));
@@ -74,14 +78,8 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginSuccessful_ReturnsCorrectRole()
     {
-        var request = new LoginRequest("admin@bmb.com", "Password123!");
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = request.Email,
-            Password = request.Password,
-            Role = Role.Administrativo
-        };
+        var request = new LoginRequest { Email = "admin@bmb.com", Password = "Valid1Password!@" };
+        var user = new User("Juan", "Perez", request.Email, ValidPhone, request.Password, Role.Administrativo);
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Returns(user);

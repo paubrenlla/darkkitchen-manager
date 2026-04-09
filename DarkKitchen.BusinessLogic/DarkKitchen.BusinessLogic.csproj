@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -9,6 +9,8 @@
     <ItemGroup>
         <ProjectReference Include="..\DarkKitchen.IBusinessLogic\DarkKitchen.IBusinessLogic.csproj" />
         <ProjectReference Include="..\DarkKitchen.IDataAccess\DarkKitchen.IDataAccess.csproj" />
+        <ProjectReference Include="..\DarkKitchen.Models\DarkKitchen.Models.csproj" />
+        <ProjectReference Include="..\DarkKitchen.Domain\DarkKitchen.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
