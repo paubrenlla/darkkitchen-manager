@@ -14,4 +14,15 @@ public class PhoneNumberTests
         var invalidPhone = "123";
         PhoneNumber.Create("+598", invalidPhone, uruguayStrategy);
     }
+
+    [TestMethod]
+    public void CreatePhone_WithSpacesAndDashes_IsNormalizedAndSucceeds()
+    {
+        var rawPhone = "094-123 456";
+        var expectedPhone = "094123456";
+
+        var phone = PhoneNumber.Create(rawPhone, "+598", uruguayStrategy);
+
+        Assert.AreEqual(expectedPhone, phone.Number);
+    }
 }
