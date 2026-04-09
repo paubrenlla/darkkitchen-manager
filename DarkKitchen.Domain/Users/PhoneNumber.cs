@@ -24,6 +24,6 @@ public class PhoneNumber
             throw new ArgumentException($"Invalid phone number for country prefix {validationStrategy.CountryPrefix}.");
         }
 
-        return new PhoneNumber(validationStrategy.CountryPrefix, cleanNumber);
+        return new PhoneNumber(prefix, cleanNumber);
     }
 }
