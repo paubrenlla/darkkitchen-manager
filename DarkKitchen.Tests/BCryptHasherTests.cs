@@ -29,8 +29,18 @@ public class BCryptHasherTests
     {
         var hash = _hasher.HashPassword(RawPassword);
 
-        bool result = _hasher.VerifyPassword(RawPassword, hash);
+        var result = _hasher.VerifyPassword(RawPassword, hash);
 
         Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void VerifyPassword_WrongPassword_ReturnsFalse()
+    {
+        var hash = _hasher.HashPassword(RawPassword);
+
+        var result = _hasher.VerifyPassword("WrongPassword123!", hash);
+
+        Assert.IsFalse(result);
     }
 }
