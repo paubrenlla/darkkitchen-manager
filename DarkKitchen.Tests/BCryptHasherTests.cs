@@ -1,3 +1,5 @@
+using DarkKitchen.Domain.Users;
+
 namespace DarkKitchen.Tests;
 
 [TestClass]
@@ -15,10 +17,10 @@ public class BCryptHasherTests
     [TestMethod]
     public void HashPassword_ShouldReturnHashedString()
     {
-        string hashedPassword = _hasher.HashPassword(RawPassword);
+        var hashedPassword = _hasher.HashPassword(RawPassword);
 
         Assert.IsNotNull(hashedPassword);
-        Assert.AreEqual(hashedPassword, RawPassword);
+        Assert.AreNotEqual(hashedPassword, RawPassword);
         Assert.IsTrue(hashedPassword.StartsWith("$2"));
     }
 }
