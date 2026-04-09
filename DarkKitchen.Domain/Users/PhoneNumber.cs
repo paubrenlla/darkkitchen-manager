@@ -4,7 +4,7 @@ public class PhoneNumber
 {
     public PhoneNumber(string countryPrefix, string number, IPhoneValidationStrategy validationStrategy)
     {
-        if(!validationStrategy.IsValid(number))
+        if(!validationStrategy.IsValid(countryPrefix, number))
         {
             throw new ArgumentException($"Invalid phone number for country prefix {validationStrategy.CountryPrefix}.");
         }

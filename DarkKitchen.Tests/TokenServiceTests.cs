@@ -13,7 +13,7 @@ public class TokenServiceTests
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
-    private static readonly PhoneNumber ValidPhone = new("094123456", uruguayStrategy);
+    private static readonly PhoneNumber ValidPhone = new("+598", "094123456", uruguayStrategy);
 
     private Mock<IConfiguration> _configurationMock = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
@@ -24,7 +24,7 @@ public class TokenServiceTests
     {
         _configurationMock = new Mock<IConfiguration>();
         _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
-        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
+        _phoneStrategyMock.Setup(s => s.IsValid("+598", It.IsAny<string>())).Returns(true);
 
         // Set up the mock configuration to return a dummy secret key
         var configSectionMock = new Mock<IConfigurationSection>();

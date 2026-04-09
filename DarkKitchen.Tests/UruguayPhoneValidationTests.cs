@@ -5,13 +5,15 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class UruguayPhoneValidationTests
 {
+    private readonly string prefix = "+598";
+
     [TestMethod]
     public void IsValid_UruguayMobile_ReturnsTrue()
     {
         var strategy = new UruguayPhoneValidationStrategy();
         var phone = "094123456";
 
-        var res = strategy.IsValid(phone);
+        var res = strategy.IsValid(prefix, phone);
 
         Assert.IsTrue(res);
     }
@@ -22,7 +24,7 @@ public class UruguayPhoneValidationTests
         var strategy = new UruguayPhoneValidationStrategy();
         var phone = "094123";
 
-        var res = strategy.IsValid(phone);
+        var res = strategy.IsValid(prefix, phone);
 
         Assert.IsFalse(res);
     }
@@ -33,7 +35,7 @@ public class UruguayPhoneValidationTests
         var strategy = new UruguayPhoneValidationStrategy();
         var phone = "094123123123";
 
-        var res = strategy.IsValid(phone);
+        var res = strategy.IsValid(prefix, phone);
 
         Assert.IsFalse(res);
     }
@@ -42,7 +44,7 @@ public class UruguayPhoneValidationTests
     public void IsValid_DoesNotStartWith09_ReturnsFalse()
     {
         var strategy = new UruguayPhoneValidationStrategy();
-        var result = strategy.IsValid("123456789");
+        var result = strategy.IsValid(prefix, "123456789");
         Assert.IsFalse(result);
     }
 
@@ -51,7 +53,7 @@ public class UruguayPhoneValidationTests
     {
         var strategy = new UruguayPhoneValidationStrategy();
 
-        var res = strategy.IsValid(null!);
+        var res = strategy.IsValid(prefix, null!);
 
         Assert.IsFalse(res);
     }
@@ -61,7 +63,7 @@ public class UruguayPhoneValidationTests
     {
         var strategy = new UruguayPhoneValidationStrategy();
 
-        var res = strategy.IsValid(string.Empty);
+        var res = strategy.IsValid(prefix, string.Empty);
 
         Assert.IsFalse(res);
     }
@@ -71,7 +73,7 @@ public class UruguayPhoneValidationTests
     {
         var strategy = new UruguayPhoneValidationStrategy();
 
-        var res = strategy.IsValid("099ABC123");
+        var res = strategy.IsValid(prefix, "099ABC123");
 
         Assert.IsFalse(res, "Phone number cannot contain letters.");
     }

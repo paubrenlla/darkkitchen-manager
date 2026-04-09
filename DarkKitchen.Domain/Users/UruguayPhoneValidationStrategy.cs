@@ -5,7 +5,8 @@ namespace DarkKitchen.Domain.Users;
 public class UruguayPhoneValidationStrategy : IPhoneValidationStrategy
 {
     public string CountryPrefix => "+598";
-    public bool IsValid(string phone)
+
+    public bool IsValid(string prefix, string phone)
     {
         if(string.IsNullOrWhiteSpace(phone))
         {

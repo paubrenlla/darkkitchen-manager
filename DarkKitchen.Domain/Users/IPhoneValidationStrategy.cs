@@ -2,6 +2,6 @@ namespace DarkKitchen.Domain.Users;
 
 public interface IPhoneValidationStrategy
 {
-    bool IsValid(string phoneNumber);
     string CountryPrefix { get; }
+    bool IsValid(string prefix, string phoneNumber);
 }

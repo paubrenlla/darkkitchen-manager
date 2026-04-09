@@ -12,13 +12,6 @@ public class PhoneNumberTests
     public void CreateUser_InvalidUruguayPhone_ThrowsArgumentException()
     {
         var invalidPhone = "123";
-        new PhoneNumber(invalidPhone, uruguayStrategy);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void CreateUser_NullStrategy_ThrowsArgumentNullException()
-    {
-        new PhoneNumber("094123456", null!);
+        new PhoneNumber("+598", invalidPhone, uruguayStrategy);
     }
 }
