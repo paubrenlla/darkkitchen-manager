@@ -125,47 +125,4 @@ public class UserTests
         var withSequence = "Valid1Password!@123";
         new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence);
     }
-
-    /*
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentException), "Invalid phone format.")]
-    public void CreateUser_InvalidUruguayPhone_ThrowsArgumentException()
-    {
-        var strategy = new UruguayPhoneValidationStrategy();
-        var invalidPhone = "123";
-
-        new User(ValidName, ValidSurname, ValidEmail, invalidPhone, ValidPassword, Role.Cliente, strategy);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void CreateUser_NullStrategy_ThrowsArgumentNullException()
-    {
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, null!);
-    }
-
-    [TestMethod]
-    public void CreateUser_ShouldStorePhoneWithCountryPrefix()
-    {
-        var strategy = new UruguayPhoneValidationStrategy();
-        var inputPhone = "094123456";
-        var expectedPhone = "+598094123456";
-
-        var user = new User(ValidName, ValidSurname, ValidEmail, inputPhone, ValidPassword, strategy);
-
-        Assert.AreEqual(expectedPhone, user.Phone);
-    }
-
-    [TestMethod]
-    public void CreateUser_WithSpacesAndDashes_ShouldStoreNormalizedPhone()
-    {
-        var strategy = new UruguayPhoneValidationStrategy();
-        var inputPhone = "094-123 456";
-        var expected = "+598094123456";
-
-        var user = new User(ValidName, ValidSurname, ValidEmail, inputPhone, ValidPassword, strategy);
-
-        Assert.AreEqual(expected, user.Phone);
-    }
-    */
 }
