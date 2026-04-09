@@ -21,25 +21,29 @@ public class ProductsControllerTests
         var lineCombo = new ProductLine("Combo burgers");
         var categoryParrilla = new ProductCategory("Parrilla");
 
-        _testProducts = new List<Product>
-        {
+        _testProducts =
+        [
             new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m),
             new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m),
-        };
+        ];
 
         _controller = new ProductsController(_mockService.Object);
     }
 
     [TestMethod]
-    public void GetProducts_ShouldReturnOkWithProducts()
-    {
-        _mockService.Setup(s => s.GetProducts(null, null, null)).Returns(_testProducts);
+public void GetProducts_ShouldReturnOkWithProducts()
+{
+    _mockService.Setup(s => s.GetProducts(null, null, null)).Returns(_testProducts);
 
-        var result = _controller.GetProducts(null, null, null) as OkObjectResult;
+    var result = _controller.GetProducts(null, null, null) as OkObjectResult;
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-    }
+    Assert.IsNotNull(result);
+    Assert.AreEqual(200, result.StatusCode);
+
+    var products = (result.Value as IEnumerable<object>)?.ToList();
+    Assert.IsNotNull(products);
+    Assert.AreEqual(2, products.Count);
+}
 
     [TestMethod]
     public void GetProducts_WithFilters_ShouldPassFiltersToService()
