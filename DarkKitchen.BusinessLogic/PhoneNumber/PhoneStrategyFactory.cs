@@ -3,14 +3,9 @@ using DarkKitchen.IBusinessLogic.IPhoneNumber;
 
 namespace DarkKitchen.BusinessLogic.PhoneNumber;
 
-public class PhoneStrategyFactory : IPhoneStrategyFactory
+public class PhoneStrategyFactory(IEnumerable<IPhoneValidationStrategy> strategies) : IPhoneStrategyFactory
 {
-    private readonly IEnumerable<IPhoneValidationStrategy> _strategies;
-
-    public PhoneStrategyFactory(IEnumerable<IPhoneValidationStrategy> strategies)
-    {
-        _strategies = strategies;
-    }
+    private readonly IEnumerable<IPhoneValidationStrategy> _strategies = strategies;
 
     public IPhoneValidationStrategy GetStrategy(string countryPrefix)
     {
