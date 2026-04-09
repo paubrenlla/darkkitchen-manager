@@ -23,4 +23,14 @@ public class BCryptHasherTests
         Assert.AreNotEqual(hashedPassword, RawPassword);
         Assert.IsTrue(hashedPassword.StartsWith("$2"));
     }
+
+    [TestMethod]
+    public void VerifyPassword_CorrectPassword_ReturnsTrue()
+    {
+        var hash = _hasher.HashPassword(RawPassword);
+
+        bool result = _hasher.VerifyPassword(RawPassword, hash);
+
+        Assert.IsTrue(result);
+    }
 }
