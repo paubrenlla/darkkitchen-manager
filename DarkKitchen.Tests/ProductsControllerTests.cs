@@ -31,24 +31,24 @@ public class ProductsControllerTests
     }
 
     [TestMethod]
-public void GetProducts_ShouldReturnOkWithProducts()
-{
-    _mockService.Setup(s => s.GetProducts(null, null, null)).Returns(_testProducts);
+    public void GetProducts_ShouldReturnOkWithProducts()
+    {
+        _mockService.Setup(s => s.GetProducts(null, null, null)).Returns(_testProducts);
 
-    var result = _controller.GetProducts(null, null, null) as OkObjectResult;
+        var result = _controller.GetProducts(null, null, null) as OkObjectResult;
 
-    Assert.IsNotNull(result);
-    Assert.AreEqual(200, result.StatusCode);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
 
-    var products = (result.Value as IEnumerable<object>)?.ToList();
-    Assert.IsNotNull(products);
-    Assert.AreEqual(2, products.Count);
-}
+        var products = (result.Value as IEnumerable<object>)?.ToList();
+        Assert.IsNotNull(products);
+        Assert.AreEqual(2, products.Count);
+    }
 
     [TestMethod]
     public void GetProducts_WithFilters_ShouldPassFiltersToService()
     {
-        _mockService.Setup(s => s.GetProducts("Doble", "Combo burgers", null)).Returns(new List<Product> { _testProducts[1] });
+        _mockService.Setup(s => s.GetProducts("Doble", "Combo burgers", null)).Returns([_testProducts[1]]);
 
         var result = _controller.GetProducts("Doble", "Combo burgers", null) as OkObjectResult;
 
@@ -59,7 +59,7 @@ public void GetProducts_ShouldReturnOkWithProducts()
     [TestMethod]
     public void GetProducts_NoResults_ShouldReturnOkWithEmptyList()
     {
-        _mockService.Setup(s => s.GetProducts("Pizza", null, null)).Returns(new List<Product>());
+        _mockService.Setup(s => s.GetProducts("Pizza", null, null)).Returns([]);
 
         var result = _controller.GetProducts("Pizza", null, null) as OkObjectResult;
 
