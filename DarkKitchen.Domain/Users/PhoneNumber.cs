@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace DarkKitchen.Domain.Users;
 
 public class PhoneNumber
@@ -15,11 +17,13 @@ public class PhoneNumber
     {
         ArgumentNullException.ThrowIfNull(validationStrategy);
 
-        if(!validationStrategy.IsValid(prefix, number))
+        var cleanNumber = Regex.Replace(number ?? string.Empty, @"[^\d]", string.Empty);
+
+        if(!validationStrategy.IsValid(cleanNumber))
         {
             throw new ArgumentException($"Invalid phone number for country prefix {validationStrategy.CountryPrefix}.");
         }
 
-        return new PhoneNumber(validationStrategy.CountryPrefix, number);
+        return new PhoneNumber(validationStrategy.CountryPrefix, cleanNumber);
     }
 }
