@@ -16,7 +16,7 @@ public class AuthControllerTests
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
-    private static readonly PhoneNumber ValidPhone = new("+598", "094123456", uruguayStrategy);
+    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", uruguayStrategy);
 
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;

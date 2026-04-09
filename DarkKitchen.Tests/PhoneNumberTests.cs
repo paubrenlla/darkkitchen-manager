@@ -12,6 +12,6 @@ public class PhoneNumberTests
     public void CreateUser_InvalidUruguayPhone_ThrowsArgumentException()
     {
         var invalidPhone = "123";
-        new PhoneNumber("+598", invalidPhone, uruguayStrategy);
+        PhoneNumber.Create("+598", invalidPhone, uruguayStrategy);
     }
 }

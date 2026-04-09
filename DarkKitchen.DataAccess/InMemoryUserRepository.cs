@@ -17,21 +17,21 @@ public class InMemoryUserRepository : IUserRepository
                 "Admin",
                 "Jefe",
                 "admin@bmb.com",
-                new PhoneNumber("+598", "094222333", uruguayStrategy),
+                PhoneNumber.Create("+598", "094222333", uruguayStrategy),
                 mockPassword,
                 Role.Administrativo),
             new User(
                 "Pepe",
                 "Ruiz",
                 "preparador@bmb.com",
-                new PhoneNumber("+598", "094333444", uruguayStrategy),
+                PhoneNumber.Create("+598", "094333444", uruguayStrategy),
                 mockPassword,
                 Role.Preparador),
             new User(
                 "Juan",
                 "Sosa",
                 "cliente@bmb.com",
-                new PhoneNumber("+598", "094444555", uruguayStrategy),
+                PhoneNumber.Create("+598", "094444555", uruguayStrategy),
                 mockPassword)
         ];
     }

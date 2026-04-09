@@ -13,7 +13,7 @@ public class AuthServiceTests
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
-    private static readonly PhoneNumber ValidPhone = new("+598", "094123456", uruguayStrategy);
+    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", uruguayStrategy);
 
     private AuthService _authService = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
