@@ -15,8 +15,8 @@ public class AuthControllerTests
     private const string ValidSurname = "Perez";
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
-    private static readonly IPhoneValidationStrategy uruguayStrategy = new UruguayPhoneValidationStrategy();
-    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", uruguayStrategy);
+    private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
+    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", UruguayStrategy);
 
     private AuthController _authController = null!;
     private Mock<IAuthService> _authServiceMock = null!;
@@ -36,7 +36,7 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginSuccessful_ReturnsOkAndToken()
     {
-        var request = new LoginRequest(ValidEmail, ValidPassword);
+        var request = new LoginRequest { Email = ValidEmail, Password = ValidPassword };
         var user = new User(ValidName, ValidSurname, request.Email, ValidPhone, request.Password, Role.Cliente);
         var generatedToken = "mocked.jwt.token";
 
@@ -64,7 +64,7 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginFailed_ReturnsUnauthorized()
     {
-        var request = new LoginRequest(ValidEmail, "WrongPassword");
+        var request = new LoginRequest { Email = ValidEmail, Password = "WrongPassword" };
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
             .Throws(new UnauthorizedAccessException("Invalid Credentials."));
@@ -78,7 +78,7 @@ public class AuthControllerTests
     [TestMethod]
     public void LoginSuccessful_ReturnsCorrectRole()
     {
-        var request = new LoginRequest("admin@bmb.com", "Valid1Password!@");
+        var request = new LoginRequest { Email = "admin@bmb.com", Password = "Valid1Password!@" };
         var user = new User("Juan", "Perez", request.Email, ValidPhone, request.Password, Role.Administrativo);
 
         _authServiceMock.Setup(service => service.Login(request.Email, request.Password))
