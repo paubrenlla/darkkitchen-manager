@@ -125,4 +125,12 @@ public class UserTests
         var withSequence = "Valid1Password!@123";
         new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException), "Password cannot contain sequences.")]
+    public void CreateUser_PasswordWithDescendingSequence_ThrowsArgumentException()
+    {
+        var withDescendingSequence = "Valid1Password!@321";
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withDescendingSequence);
+    }
 }

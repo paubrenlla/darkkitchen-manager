@@ -59,4 +59,21 @@ public class ModelTests
         Assert.IsFalse(isValid);
         Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El formato del email ingresado no es válido."));
     }
+
+    [TestMethod]
+    public void UserCreateRequest_SetAndGetRole_ReturnsCorrectValue()
+    {
+        var request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094111222",
+            Password = "Pass123!",
+            Role = Role.Administrativo
+        };
+
+        Assert.AreEqual(Role.Administrativo, request.Role);
+    }
 }

@@ -25,4 +25,18 @@ public class PhoneNumberTests
 
         Assert.AreEqual(expectedPhone, phone.Number);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void CreatePhone_NullStrategy_ThrowsArgumentException()
+    {
+        PhoneNumber.Create("+598", "094123456", null!);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreatePhone_NullNumber_ThrowsArgumentException()
+    {
+        PhoneNumber.Create("+598", null!, UruguayStrategy);
+    }
 }

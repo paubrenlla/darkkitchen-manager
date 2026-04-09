@@ -51,4 +51,13 @@ public class BCryptHasherTests
 
         Assert.IsFalse(result);
     }
+
+    [TestMethod]
+    public void VerifyPassword_EmptyOrNullInputs_ReturnsFalse()
+    {
+        Assert.IsFalse(_hasher.VerifyPassword(null!, "hash"));
+        Assert.IsFalse(_hasher.VerifyPassword("pass", null!));
+        Assert.IsFalse(_hasher.VerifyPassword(string.Empty, "hash"));
+        Assert.IsFalse(_hasher.VerifyPassword("pass", string.Empty));
+    }
 }
