@@ -43,4 +43,12 @@ public class BCryptHasherTests
 
         Assert.IsFalse(result);
     }
+
+    [TestMethod]
+    public void VerifyPassword_InvalidHashFormat_ReturnsFalse()
+    {
+        var result = _hasher.VerifyPassword(RawPassword, "not-a-bcrypt-hash");
+
+        Assert.IsFalse(result);
+    }
 }
