@@ -24,7 +24,7 @@ public class TokenServiceTests
     {
         _configurationMock = new Mock<IConfiguration>();
         _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
-        _phoneStrategyMock.Setup(s => s.IsValid("+598", It.IsAny<string>())).Returns(true);
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
 
         // Set up the mock configuration to return a dummy secret key
         var configSectionMock = new Mock<IConfigurationSection>();

@@ -6,7 +6,7 @@ public class UruguayPhoneValidationStrategy : IPhoneValidationStrategy
 {
     public string CountryPrefix => "+598";
 
-    public bool IsValid(string prefix, string phone)
+    public bool IsValid(string phone)
     {
         if(string.IsNullOrWhiteSpace(phone))
         {

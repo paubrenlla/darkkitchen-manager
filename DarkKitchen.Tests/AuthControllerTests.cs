@@ -29,7 +29,7 @@ public class AuthControllerTests
         _authServiceMock = new Mock<IAuthService>();
         _tokenServiceMock = new Mock<ITokenService>();
         _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
-        _phoneStrategyMock.Setup(s => s.IsValid("+598", It.IsAny<string>())).Returns(true);
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
         _authController = new AuthController(_authServiceMock.Object, _tokenServiceMock.Object);
     }
 

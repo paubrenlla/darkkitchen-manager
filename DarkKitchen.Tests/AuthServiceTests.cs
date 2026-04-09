@@ -24,7 +24,7 @@ public class AuthServiceTests
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
-        _phoneStrategyMock.Setup(s => s.IsValid("+598", It.IsAny<string>())).Returns(true);
+        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
         _authService = new AuthService(_userRepositoryMock.Object);
     }
 

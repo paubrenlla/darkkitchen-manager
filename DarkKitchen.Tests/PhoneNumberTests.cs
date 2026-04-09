@@ -21,7 +21,7 @@ public class PhoneNumberTests
         var rawPhone = "094-123 456";
         var expectedPhone = "094123456";
 
-        var phone = PhoneNumber.Create(rawPhone, "+598", uruguayStrategy);
+        var phone = PhoneNumber.Create("+598", rawPhone, uruguayStrategy);
 
         Assert.AreEqual(expectedPhone, phone.Number);
     }
