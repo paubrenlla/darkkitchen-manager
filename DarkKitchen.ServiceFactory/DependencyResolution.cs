@@ -2,6 +2,7 @@ using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
@@ -19,7 +20,7 @@ public static class DependencyResolution
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
 
-        services.AddSingleton<DarkKitchen.Domain.Users.IPhoneValidationStrategy, DarkKitchen.Domain.Users.UruguayPhoneValidationStrategy>();
+        services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
         services.AddScoped<IUserService, UserService>();
 
