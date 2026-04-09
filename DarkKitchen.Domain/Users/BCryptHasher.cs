@@ -1,3 +1,5 @@
+using BCrypt.Net;
+
 namespace DarkKitchen.Domain.Users;
 
 public class BCryptHasher : IPasswordHasher
@@ -11,6 +13,18 @@ public class BCryptHasher : IPasswordHasher
 
     public bool VerifyPassword(string password, string hashedPassword)
     {
-        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        if(string.IsNullOrEmpty(password) || string.IsNullOrEmpty(hashedPassword))
+        {
+            return false;
+        }
+
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
+        catch(SaltParseException)
+        {
+            return false;
+        }
     }
 }
