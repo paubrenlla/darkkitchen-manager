@@ -29,10 +29,9 @@ public class ModelTests
     [TestMethod]
     public void UserCreateRequest_MissingName_ReturnsValidationErrors()
     {
-        // Arrange
         var request = new UserCreateRequest
         {
-            Name = null!, // Missing
+            Name = null!,
             Surname = "Perez",
             Email = "juan@test.com",
             CountryPrefix = "+598",
@@ -40,12 +39,10 @@ public class ModelTests
             Password = "Pass123!"
         };
 
-        // Act
         var validationResults = new List<ValidationResult>();
         var context = new ValidationContext(request, null, null);
-        bool isValid = Validator.TryValidateObject(request, context, validationResults, true);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
 
-        // Assert
         Assert.IsFalse(isValid);
         Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El nombre es obligatorio."));
     }
@@ -53,19 +50,12 @@ public class ModelTests
     [TestMethod]
     public void LoginRequest_InvalidEmail_ReturnsValidationErrors()
     {
-        // Arrange
-        var request = new LoginRequest
-        {
-            Email = "invalid-email",
-            Password = "ValidPassword123"
-        };
+        var request = new LoginRequest { Email = "invalid-email", Password = "ValidPassword123" };
 
-        // Act
         var validationResults = new List<ValidationResult>();
         var context = new ValidationContext(request, null, null);
-        bool isValid = Validator.TryValidateObject(request, context, validationResults, true);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
 
-        // Assert
         Assert.IsFalse(isValid);
         Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El formato del email ingresado no es válido."));
     }
