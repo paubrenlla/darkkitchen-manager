@@ -1,4 +1,4 @@
-using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain;
 
 namespace DarkKitchen.Tests;
 
