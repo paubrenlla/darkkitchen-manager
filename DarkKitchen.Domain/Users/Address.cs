@@ -2,11 +2,10 @@ namespace DarkKitchen.Domain;
 
 public class Address
 {
-    public Address(string street, string number, string apartment, string city, string country)
+    public Address(string street, string number, string? apartment, string city, string country)
     {
         Validate(street, "Street");
         Validate(number, "Number");
-        Validate(apartment, "Apartment");
         Validate(city, "City");
         Validate(country, "Country");
 
@@ -19,7 +18,7 @@ public class Address
 
     public string Street { get; private set; }
     public string Number { get; private set; }
-    public string Apartment { get; private set; }
+    public string? Apartment { get; private set; }
     public string City { get; private set; }
     public string Country { get; private set; }
 
