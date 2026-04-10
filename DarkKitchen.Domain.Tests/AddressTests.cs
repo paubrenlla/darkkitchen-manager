@@ -26,4 +26,19 @@ public class AddressTests
     {
         new Address("Calle", "123", "Apt", string.Empty, "Uruguay");
     }
+
+    [TestMethod]
+    public void CreateAddress_WithoutApartment_ShouldSucceed()
+    {
+        var street = "Cuareim";
+        var number = "1451";
+        string? apartment = null;
+        var city = "Montevideo";
+        var country = "Uruguay";
+
+        var address = new Address(street, number, apartment, city, country);
+
+        Assert.AreEqual(street, address.Street);
+        Assert.IsNull(address.Apartment);
+    }
 }
