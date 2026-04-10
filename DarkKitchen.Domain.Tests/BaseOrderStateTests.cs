@@ -31,4 +31,11 @@ public class OrderStateTests
         var state = new PendingState();
         Assert.AreEqual("Pendiente", state.Name);
     }
+
+    [TestMethod]
+    public void PreparedOrderState_Name_ShouldReturnPrepared()
+    {
+        var state = new PreparedOrderState();
+        Assert.AreEqual("Preparado", state.Name);
+    }
 }
