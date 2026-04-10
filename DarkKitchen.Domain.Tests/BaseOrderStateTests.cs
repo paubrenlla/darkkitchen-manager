@@ -35,7 +35,7 @@ public class OrderStateTests
     [TestMethod]
     public void PreparedOrderState_Name_ShouldReturnPrepared()
     {
-        var state = new PreparedOrderState();
+        var state = new PreparedState();
         Assert.AreEqual("Preparado", state.Name);
     }
 }
