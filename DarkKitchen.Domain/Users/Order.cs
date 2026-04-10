@@ -1,0 +1,16 @@
+namespace DarkKitchen.Domain.Users;
+
+public class Order
+{
+    public Order(Address deliveryAddress)
+    {
+        DeliveryAddress = deliveryAddress;
+    }
+
+    public Guid Id { get; private set; }
+    public int OrderNumber { get; private set; }
+    public Guid ClientId { get; private set; }
+    public Address DeliveryAddress { get; private set; }
+    public DeliveryType Type { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+}
