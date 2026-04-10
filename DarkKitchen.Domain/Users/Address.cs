@@ -4,10 +4,10 @@ public class Address
 {
     public Address(string street, string number, string? apartment, string city, string country)
     {
-        Validate(street, "Street");
-        Validate(number, "Number");
-        Validate(city, "City");
-        Validate(country, "Country");
+        ValidateRequired(street, nameof(Street));
+        ValidateRequired(number, nameof(Number));
+        ValidateRequired(city, nameof(City));
+        ValidateRequired(country, nameof(Country));
 
         Street = street;
         Number = number;
@@ -22,7 +22,7 @@ public class Address
     public string City { get; private set; }
     public string Country { get; private set; }
 
-    private static void Validate(string value, string fieldName)
+    private static void ValidateRequired(string value, string fieldName)
     {
         if(string.IsNullOrWhiteSpace(value))
         {
