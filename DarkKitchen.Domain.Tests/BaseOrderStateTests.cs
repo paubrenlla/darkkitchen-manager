@@ -59,4 +59,11 @@ public class OrderStateTests
         var state = new DeliveredState();
         Assert.AreEqual("Entregado", state.Name);
     }
+
+    [TestMethod]
+    public void NotDeliveredOrderState_Name_ShouldReturnNotDelivered()
+    {
+        var state = new NotDeliveredState();
+        Assert.AreEqual("No entregado", state.Name);
+    }
 }
