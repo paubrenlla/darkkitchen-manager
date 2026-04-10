@@ -1,4 +1,4 @@
-namespace DarkKitchen.Domain;
+namespace DarkKitchen.Domain.Orders;
 
 public class Address
 {

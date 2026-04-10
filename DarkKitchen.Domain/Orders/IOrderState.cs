@@ -1,4 +1,4 @@
-namespace DarkKitchen.Domain.Users;
+namespace DarkKitchen.Domain.Orders;
 
 public interface IOrderState
 {

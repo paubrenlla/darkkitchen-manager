@@ -1,10 +1,15 @@
-namespace DarkKitchen.Domain.Users;
+namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
     public Order(Address deliveryAddress)
     {
         DeliveryAddress = deliveryAddress;
+    }
+
+    public Order()
+    {
+        throw new NotImplementedException();
     }
 
     public Guid Id { get; private set; }
