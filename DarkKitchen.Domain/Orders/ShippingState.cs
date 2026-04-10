@@ -1,6 +1,6 @@
 namespace DarkKitchen.Domain.Orders;
 
-public class ShippedState : BaseOrderState
+public class ShippingState : BaseOrderState
 {
     public override string Name => "En camino";
 }
