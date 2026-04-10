@@ -19,4 +19,11 @@ public class AddressTests
         Assert.AreEqual(street, address.Street);
         Assert.AreEqual(city, address.City);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateAddress_WithEmptyCity_ShouldThrowException()
+    {
+        new Address("Calle", "123", "Apt", string.Empty, "Uruguay");
+    }
 }
