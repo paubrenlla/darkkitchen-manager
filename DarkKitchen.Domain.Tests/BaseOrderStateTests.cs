@@ -66,4 +66,12 @@ public class OrderStateTests
         var state = new NotDeliveredState();
         Assert.AreEqual("No entregado", state.Name);
     }
+
+    [TestMethod]
+    public void PendingState_Prepare_ShouldTransitionToPreparedState()
+    {
+        var state = new PendingState();
+        state.Prepare(_order);
+        Assert.AreEqual("Prepared", _order.StateName);
+    }
 }
