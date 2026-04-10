@@ -72,6 +72,7 @@ public class OrderStateTests
     {
         var state = new PendingState();
         state.Prepare(_order);
-        Assert.AreEqual("Prepared", _order.StateName);
+        Assert.AreEqual("Preparado", _order.StateName);
+    }
     }
 }
