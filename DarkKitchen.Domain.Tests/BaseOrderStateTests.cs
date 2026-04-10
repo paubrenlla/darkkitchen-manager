@@ -49,7 +49,7 @@ public class OrderStateTests
     [TestMethod]
     public void OnItsWayOrderState_Name_ShouldReturnOnItsWay()
     {
-        var state = new ShippedyState();
+        var state = new ShippedState();
         Assert.AreEqual("En camino", state.Name);
     }
 }
