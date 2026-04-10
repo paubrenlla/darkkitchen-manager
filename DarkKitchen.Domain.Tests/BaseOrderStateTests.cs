@@ -24,4 +24,11 @@ public class OrderStateTests
         Assert.IsTrue(state.TransitionDate >= before);
         Assert.IsTrue(state.TransitionDate <= after);
     }
+
+    [TestMethod]
+    public void PendingState_Name_ShouldReturnPendiente()
+    {
+        var state = new PendingState();
+        Assert.AreEqual("Pendiente", state.Name);
+    }
 }
