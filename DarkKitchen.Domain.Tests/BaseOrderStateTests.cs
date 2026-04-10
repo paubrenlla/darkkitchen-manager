@@ -50,6 +50,7 @@ public class OrderStateTests
     public void OnItsWayOrderState_Name_ShouldReturnOnItsWay()
     {
         var state = new ShippedState();
+        var state = new ShippingState();
         Assert.AreEqual("En camino", state.Name);
     }
 
@@ -73,6 +74,14 @@ public class OrderStateTests
         var state = new PendingState();
         state.Prepare(_order);
         Assert.AreEqual("Preparado", _order.StateName);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PreparedState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        var state = new PreparedState();
+        state.Prepare(_order);
     }
     }
 }
