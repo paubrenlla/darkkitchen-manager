@@ -114,4 +114,12 @@ public class OrderStateTests
         var state = new NotDeliveredState();
         state.Prepare(_order);
     }
+
+    [TestMethod]
+    public void PendingState_Cancel_ShouldTransitionToCancelledState()
+    {
+        var state = new PendingState();
+        state.Cancel(_order);
+        Assert.AreEqual("Cancelled", _order.StateName);
+    }
 }
