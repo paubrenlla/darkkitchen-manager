@@ -18,4 +18,10 @@ public class Order
     public Address DeliveryAddress { get; private set; }
     public DeliveryType Type { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public string StateName { get; private set; } = string.Empty;
+
+    public void ChangeState(IOrderState newState)
+    {
+        StateName = newState.Name;
+    }
 }
