@@ -106,5 +106,12 @@ public class OrderStateTests
         var state = new DeliveredState();
         state.Prepare(_order);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        var state = new NotDeliveredState();
+        state.Prepare(_order);
     }
 }
