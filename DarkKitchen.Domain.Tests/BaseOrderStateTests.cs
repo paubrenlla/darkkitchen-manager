@@ -45,4 +45,11 @@ public class OrderStateTests
         var state = new CancelledState();
         Assert.AreEqual("Cancelado", state.Name);
     }
+
+    [TestMethod]
+    public void OnItsWayOrderState_Name_ShouldReturnOnItsWay()
+    {
+        var state = new ShippedyState();
+        Assert.AreEqual("En camino", state.Name);
+    }
 }
