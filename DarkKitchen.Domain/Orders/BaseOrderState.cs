@@ -8,31 +8,30 @@ public abstract class BaseOrderState : IOrderState
     }
 
     public abstract string Name { get; }
-
     public DateTime TransitionDate { get; }
 
-    public void Prepare(Order order)
+    public virtual void Prepare(Order order)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException($"No se puede preparar un pedido en estado {Name}");
     }
 
-    public void Cancel(Order order)
+    public virtual void Cancel(Order order)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException($"No se puede cancelar un pedido en estado {Name}");
     }
 
-    public void Ship(Order order)
+    public virtual void Ship(Order order)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException($"No se puede enviar un pedido en estado {Name}");
     }
 
-    public void Deliver(Order order)
+    public virtual void Deliver(Order order)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException($"No se puede entregar un pedido en estado {Name}");
     }
 
-    public void RejectedDelivery(Order order)
+    public virtual void RejectedDelivery(Order order)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException($"No se puede rechazar un pedido en estado {Name}");
     }
 }
