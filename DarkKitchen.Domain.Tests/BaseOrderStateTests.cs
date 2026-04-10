@@ -38,4 +38,11 @@ public class OrderStateTests
         var state = new PreparedState();
         Assert.AreEqual("Preparado", state.Name);
     }
+
+    [TestMethod]
+    public void CancelledOrderState_Name_ShouldReturnCancelled()
+    {
+        var state = new CancelledState();
+        Assert.AreEqual("Cancelado", state.Name);
+    }
 }
