@@ -52,4 +52,11 @@ public class OrderStateTests
         var state = new ShippedState();
         Assert.AreEqual("En camino", state.Name);
     }
+
+    [TestMethod]
+    public void DeliveredOrderState_Name_ShouldReturnDelivered()
+    {
+        var state = new DeliveredState();
+        Assert.AreEqual("Entregado", state.Name);
+    }
 }
