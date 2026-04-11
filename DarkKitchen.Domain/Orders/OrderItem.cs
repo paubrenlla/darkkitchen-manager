@@ -9,6 +9,11 @@ public class OrderItem
             throw new ArgumentException("Quantity must be greater than zero.");
         }
 
+        if(price < 0)
+        {
+            throw new ArgumentException("Price cannot be less than zero.");
+        }
+
         ProductId = productId;
         Quantity = quantity;
         Price = price;
