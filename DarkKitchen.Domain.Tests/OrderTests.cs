@@ -44,4 +44,11 @@ public class OrderTests
         _order.Prepare();
         Assert.AreEqual("Prepared", _order.StateName);
     }
+
+    [TestMethod]
+    public void Cancel_WhenPending_ShouldChangeStateToCancelled()
+    {
+        _order.Cancel();
+        Assert.AreEqual("Cancelled", _order.StateName);
+    }
 }
