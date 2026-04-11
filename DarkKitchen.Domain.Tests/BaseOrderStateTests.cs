@@ -146,5 +146,12 @@ public class OrderStateTests
         var state = new DeliveredState();
         state.Cancel(_order);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        var state = new NotDeliveredState();
+        state.Cancel(_order);
     }
 }
