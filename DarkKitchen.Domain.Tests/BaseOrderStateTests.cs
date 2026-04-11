@@ -122,5 +122,13 @@ public class OrderStateTests
         state.Cancel(_order);
         Assert.AreEqual("Cancelado", _order.StateName);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PreparedState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        var state = new PreparedState();
+        state.Cancel(_order);
+    }
     }
 }
