@@ -170,4 +170,12 @@ public class OrderStateTests
         state.Ship(_order);
         Assert.AreEqual("En camino", _order.StateName);
     }
+
+    [TestMethod]
+    public void ShippingState_Deliver_ShouldTransitionToDelivered()
+    {
+        var state = new ShippingState();
+        state.Deliver(_order);
+        Assert.AreEqual("Entregado", _order.StateName);
+    }
 }
