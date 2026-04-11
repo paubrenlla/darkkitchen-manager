@@ -30,42 +30,42 @@ public class OrderStateTests
     public void PendingState_Name_ShouldReturnPendiente()
     {
         var state = new PendingState();
-        Assert.AreEqual("Pendiente", state.Name);
+        Assert.AreEqual("Pending", state.Name);
     }
 
     [TestMethod]
     public void PreparedOrderState_Name_ShouldReturnPrepared()
     {
         var state = new PreparedState();
-        Assert.AreEqual("Preparado", state.Name);
+        Assert.AreEqual("Prepared", state.Name);
     }
 
     [TestMethod]
     public void CancelledOrderState_Name_ShouldReturnCancelled()
     {
         var state = new CancelledState();
-        Assert.AreEqual("Cancelado", state.Name);
+        Assert.AreEqual("Cancelled", state.Name);
     }
 
     [TestMethod]
     public void OnItsWayOrderState_Name_ShouldReturnOnItsWay()
     {
         var state = new ShippingState();
-        Assert.AreEqual("En camino", state.Name);
+        Assert.AreEqual("Shipping", state.Name);
     }
 
     [TestMethod]
     public void DeliveredOrderState_Name_ShouldReturnDelivered()
     {
         var state = new DeliveredState();
-        Assert.AreEqual("Entregado", state.Name);
+        Assert.AreEqual("Delivered", state.Name);
     }
 
     [TestMethod]
     public void NotDeliveredOrderState_Name_ShouldReturnNotDelivered()
     {
         var state = new NotDeliveredState();
-        Assert.AreEqual("No entregado", state.Name);
+        Assert.AreEqual("Not delivered", state.Name);
     }
 
     [TestMethod]
@@ -73,7 +73,7 @@ public class OrderStateTests
     {
         var state = new PendingState();
         state.Prepare(_order);
-        Assert.AreEqual("Preparado", _order.StateName);
+        Assert.AreEqual("Prepared", _order.StateName);
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public class OrderStateTests
     {
         var state = new PendingState();
         state.Cancel(_order);
-        Assert.AreEqual("Cancelado", _order.StateName);
+        Assert.AreEqual("Cancelled", _order.StateName);
     }
 
     [TestMethod]
@@ -169,7 +169,7 @@ public class OrderStateTests
     {
         var state = new PreparedState();
         state.Ship(_order);
-        Assert.AreEqual("En camino", _order.StateName);
+        Assert.AreEqual("Shipping", _order.StateName);
     }
 
     [TestMethod]
@@ -177,7 +177,7 @@ public class OrderStateTests
     {
         var state = new ShippingState();
         state.Deliver(_order);
-        Assert.AreEqual("Entregado", _order.StateName);
+        Assert.AreEqual("Delivered", _order.StateName);
     }
 
     [TestMethod]
@@ -185,6 +185,6 @@ public class OrderStateTests
     {
         var state = new ShippingState();
         state.NotDelivered(_order);
-        Assert.AreEqual("No entregado", _order.StateName);
+        Assert.AreEqual("Not delivered", _order.StateName);
     }
 }

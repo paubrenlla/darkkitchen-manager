@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public class ShippingState : BaseOrderState
 {
-    public override string Name => "En camino";
+    public override string Name => "Shipping";
 
     public override void Deliver(Order order)
     {
