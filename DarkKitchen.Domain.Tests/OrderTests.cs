@@ -77,4 +77,26 @@ public class OrderTests
         _order.NotDelivered();
         Assert.AreEqual("NotDelivered", _order.StateName);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Deliver_WhenPending_ShouldThrowException()
+    {
+        _order.Deliver();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Ship_WhenPending_ShouldThrowException()
+    {
+        _order.Ship();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Cancel_WhenPrepared_ShouldThrowException()
+    {
+        _order.Prepare();
+        _order.Cancel();
+    }
 }
