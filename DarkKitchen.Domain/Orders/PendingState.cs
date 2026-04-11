@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public class PendingState : BaseOrderState
 {
-    public override string Name => "Pendiente";
+    public override string Name => "Pending";
 
     public override void Prepare(Order order)
     {
