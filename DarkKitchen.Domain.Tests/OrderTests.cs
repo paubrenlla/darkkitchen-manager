@@ -68,4 +68,13 @@ public class OrderTests
         _order.Deliver();
         Assert.AreEqual("Delivered", _order.StateName);
     }
+
+    [TestMethod]
+    public void NotDelivered_WhenShipping_ShouldChangeStateToNotDelivered()
+    {
+        _order.Prepare();
+        _order.Ship();
+        _order.NotDelivered();
+        Assert.AreEqual("NotDelivered", _order.StateName);
+    }
 }
