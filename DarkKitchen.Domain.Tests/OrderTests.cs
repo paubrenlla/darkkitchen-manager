@@ -99,4 +99,17 @@ public class OrderTests
         _order.Prepare();
         _order.Cancel();
     }
+
+    [TestMethod]
+    public void CurrentState_ShouldReturnSameInstance_WhenStateHasNotChanged()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+
+        IOrderState state1 = order.CurrentState;
+        IOrderState state2 = order.CurrentState;
+
+        Assert.AreSame(state1, state2, "Debería devolver la misma instancia de estado");
+    }
 }
