@@ -13,4 +13,11 @@ public class OrderItemTests
         Assert.AreEqual(2, item.Quantity);
         Assert.AreEqual(150.5m, item.Price);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateItem_WithZeroQuantity_ShouldThrowException()
+    {
+        new OrderItem(Guid.NewGuid(), 0, 100);
+    }
 }
