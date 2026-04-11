@@ -162,4 +162,12 @@ public class OrderStateTests
         var state = new ShippingState();
         state.Cancel(_order);
     }
+
+    [TestMethod]
+    public void PreparedState_Ship_ShouldTransitionToOnTheWayState()
+    {
+        var state = new PreparedState();
+        state.Ship(_order);
+        Assert.AreEqual("En camino", _order.StateName);
+    }
 }
