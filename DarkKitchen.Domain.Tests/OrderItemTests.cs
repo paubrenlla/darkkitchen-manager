@@ -20,4 +20,11 @@ public class OrderItemTests
     {
         new OrderItem(Guid.NewGuid(), 0, 100);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateItem_WithNegativePrice_ShouldThrowException()
+    {
+        new OrderItem(Guid.NewGuid(), 5, -5);
+    }
 }
