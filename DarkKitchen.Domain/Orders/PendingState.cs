@@ -8,4 +8,9 @@ public class PendingState : BaseOrderState
     {
         order.ChangeState(new PreparedState());
     }
+
+    public override void Cancel(Order order)
+    {
+        order.ChangeState(new CancelledState());
+    }
 }

@@ -120,6 +120,7 @@ public class OrderStateTests
     {
         var state = new PendingState();
         state.Cancel(_order);
-        Assert.AreEqual("Cancelled", _order.StateName);
+        Assert.AreEqual("Cancelado", _order.StateName);
+    }
     }
 }
