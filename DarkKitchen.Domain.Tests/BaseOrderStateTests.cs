@@ -130,5 +130,13 @@ public class OrderStateTests
         var state = new PreparedState();
         state.Cancel(_order);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        var state = new CancelledState();
+        state.Cancel(_order);
+    }
     }
 }
