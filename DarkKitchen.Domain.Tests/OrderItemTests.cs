@@ -1,3 +1,5 @@
+using DarkKitchen.Domain.Orders;
+
 [TestClass]
 public class OrderItemTests
 {
