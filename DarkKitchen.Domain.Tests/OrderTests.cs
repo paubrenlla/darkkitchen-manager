@@ -16,4 +16,12 @@ public class OrderTests
         Assert.AreEqual("Pending", order.StateName);
         Assert.IsInstanceOfType(order.CurrentState, typeof(PendingState));
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Order_Constructor_WithoutItems_ShouldThrowException()
+    {
+        var address = new Address("Cuareim", "1451", null, "Montevideo", "Uruguay");
+        new Order(Guid.NewGuid(), address, DeliveryType.Express, new List<OrderItem>());
+    }
 }
