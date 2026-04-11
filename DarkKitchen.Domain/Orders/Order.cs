@@ -53,4 +53,9 @@ public class Order
     {
         CurrentState.Ship(this);
     }
+
+    public void Deliver()
+    {
+        CurrentState.Deliver(this);
+    }
 }
