@@ -8,4 +8,9 @@ public class ShippingState : BaseOrderState
     {
         order.ChangeState(new DeliveredState());
     }
+
+    public override void RejectedDelivery(Order order)
+    {
+        order.ChangeState(new NotDeliveredState());
+    }
 }
