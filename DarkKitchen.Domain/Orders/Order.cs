@@ -58,4 +58,9 @@ public class Order
     {
         CurrentState.Deliver(this);
     }
+
+    public void NotDelivered()
+    {
+        CurrentState.NotDelivered(this);
+    }
 }
