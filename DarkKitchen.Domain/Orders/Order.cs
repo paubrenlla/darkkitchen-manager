@@ -38,4 +38,9 @@ public class Order
     {
         StateName = newState.Name;
     }
+
+    public void Prepare()
+    {
+        CurrentState.Prepare(this);
+    }
 }
