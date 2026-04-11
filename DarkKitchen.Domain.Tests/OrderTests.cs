@@ -51,4 +51,12 @@ public class OrderTests
         _order.Cancel();
         Assert.AreEqual("Cancelled", _order.StateName);
     }
+
+    [TestMethod]
+    public void Ship_WhenPrepared_ShouldChangeStateToShipping()
+    {
+        _order.Prepare();
+        _order.Ship();
+        Assert.AreEqual("Shipping", _order.StateName);
+    }
 }
