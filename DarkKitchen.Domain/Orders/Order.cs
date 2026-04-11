@@ -43,4 +43,9 @@ public class Order
     {
         CurrentState.Prepare(this);
     }
+
+    public void Cancel()
+    {
+        CurrentState.Cancel(this);
+    }
 }
