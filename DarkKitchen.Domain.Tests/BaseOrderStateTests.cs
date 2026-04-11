@@ -178,4 +178,12 @@ public class OrderStateTests
         state.Deliver(_order);
         Assert.AreEqual("Entregado", _order.StateName);
     }
+
+    [TestMethod]
+    public void ShippingState_Deliver_ShouldTransitionToNotDelivered()
+    {
+        var state = new ShippingState();
+        state.RejectedDelivery(_order);
+        Assert.AreEqual("No entregado", _order.StateName);
+    }
 }
