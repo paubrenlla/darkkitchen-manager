@@ -183,7 +183,7 @@ public class OrderStateTests
     public void ShippingState_Deliver_ShouldTransitionToNotDelivered()
     {
         var state = new ShippingState();
-        state.RejectedDelivery(_order);
+        state.NotDelivered(_order);
         Assert.AreEqual("No entregado", _order.StateName);
     }
 }

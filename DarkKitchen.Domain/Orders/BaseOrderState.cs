@@ -30,7 +30,7 @@ public abstract class BaseOrderState : IOrderState
         throw new InvalidOperationException($"No se puede entregar un pedido en estado {Name}");
     }
 
-    public virtual void RejectedDelivery(Order order)
+    public virtual void NotDelivered(Order order)
     {
         throw new InvalidOperationException($"No se puede rechazar un pedido en estado {Name}");
     }

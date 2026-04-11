@@ -8,5 +8,5 @@ public interface IOrderState
     void Cancel(Order order);
     void Ship(Order order);
     void Deliver(Order order);
-    void RejectedDelivery(Order order);
+    void NotDelivered(Order order);
 }
