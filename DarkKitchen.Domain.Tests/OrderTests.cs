@@ -59,4 +59,13 @@ public class OrderTests
         _order.Ship();
         Assert.AreEqual("Shipping", _order.StateName);
     }
+
+    [TestMethod]
+    public void Deliver_WhenShipping_ShouldChangeStateToDelivered()
+    {
+        _order.Prepare();
+        _order.Ship();
+        _order.Deliver();
+        Assert.AreEqual("Delivered", _order.StateName);
+    }
 }
