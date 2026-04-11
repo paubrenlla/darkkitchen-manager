@@ -18,4 +18,11 @@ public class OrderStateFactoryTests
 
         Assert.IsInstanceOfType(result, expectedType);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Create_WithInvalidStateName_ShouldThrowException()
+    {
+        OrderStateFactory.Create("EstadoQueNoExiste");
+    }
 }
