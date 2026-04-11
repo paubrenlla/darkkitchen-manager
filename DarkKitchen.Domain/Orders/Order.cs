@@ -48,4 +48,9 @@ public class Order
     {
         CurrentState.Cancel(this);
     }
+
+    public void Ship()
+    {
+        CurrentState.Ship(this);
+    }
 }
