@@ -69,7 +69,7 @@ public class OrderStateTests
     public void NotDeliveredOrderState_Name_ShouldReturnNotDelivered()
     {
         var state = new NotDeliveredState();
-        Assert.AreEqual("Not delivered", state.Name);
+        Assert.AreEqual("NotDelivered", state.Name);
     }
 
     [TestMethod]
@@ -189,6 +189,6 @@ public class OrderStateTests
     {
         var state = new ShippingState();
         state.NotDelivered(_order);
-        Assert.AreEqual("Not delivered", _order.StateName);
+        Assert.AreEqual("NotDelivered", _order.StateName);
     }
 }

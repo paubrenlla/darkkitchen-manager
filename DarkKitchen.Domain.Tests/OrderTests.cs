@@ -5,6 +5,16 @@ namespace DarkKitchen.Tests;
 [TestClass]
 public class OrderTests
 {
+    private Order _order = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+    }
+
     [TestMethod]
     public void Constructor_WhenCreated_ShouldSetPendingState()
     {
@@ -26,5 +36,12 @@ public class OrderTests
     {
         var address = new Address("Cuareim", "1451", null, "Montevideo", "Uruguay");
         new Order(Guid.NewGuid(), address, DeliveryType.Express, new List<OrderItem>());
+    }
+
+    [TestMethod]
+    public void Prepare_WhenPending_ShouldChangeStateToPrepared()
+    {
+        _order.Prepare();
+        Assert.AreEqual("Prepared", _order.StateName);
     }
 }

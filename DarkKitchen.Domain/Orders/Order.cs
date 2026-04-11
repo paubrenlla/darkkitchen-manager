@@ -34,7 +34,7 @@ public class Order
 
     public IOrderState CurrentState => OrderStateFactory.Create(StateName);
 
-    internal void ChangeState(IOrderState newState)
+    public void ChangeState(IOrderState newState)
     {
         StateName = newState.Name;
     }
