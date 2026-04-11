@@ -154,4 +154,12 @@ public class OrderStateTests
         var state = new NotDeliveredState();
         state.Cancel(_order);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void ShippingState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        var state = new ShippingState();
+        state.Cancel(_order);
+    }
 }
