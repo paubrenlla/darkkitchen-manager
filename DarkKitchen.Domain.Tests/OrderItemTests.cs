@@ -1,5 +1,7 @@
 using DarkKitchen.Domain.Orders;
 
+namespace DarkKitchen.Domain.Tests;
+
 [TestClass]
 public class OrderItemTests
 {

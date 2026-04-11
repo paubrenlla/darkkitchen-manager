@@ -1,6 +1,6 @@
 using DarkKitchen.Domain.Orders;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.Domain.Tests;
 
 [TestClass]
 public class OrderStateFactoryTests
