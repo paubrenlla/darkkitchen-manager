@@ -11,8 +11,12 @@ public class OrderStateTests
     public void Setup()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+
         var clientId = Guid.NewGuid();
-        _order = new Order(clientId, address, DeliveryType.Express);
+
+        _order = new Order(clientId, address, DeliveryType.Express, items);
     }
 
     [TestMethod]

@@ -8,10 +8,13 @@ public class OrderTests
     [TestMethod]
     public void Constructor_WhenCreated_ShouldSetPendingState()
     {
-        var address = new Address("Av Italia", "1111", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+
         var clientId = Guid.NewGuid();
 
-        var order = new Order(clientId, address, DeliveryType.Express);
+        var order = new Order(clientId, address, DeliveryType.Express, items);
 
         Assert.AreEqual("Pending", order.StateName);
         Assert.IsInstanceOfType(order.CurrentState, typeof(PendingState));
