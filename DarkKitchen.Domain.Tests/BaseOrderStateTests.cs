@@ -164,7 +164,7 @@ public class OrderStateTests
     }
 
     [TestMethod]
-    public void PreparedState_Ship_ShouldTransitionToOnTheWayState()
+    public void PreparedState_Ship_ShouldTransitionToShippingState()
     {
         var state = new PreparedState();
         state.Ship(_order);
