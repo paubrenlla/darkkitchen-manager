@@ -1,4 +1,3 @@
-using DarkKitchen.DataAccess;
 using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.DataAccess.Tests;

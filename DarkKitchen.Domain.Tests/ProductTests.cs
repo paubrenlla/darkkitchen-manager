@@ -1,4 +1,3 @@
-using DarkKitchen.Domain;
 
 namespace DarkKitchen.Domain.Tests;
 

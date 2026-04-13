@@ -2,7 +2,6 @@ using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.DataAccess;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.ServiceFactory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkKitchen.ServiceFactory.Tests;
