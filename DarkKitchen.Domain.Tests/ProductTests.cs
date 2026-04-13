@@ -1,4 +1,3 @@
-
 namespace DarkKitchen.Domain.Tests;
 
 [TestClass]
