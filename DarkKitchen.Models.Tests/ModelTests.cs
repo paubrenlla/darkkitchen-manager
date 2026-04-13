@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.DTOs;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.Models.Tests;
 
 [TestClass]
 public class ModelTests

@@ -1,7 +1,7 @@
 using DarkKitchen.DataAccess;
 using DarkKitchen.Domain.Users;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.DataAccess.Tests;
 
 [TestClass]
 public class UserRepositoryTests

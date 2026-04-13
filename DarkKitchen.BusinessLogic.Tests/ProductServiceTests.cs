@@ -1,9 +1,9 @@
-﻿using DarkKitchen.BusinessLogic;
+using DarkKitchen.BusinessLogic;
 using DarkKitchen.Domain;
 using DarkKitchen.IDataAccess;
 using Moq;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.BusinessLogic.Tests;
 
 [TestClass]
 public class ProductServiceTests

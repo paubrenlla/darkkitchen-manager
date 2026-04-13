@@ -3,7 +3,7 @@ using DarkKitchen.Domain.Users;
 using DarkKitchen.IDataAccess;
 using Moq;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.BusinessLogic.Tests;
 
 [TestClass]
 public class AuthServiceTests
@@ -13,7 +13,9 @@ public class AuthServiceTests
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
-    private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", UruguayStrategy);
+
+    private static readonly Domain.Users.PhoneNumber ValidPhone =
+        Domain.Users.PhoneNumber.Create("+598", "094123456", UruguayStrategy);
 
     private AuthService _authService = null!;
     private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;

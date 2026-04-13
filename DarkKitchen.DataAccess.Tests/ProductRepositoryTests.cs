@@ -1,6 +1,6 @@
 using DarkKitchen.DataAccess;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.DataAccess.Tests;
 
 [TestClass]
 public class ProductRepositoryTests

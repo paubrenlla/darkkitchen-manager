@@ -5,7 +5,7 @@ using DarkKitchen.IDataAccess;
 using DarkKitchen.ServiceFactory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.ServiceFactory.Tests;
 
 [TestClass]
 public class ServiceFactoryTests

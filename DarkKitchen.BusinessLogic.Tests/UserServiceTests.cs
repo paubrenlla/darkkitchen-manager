@@ -5,7 +5,7 @@ using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
 using Moq;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.BusinessLogic.Tests;
 
 [TestClass]
 public class UserServiceTests
