@@ -6,7 +6,7 @@ using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.WebApi.Tests;
 
 [TestClass]
 public class AuthControllerTests

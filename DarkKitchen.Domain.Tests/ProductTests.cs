@@ -1,6 +1,4 @@
-using DarkKitchen.Domain;
-
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.Domain.Tests;
 
 [TestClass]
 public class ProductTests

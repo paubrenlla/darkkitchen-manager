@@ -1,6 +1,6 @@
 using DarkKitchen.Domain.Users;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.Domain.Tests;
 
 [TestClass]
 public class UserTests

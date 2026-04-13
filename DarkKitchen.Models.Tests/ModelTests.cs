@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.DTOs;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.Models.Tests;
 
 [TestClass]
 public class ModelTests
@@ -10,14 +10,11 @@ public class ModelTests
     [TestMethod]
     public void UserCreateResponse_FromUser_MapsCorrectData()
     {
-        // Arrange
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
 
-        // Act
         var result = UserCreateResponse.FromUser(user);
 
-        // Assert
         Assert.AreEqual(user.Id, result.Id);
         Assert.AreEqual("Juan", result.Name);
         Assert.AreEqual("Perez", result.Surname);
