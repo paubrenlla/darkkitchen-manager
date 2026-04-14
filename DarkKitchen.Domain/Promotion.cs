@@ -6,6 +6,7 @@ public class Promotion
         List<Product> products)
     {
         ValidateName(name);
+        ValidateDiscountPercentage(discountPercentage);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -24,6 +25,14 @@ public class Promotion
     private DateTime StartDate { get; set; }
     private DateTime EndDate { get; set; }
     private List<Product> Products { get; set; } = new();
+
+    private static void ValidateDiscountPercentage(int discountPercentage)
+    {
+        if(discountPercentage <= 0)
+        {
+            throw new ArgumentException("Discount percentage must be greater than zero.");
+        }
+    }
 
     private static void ValidateName(string name)
     {
