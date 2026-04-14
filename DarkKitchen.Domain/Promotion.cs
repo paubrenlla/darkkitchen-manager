@@ -25,7 +25,7 @@ public class Promotion
     private int DiscountPercentage { get; set; }
     private DateTime StartDate { get; set; }
     private DateTime EndDate { get; set; }
-    private List<Product> Products { get; set; } = new();
+    private List<Product> Products { get; set; } = [];
 
     private static void ValidateDates(DateTime startDate, DateTime endDate)
     {
