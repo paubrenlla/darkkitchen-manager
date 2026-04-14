@@ -42,6 +42,19 @@ public class PromotionTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreatePromotion_WithInvalidDiscount_ShouldThrowException()
+    {
+        var name = "Valid Name";
+        var discount = 0;
+        DateTime startDate = DateTime.Now;
+        DateTime endDate = DateTime.Now.AddDays(1);
+        var products = new List<Product>();
+
+        new Promotion(name, discount, startDate, endDate, products);
+    }
+
+    [TestMethod]
     public void CreatePromotion_WithValidData()
     {
         var name = "Valid Name";
