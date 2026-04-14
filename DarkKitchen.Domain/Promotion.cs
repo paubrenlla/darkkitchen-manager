@@ -7,6 +7,7 @@ public class Promotion
     {
         ValidateName(name);
         ValidateDiscountPercentage(discountPercentage);
+        ValidateDates(startDate, endDate);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -25,6 +26,14 @@ public class Promotion
     private DateTime StartDate { get; set; }
     private DateTime EndDate { get; set; }
     private List<Product> Products { get; set; } = new();
+
+    private static void ValidateDates(DateTime startDate, DateTime endDate)
+    {
+        if(startDate > endDate)
+        {
+            throw new ArgumentException("Start date must be before or equal to end date.");
+        }
+    }
 
     private static void ValidateDiscountPercentage(int discountPercentage)
     {
