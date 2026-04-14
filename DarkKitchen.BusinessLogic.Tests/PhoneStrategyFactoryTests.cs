@@ -2,7 +2,7 @@ using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.Domain.Users;
 using Moq;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.BusinessLogic.Tests;
 
 [TestClass]
 public class PhoneStrategyFactoryTests

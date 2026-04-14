@@ -1,6 +1,6 @@
-using DarkKitchen.DataAccess;
+using DarkKitchen.Domain;
 
-namespace DarkKitchen.Tests;
+namespace DarkKitchen.DataAccess.Tests;
 
 [TestClass]
 public class ProductRepositoryTests
@@ -16,7 +16,7 @@ public class ProductRepositoryTests
     [TestMethod]
     public void GetAll_ReturnsSeededProducts()
     {
-        var result = _productRepository.GetAll();
+        IEnumerable<Product> result = _productRepository.GetAll();
 
         Assert.IsNotNull(result);
         var productList = result.ToList();
