@@ -55,6 +55,33 @@ public class PromotionTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreatePromotion_WithInvalidDates_ShouldThrowException()
+    {
+        var name = "Valid Name";
+        var discount = 10;
+        DateTime startDate = DateTime.Today;
+        DateTime endDate = DateTime.Today.AddDays(-1);
+        var products = new List<Product>();
+
+        new Promotion(name, discount, startDate, endDate, products);
+    }
+
+    [TestMethod]
+    public void CreatePromotion_WithSameDates_ShouldSucceed()
+    {
+        var name = "Valid Name";
+        var discount = 10;
+        DateTime startDate = DateTime.Today;
+        DateTime endDate = DateTime.Today;
+        var products = new List<Product>();
+
+        var promotion = new Promotion(name, discount, startDate, endDate, products);
+
+        Assert.IsNotNull(promotion);
+    }
+
+    [TestMethod]
     public void CreatePromotion_WithValidData()
     {
         var name = "Valid Name";
