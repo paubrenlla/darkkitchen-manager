@@ -1,3 +1,4 @@
+using System.Reflection;
 using DarkKitchen.Domain.Orders;
 
 namespace DarkKitchen.Domain.Tests;
@@ -11,7 +12,7 @@ public class OrderTests
     public void Setup()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
         _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
     }
 
@@ -20,7 +21,7 @@ public class OrderTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
 
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
 
         var clientId = Guid.NewGuid();
 
@@ -35,7 +36,7 @@ public class OrderTests
     public void Order_Constructor_WithoutItems_ShouldThrowException()
     {
         var address = new Address("Cuareim", "1451", null, "Montevideo", "Uruguay");
-        new Order(Guid.NewGuid(), address, DeliveryType.Express, new List<OrderItem>());
+        new Order(Guid.NewGuid(), address, DeliveryType.Express, []);
     }
 
     [TestMethod]
@@ -104,12 +105,67 @@ public class OrderTests
     public void CurrentState_ShouldReturnSameInstance_WhenStateHasNotChanged()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
         var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
 
         IOrderState state1 = order.CurrentState;
         IOrderState state2 = order.CurrentState;
 
         Assert.AreSame(state1, state2, "Debería devolver la misma instancia de estado");
+    }
+
+    [TestMethod]
+    public void Properties_ShouldReturnExpectedValues()
+    {
+        Assert.AreNotEqual(Guid.Empty, _order.Id);
+        Assert.IsNotNull(_order.DeliveryAddress);
+        Assert.AreEqual(DeliveryType.Express, _order.Type);
+        Assert.IsTrue(_order.CreatedAt <= DateTime.Now);
+        Assert.AreEqual(0, _order.OrderNumber);
+        Assert.AreNotEqual(Guid.Empty, _order.ClientId);
+    }
+
+    [TestMethod]
+    public void Items_Property_ShouldReturnReadOnlyList()
+    {
+        Assert.IsNotNull(_order.Items);
+        Assert.AreEqual(1, _order.Items.Count);
+        Assert.IsInstanceOfType(_order.Items, typeof(IReadOnlyCollection<OrderItem>));
+    }
+
+    [TestMethod]
+    public void CurrentState_WhenInternalStateIsNull_ShouldHydrateFromFactory()
+    {
+        FieldInfo? field = typeof(Order).GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
+        field?.SetValue(_order, null);
+
+        IOrderState state = _order.CurrentState;
+
+        Assert.IsNotNull(state);
+        Assert.AreEqual("Pending", state.Name);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDelivered_WhenInInvalidState_ShouldThrowException()
+    {
+        _order.NotDelivered();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Prepare_WhenAlreadyPrepared_ShouldThrowException()
+    {
+        _order.Prepare();
+        _order.Prepare();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Ship_WhenAlreadyShipped_ShouldThrowException()
+    {
+        _order.Prepare();
+        _order.Ship();
+        _order.Ship();
     }
 }

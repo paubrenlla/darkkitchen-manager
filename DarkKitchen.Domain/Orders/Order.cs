@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
-    private readonly List<OrderItem> _items = new();
+    private readonly List<OrderItem> _items;
     private IOrderState? _currentState;
 
     public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items)
