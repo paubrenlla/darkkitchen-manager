@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public interface IOrderState
 {
-    string Name { get; }
+    OrderState State { get; }
     DateTime TransitionDate { get; }
     void Prepare(Order order);
     void Cancel(Order order);

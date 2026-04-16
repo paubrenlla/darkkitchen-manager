@@ -20,14 +20,12 @@ public class OrderTests
     public void Constructor_WhenCreated_ShouldSetPendingState()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-
         List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
-
         var clientId = Guid.NewGuid();
 
         var order = new Order(clientId, address, DeliveryType.Express, items);
 
-        Assert.AreEqual("Pending", order.StateName);
+        Assert.AreEqual(OrderState.Pending, order.State);
         Assert.IsInstanceOfType(order.CurrentState, typeof(PendingState));
     }
 
@@ -43,14 +41,14 @@ public class OrderTests
     public void Prepare_WhenPending_ShouldChangeStateToPrepared()
     {
         _order.Prepare();
-        Assert.AreEqual("Prepared", _order.StateName);
+        Assert.AreEqual(OrderState.Prepared, _order.State);
     }
 
     [TestMethod]
     public void Cancel_WhenPending_ShouldChangeStateToCancelled()
     {
         _order.Cancel();
-        Assert.AreEqual("Cancelled", _order.StateName);
+        Assert.AreEqual(OrderState.Cancelled, _order.State);
     }
 
     [TestMethod]
@@ -58,7 +56,7 @@ public class OrderTests
     {
         _order.Prepare();
         _order.Ship();
-        Assert.AreEqual("Shipping", _order.StateName);
+        Assert.AreEqual(OrderState.Shipping, _order.State);
     }
 
     [TestMethod]
@@ -67,7 +65,7 @@ public class OrderTests
         _order.Prepare();
         _order.Ship();
         _order.Deliver();
-        Assert.AreEqual("Delivered", _order.StateName);
+        Assert.AreEqual(OrderState.Delivered, _order.State);
     }
 
     [TestMethod]
@@ -76,7 +74,7 @@ public class OrderTests
         _order.Prepare();
         _order.Ship();
         _order.NotDelivered();
-        Assert.AreEqual("NotDelivered", _order.StateName);
+        Assert.AreEqual(OrderState.NotDelivered, _order.State);
     }
 
     [TestMethod]
@@ -142,7 +140,7 @@ public class OrderTests
         IOrderState state = _order.CurrentState;
 
         Assert.IsNotNull(state);
-        Assert.AreEqual("Pending", state.Name);
+        Assert.AreEqual(OrderState.Pending, state.State);
     }
 
     [TestMethod]

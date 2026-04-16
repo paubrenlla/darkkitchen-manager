@@ -28,7 +28,8 @@ public class Order
     public Address DeliveryAddress { get; private set; }
     public DeliveryType Type { get; private set; }
     public DateTime CreatedAt { get; private set; }
-    public string StateName { get; private set; } = string.Empty;
+
+    public OrderState State { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
     public IOrderState CurrentState
@@ -37,7 +38,7 @@ public class Order
         {
             if(_currentState == null)
             {
-                _currentState = OrderStateFactory.Create(StateName);
+                _currentState = OrderStateFactory.Create(State);
             }
 
             return _currentState;
@@ -46,7 +47,7 @@ public class Order
 
     public void ChangeState(IOrderState newState)
     {
-        StateName = newState.Name;
+        State = newState.State;
         _currentState = newState;
     }
 

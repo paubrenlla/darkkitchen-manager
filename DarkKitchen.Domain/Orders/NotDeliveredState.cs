@@ -2,5 +2,5 @@ namespace DarkKitchen.Domain.Orders;
 
 public class NotDeliveredState : BaseOrderState
 {
-    public override string Name => "NotDelivered";
+    public override OrderState State => OrderState.NotDelivered;
 }

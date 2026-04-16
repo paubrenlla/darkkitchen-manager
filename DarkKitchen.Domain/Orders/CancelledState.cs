@@ -2,5 +2,5 @@ namespace DarkKitchen.Domain.Orders;
 
 public class CancelledState : BaseOrderState
 {
-    public override string Name => "Cancelled";
+    public override OrderState State => OrderState.Cancelled;
 }

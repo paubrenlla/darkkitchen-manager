@@ -1,6 +1,6 @@
 namespace DarkKitchen.Domain.Orders;
 
-public enum OrderStatus
+public enum OrderState
 {
     /// <summary>
     ///     Order is created but not yet processed

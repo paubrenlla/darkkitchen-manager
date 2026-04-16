@@ -2,17 +2,17 @@ namespace DarkKitchen.Domain.Orders;
 
 public static class OrderStateFactory
 {
-    public static IOrderState Create(string stateName)
+    public static IOrderState Create(OrderState state)
     {
-        return stateName switch
+        return state switch
         {
-            "Pending" => new PendingState(),
-            "Prepared" => new PreparedState(),
-            "Shipping" => new ShippingState(),
-            "Delivered" => new DeliveredState(),
-            "NotDelivered" => new NotDeliveredState(),
-            "Cancelled" => new CancelledState(),
-            _ => throw new ArgumentException($"Estado desconocido: {stateName}")
+            OrderState.Pending => new PendingState(),
+            OrderState.Prepared => new PreparedState(),
+            OrderState.Shipping => new ShippingState(),
+            OrderState.Delivered => new DeliveredState(),
+            OrderState.NotDelivered => new NotDeliveredState(),
+            OrderState.Cancelled => new CancelledState(),
+            _ => throw new ArgumentException($"Estado no soportado: {state}")
         };
     }
 }
