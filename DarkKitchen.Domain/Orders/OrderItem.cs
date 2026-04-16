@@ -6,12 +6,12 @@ public class OrderItem
     {
         if(quantity <= 0)
         {
-            throw new ArgumentException("Quantity must be greater than zero.");
+            throw new ArgumentException("La cantidad debe ser mayor a cero.");
         }
 
         if(price < 0)
         {
-            throw new ArgumentException("Price cannot be less than zero.");
+            throw new ArgumentException("El precio no puede ser negativo.");
         }
 
         ProductId = productId;

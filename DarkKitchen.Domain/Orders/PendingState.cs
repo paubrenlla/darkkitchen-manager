@@ -6,11 +6,11 @@ public class PendingState : BaseOrderState
 
     public override void Prepare(Order order)
     {
-        order.SetState(OrderState.Prepared);
+        order.TransitionTo(OrderState.Prepared);
     }
 
     public override void Cancel(Order order)
     {
-        order.SetState(OrderState.Cancelled);
+        order.TransitionTo(OrderState.Cancelled);
     }
 }

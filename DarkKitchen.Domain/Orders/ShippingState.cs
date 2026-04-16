@@ -6,11 +6,11 @@ public class ShippingState : BaseOrderState
 
     public override void Deliver(Order order)
     {
-        order.SetState(OrderState.Delivered);
+        order.TransitionTo(OrderState.Delivered);
     }
 
     public override void NotDelivered(Order order)
     {
-        order.SetState(OrderState.NotDelivered);
+        order.TransitionTo(OrderState.NotDelivered);
     }
 }

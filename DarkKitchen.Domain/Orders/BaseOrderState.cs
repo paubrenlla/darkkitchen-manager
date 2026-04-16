@@ -2,13 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public abstract class BaseOrderState : IOrderState
 {
-    protected BaseOrderState()
-    {
-        TransitionDate = DateTime.Now;
-    }
-
     public abstract OrderState State { get; }
-    public DateTime TransitionDate { get; }
 
     public virtual void Prepare(Order order)
     {
