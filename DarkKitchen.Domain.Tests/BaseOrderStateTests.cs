@@ -185,10 +185,10 @@ public class OrderStateTests
     }
 
     [TestMethod]
-    public void ShippingState_Deliver_ShouldTransitionToNotDelivered()
+    public void ShippingState_NotDelivered_ShouldTransitionToNotDelivered()
     {
         var state = new ShippingState();
         state.NotDelivered(_order);
-        Assert.AreEqual(OrderState.Delivered, _order.State);
+        Assert.AreEqual(OrderState.NotDelivered, _order.State);
     }
 }

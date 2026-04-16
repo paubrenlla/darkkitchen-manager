@@ -3,12 +3,12 @@ namespace DarkKitchen.Domain.Orders;
 public enum DeliveryType
 {
     /// <summary>
-    ///     Express delivery
+    ///     Express delivery.
     /// </summary>
     Express,
 
     /// <summary>
-    ///     24-hours delivery
+    ///     24-hours delivery.
     /// </summary>
     TwentyFourHours
 }

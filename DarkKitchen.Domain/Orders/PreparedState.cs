@@ -6,6 +6,6 @@ public class PreparedState : BaseOrderState
 
     public override void Ship(Order order)
     {
-        order.ChangeState(new ShippingState());
+        order.SetState(OrderState.Shipping);
     }
 }
