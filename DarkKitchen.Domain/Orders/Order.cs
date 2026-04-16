@@ -3,7 +3,6 @@ namespace DarkKitchen.Domain.Orders;
 public class Order
 {
     private readonly List<OrderItem> _items;
-    private IOrderState? _currentState;
 
     public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items)
     {
@@ -18,8 +17,8 @@ public class Order
         Type = type;
         CreatedAt = DateTime.Now;
         _items = items;
-
-        ChangeState(new PendingState());
+        State = OrderState.Pending;
+        OrderNumber = 0;
     }
 
     public Guid Id { get; private set; }
@@ -28,51 +27,11 @@ public class Order
     public Address DeliveryAddress { get; private set; }
     public DeliveryType Type { get; private set; }
     public DateTime CreatedAt { get; private set; }
-
     public OrderState State { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
-    public IOrderState CurrentState
+    public void SetState(OrderState newState)
     {
-        get
-        {
-            if(_currentState == null)
-            {
-                _currentState = OrderStateFactory.Create(State);
-            }
-
-            return _currentState;
-        }
-    }
-
-    public void ChangeState(IOrderState newState)
-    {
-        State = newState.State;
-        _currentState = newState;
-    }
-
-    public void Prepare()
-    {
-        CurrentState.Prepare(this);
-    }
-
-    public void Cancel()
-    {
-        CurrentState.Cancel(this);
-    }
-
-    public void Ship()
-    {
-        CurrentState.Ship(this);
-    }
-
-    public void Deliver()
-    {
-        CurrentState.Deliver(this);
-    }
-
-    public void NotDelivered()
-    {
-        CurrentState.NotDelivered(this);
+        State = newState;
     }
 }
