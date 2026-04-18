@@ -1,6 +1,7 @@
-﻿using DarkKitchen.Domain;
-using DarkKitchen.IBusinessLogic;
+﻿using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
+using DarkKitchen.Models.Converters;
+using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
@@ -8,7 +9,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 {
     private readonly IProductRepository _productRepository = productRepository;
 
-    public IEnumerable<Product> GetProducts(string? name, string? line, string? category)
+    public IEnumerable<ProductResponse> GetProducts(string? name, string? line, string? category)
     {
         var products = _productRepository.GetAll();
 
@@ -27,6 +28,6 @@ public class ProductService(IProductRepository productRepository) : IProductServ
             products = products.Where(p => p.Category.Name.Equals(category, StringComparison.OrdinalIgnoreCase));
         }
 
-        return products;
+        return products.Select(Converter.ToProductResponse);
     }
 }
