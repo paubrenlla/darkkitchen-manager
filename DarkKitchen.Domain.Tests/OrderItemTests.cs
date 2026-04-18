@@ -29,4 +29,52 @@ public class OrderItemTests
     {
         new OrderItem(Guid.NewGuid(), 5, -5);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateItem_WithNegativeQuantity_ShouldThrowException()
+    {
+        new OrderItem(Guid.NewGuid(), -1, 100);
+    }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithValidQuantityAndPrice_ShouldReturnCorrectTotal()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 3, 50m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(150m, total);
+    }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithDecimalPrice_ShouldCalculateCorrectly()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 2, 99.99m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(199.98m, total);
+    }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithOneQuantity_ShouldReturnPrice()
+    {
+        var price = 125.50m;
+        var item = new OrderItem(Guid.NewGuid(), 1, price);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(price, total);
+    }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithZeroPrice_ShouldReturnZero()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 5, 0m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(0m, total);
+    }
 }

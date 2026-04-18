@@ -101,5 +101,17 @@ public class OrderTests
 
         Assert.AreEqual(100m, order.Subtotal);
     }
+    [TestMethod]
+    public void TransitionTo_ShouldUpdateStateAndLastTransitionDate()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        DateTime originalDate = order.LastTransitionDate;
+
+        Thread.Sleep(10);
+        order.TransitionTo(OrderState.Prepared);
+
+        Assert.AreEqual(OrderState.Prepared, order.State);
+        Assert.IsTrue(order.LastTransitionDate > originalDate);
+    }
     }
 }
