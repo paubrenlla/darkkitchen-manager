@@ -31,4 +31,11 @@ public class ShippingCostCalculatorTests
     {
         new ShippingCostCalculator(-50m, 100m);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Constructor_WithNegative24hsPrice_ShouldThrowException()
+    {
+        new ShippingCostCalculator(200m, -50m);
+    }
 }
