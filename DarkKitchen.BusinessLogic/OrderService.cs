@@ -40,6 +40,13 @@ public class OrderService : IOrderService
         OrderStateFactory.Create(order.State).Ship(order);
         _orderRepository.Update(order);
     }
+
+    public void Deliver(Guid orderId)
+    {
+        Order order = GetOrder(orderId);
+        OrderStateFactory.Create(order.State).Deliver(order);
+        _orderRepository.Update(order);
+    }
     private Order GetOrder(Guid orderId)
     {
         return _orderRepository.GetById(orderId);
