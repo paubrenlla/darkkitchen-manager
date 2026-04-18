@@ -48,6 +48,16 @@ public class OrderServiceTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Prepare_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var orderId = Guid.NewGuid();
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns((Order?)null);
+
+        _orderService.Prepare(orderId);
+    }
+
+    [TestMethod]
     public void Cancel_WhenOrderExists_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
@@ -58,6 +68,16 @@ public class OrderServiceTests
 
         Assert.AreEqual(OrderState.Cancelled, order.State);
         _orderRepositoryMock.Verify(r => r.Update(order), Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Cancel_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var orderId = Guid.NewGuid();
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns((Order?)null);
+
+        _orderService.Cancel(orderId);
     }
 
     [TestMethod]
@@ -73,6 +93,17 @@ public class OrderServiceTests
         Assert.AreEqual(OrderState.Shipping, order.State);
         _orderRepositoryMock.Verify(r => r.Update(order), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Ship_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var orderId = Guid.NewGuid();
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns((Order?)null);
+
+        _orderService.Ship(orderId);
+    }
+
     [TestMethod]
     public void Deliver_WhenOrderIsShipping_ShouldTransitionAndUpdate()
     {
@@ -89,6 +120,16 @@ public class OrderServiceTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Deliver_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var orderId = Guid.NewGuid();
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns((Order?)null);
+
+        _orderService.Deliver(orderId);
+    }
+
+    [TestMethod]
     public void NotDelivered_WhenOrderIsShipping_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
@@ -101,5 +142,15 @@ public class OrderServiceTests
 
         Assert.AreEqual(OrderState.NotDelivered, order.State);
         _orderRepositoryMock.Verify(r => r.Update(order), Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void NotDelivered_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var orderId = Guid.NewGuid();
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns((Order?)null);
+
+        _orderService.NotDelivered(orderId);
     }
 }
