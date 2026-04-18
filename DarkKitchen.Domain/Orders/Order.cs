@@ -38,5 +38,6 @@ public class Order
 
     public void AssignOrderNumber(int orderNumber)
     {
+        OrderNumber = orderNumber;
     }
 }
