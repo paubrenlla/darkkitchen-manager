@@ -56,7 +56,7 @@ public class ProductsControllerTests
     [TestMethod]
     public void GetProducts_NoResults_ShouldReturnOkWithEmptyList()
     {
-        _mockService.Setup(s => s.GetProducts("Pizza", null, null)).Returns(new List<ProductResponse>());
+        _mockService.Setup(s => s.GetProducts("Pizza", null, null)).Returns([]);
 
         var result = _controller.GetProducts("Pizza", null, null) as OkObjectResult;
 
