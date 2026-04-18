@@ -1,0 +1,36 @@
+using DarkKitchen.Domain.Orders;
+using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IDataAccess;
+using Moq;
+
+namespace DarkKitchen.BusinessLogic.Tests;
+
+[TestClass]
+public class OrderServiceTests
+{
+    private Address _address = null!;
+    private Guid _clientId;
+    private List<OrderItem> _items = null!;
+    private Mock<IOrderRepository> _orderRepositoryMock = null!;
+    private IOrderService _orderService = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _orderRepositoryMock = new Mock<IOrderRepository>();
+        _orderService = new OrderService(_orderRepositoryMock.Object);
+        _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
+        _clientId = Guid.NewGuid();
+    }
+
+    [TestMethod]
+    public void CreateOrder_ShouldCreateOrderAndAddToRepository()
+    {
+        Order order = _orderService.CreateOrder(_clientId, _address, DeliveryType.Express, _items);
+
+        Assert.IsNotNull(order);
+        Assert.AreEqual(_clientId, order.ClientId);
+        _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
+    }
+}
