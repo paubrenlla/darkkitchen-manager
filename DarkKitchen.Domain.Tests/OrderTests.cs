@@ -75,11 +75,14 @@ public class OrderTests
     }
 
     [TestMethod]
-    public void SetState_ShouldChangeOrderState()
+    public void AssignOrderNumber_ShouldSetOrderNumber()
     {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+
+        order.AssignOrderNumber(42);
+
+        Assert.AreEqual(42, order.OrderNumber);
+    }
 
         order.SetState(OrderState.Prepared);
 
