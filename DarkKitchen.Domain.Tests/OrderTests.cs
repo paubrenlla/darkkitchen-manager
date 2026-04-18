@@ -5,49 +5,69 @@ namespace DarkKitchen.Domain.Tests;
 [TestClass]
 public class OrderTests
 {
+    private Address _address = null!;
+    private Guid _clientId;
+    private List<OrderItem> _items = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
+        _clientId = Guid.NewGuid();
+    }
+
     [TestMethod]
     public void Constructor_WhenCreated_ShouldSetPendingState()
     {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
-        var clientId = Guid.NewGuid();
-
-        var order = new Order(clientId, address, DeliveryType.Express, items);
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
 
         Assert.AreEqual(OrderState.Pending, order.State);
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public void Constructor_WithoutItems_ShouldThrowException()
+    public void Constructor_WithoutItems_ShouldThrowArgumentException()
     {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        new Order(Guid.NewGuid(), address, DeliveryType.Express, []);
+        new Order(_clientId, _address, DeliveryType.Express, []);
     }
 
     [TestMethod]
-    public void Properties_ShouldReturnExpectedValues()
+    [ExpectedException(typeof(ArgumentException))]
+    public void Constructor_WithNullItems_ShouldThrowArgumentException()
     {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
-        var clientId = Guid.NewGuid();
+        new Order(_clientId, _address, DeliveryType.Express, null!);
+    }
 
-        var order = new Order(clientId, address, DeliveryType.Express, items);
+    [TestMethod]
+    public void Constructor_ShouldSetPropertiesCorrectly()
+    {
+        DateTime before = DateTime.Now;
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        DateTime after = DateTime.Now;
 
         Assert.AreNotEqual(Guid.Empty, order.Id);
-        Assert.IsNotNull(order.DeliveryAddress);
+        Assert.AreEqual(_clientId, order.ClientId);
+        Assert.AreEqual(_address, order.DeliveryAddress);
         Assert.AreEqual(DeliveryType.Express, order.Type);
-        Assert.IsTrue(order.CreatedAt <= DateTime.Now);
-        Assert.AreEqual(0, order.OrderNumber);
-        Assert.AreEqual(clientId, order.ClientId);
+        Assert.IsTrue(order.CreatedAt >= before && order.CreatedAt <= after);
+        Assert.IsNull(order.OrderNumber);
     }
 
     [TestMethod]
-    public void Items_Property_ShouldReturnReadOnlyList()
+    public void Constructor_ShouldSetLastTransitionDateToNow()
     {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        List<OrderItem> items = [new(Guid.NewGuid(), 1, 100m)];
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        DateTime before = DateTime.Now;
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        DateTime after = DateTime.Now;
+
+        Assert.IsTrue(order.LastTransitionDate >= before && order.LastTransitionDate <= after);
+    }
+
+    [TestMethod]
+    public void Items_ShouldReturnReadOnlyCollectionWithExpectedItems()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
 
         Assert.IsNotNull(order.Items);
         Assert.AreEqual(1, order.Items.Count);
