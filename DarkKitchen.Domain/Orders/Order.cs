@@ -30,6 +30,7 @@ public class Order
     public DateTime LastTransitionDate { get; private set; }
     public OrderState State { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
+    public decimal Subtotal => _items.Sum(i => i.CalculateItemTotal());
 
     {
         State = newState;
