@@ -84,7 +84,15 @@ public class OrderTests
         Assert.AreEqual(42, order.OrderNumber);
     }
 
-        order.SetState(OrderState.Prepared);
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void AssignOrderNumber_WhenAlreadyAssigned_ShouldThrowInvalidOperationException()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        order.AssignOrderNumber(1);
+
+        order.AssignOrderNumber(2);
+    }
 
         Assert.AreEqual(OrderState.Prepared, order.State);
     }
