@@ -31,6 +31,7 @@ public class Order
     public OrderState State { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     public decimal Subtotal => _items.Sum(i => i.CalculateItemTotal());
+    public decimal Total => (Subtotal + ShippingCost) * 1.22m;
 
     public void TransitionTo(OrderState newState)
     {
