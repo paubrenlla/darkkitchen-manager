@@ -94,6 +94,12 @@ public class OrderTests
         order.AssignOrderNumber(2);
     }
 
-        Assert.AreEqual(OrderState.Prepared, order.State);
+    [TestMethod]
+    public void Subtotal_ShouldCalculateCorrectly()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+
+        Assert.AreEqual(100m, order.Subtotal);
+    }
     }
 }
