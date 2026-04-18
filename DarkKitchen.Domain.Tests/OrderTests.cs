@@ -104,6 +104,28 @@ public class OrderTests
         Assert.AreEqual(100m, order.Subtotal);
     }
     [TestMethod]
+    public void Total_ShouldIncludeSubtotalPlusShippingWithIVA()
+    {
+        var calculator = new ShippingCostCalculator(200m, 100m);
+        Order.SetShippingCostCalculator(calculator);
+
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+
+        var expectedTotal = (100m + 200m) * 1.22m;
+        Assert.AreEqual(expectedTotal, order.Total);
+    }
+
+    [TestMethod]
+    public void Total_WithoutCalculator_ShouldCalculateWithZeroShipping()
+    {
+        Order.SetShippingCostCalculator(null!);
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+
+        var expectedTotal = (100m + 0m) * 1.22m;
+        Assert.AreEqual(expectedTotal, order.Total);
+    }
+
+    [TestMethod]
     public void TransitionTo_ShouldUpdateStateAndLastTransitionDate()
     {
         var order = new Order(_clientId, _address, DeliveryType.Express, _items);
