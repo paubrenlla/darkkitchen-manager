@@ -2,6 +2,10 @@ namespace DarkKitchen.Domain.Orders;
 
 public class OrderItem
 {
+    protected OrderItem()
+    {
+    }
+
     public OrderItem(Guid productId, int quantity, decimal price)
     {
         if(quantity <= 0)

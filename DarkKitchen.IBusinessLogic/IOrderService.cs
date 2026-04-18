@@ -4,9 +4,10 @@ namespace DarkKitchen.IBusinessLogic;
 
 public interface IOrderService
 {
-    void Prepare(Order order);
-    void Cancel(Order order);
-    void Ship(Order order);
-    void Deliver(Order order);
-    void NotDelivered(Order order);
+    Order CreateOrder(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items);
+    void Prepare(Guid orderId);
+    void Cancel(Guid orderId);
+    void Ship(Guid orderId);
+    void Deliver(Guid orderId);
+    void NotDelivered(Guid orderId);
 }
