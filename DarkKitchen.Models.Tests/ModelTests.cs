@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.Models.Tests;
@@ -8,12 +9,12 @@ namespace DarkKitchen.Models.Tests;
 public class ModelTests
 {
     [TestMethod]
-    public void UserCreateResponse_FromUser_MapsCorrectData()
+    public void Converter_ToUserCreateResponse_MapsCorrectData()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
 
-        var result = UserCreateResponse.FromUser(user);
+        var result = Converter.ToUserCreateResponse(user);
 
         Assert.AreEqual(user.Id, result.Id);
         Assert.AreEqual("Juan", result.Name);
@@ -33,7 +34,7 @@ public class ModelTests
             Email = "juan@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Pass123!"
+            Password = "Pass123!",
         };
 
         var validationResults = new List<ValidationResult>();
@@ -68,9 +69,9 @@ public class ModelTests
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
             Password = "Pass123!",
-            Role = Role.Administrativo
+            Role = "Administrativo",
         };
 
-        Assert.AreEqual(Role.Administrativo, request.Role);
+        Assert.AreEqual("Administrativo", request.Role);
     }
 }
