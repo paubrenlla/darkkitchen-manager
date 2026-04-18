@@ -26,6 +26,13 @@ public class OrderService : IOrderService
         OrderStateFactory.Create(order.State).Prepare(order);
         _orderRepository.Update(order);
     }
+
+    public void Cancel(Guid orderId)
+    {
+        Order order = GetOrder(orderId);
+        OrderStateFactory.Create(order.State).Cancel(order);
+        _orderRepository.Update(order);
+    }
     private Order GetOrder(Guid orderId)
     {
         return _orderRepository.GetById(orderId);
