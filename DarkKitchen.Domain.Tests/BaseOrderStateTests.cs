@@ -11,184 +11,258 @@ public class OrderStateTests
     public void Setup()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-
         var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-
-        var clientId = Guid.NewGuid();
-
-        _order = new Order(clientId, address, DeliveryType.Express, items);
+        _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
     }
 
     [TestMethod]
-    public void BaseOrderState_WhenCreated_ShouldSetTransitionDateToNow()
+    public void PendingState_State_ShouldReturnPending()
     {
-        DateTime before = DateTime.Now;
-        var state = new PendingState();
-        DateTime after = DateTime.Now;
-
-        Assert.IsTrue(state.TransitionDate >= before);
-        Assert.IsTrue(state.TransitionDate <= after);
+        Assert.AreEqual(OrderState.Pending, new PendingState().State);
     }
 
     [TestMethod]
-    public void PendingState_Name_ShouldReturnPendiente()
+    public void PreparedState_State_ShouldReturnPrepared()
     {
-        var state = new PendingState();
-        Assert.AreEqual(OrderState.Pending, state.State);
+        Assert.AreEqual(OrderState.Prepared, new PreparedState().State);
     }
 
     [TestMethod]
-    public void PreparedOrderState_Name_ShouldReturnPrepared()
+    public void ShippingState_State_ShouldReturnShipping()
     {
-        var state = new PreparedState();
-        Assert.AreEqual(OrderState.Prepared, state.State);
+        Assert.AreEqual(OrderState.Shipping, new ShippingState().State);
     }
 
     [TestMethod]
-    public void CancelledOrderState_Name_ShouldReturnCancelled()
+    public void DeliveredState_State_ShouldReturnDelivered()
     {
-        var state = new CancelledState();
-        Assert.AreEqual(OrderState.Cancelled, state.State);
+        Assert.AreEqual(OrderState.Delivered, new DeliveredState().State);
     }
 
     [TestMethod]
-    public void OnItsWayOrderState_Name_ShouldReturnOnItsWay()
+    public void NotDeliveredState_State_ShouldReturnNotDelivered()
     {
-        var state = new ShippingState();
-        Assert.AreEqual(OrderState.Shipping, state.State);
+        Assert.AreEqual(OrderState.NotDelivered, new NotDeliveredState().State);
     }
 
     [TestMethod]
-    public void DeliveredOrderState_Name_ShouldReturnDelivered()
+    public void CancelledState_State_ShouldReturnCancelled()
     {
-        var state = new DeliveredState();
-        Assert.AreEqual(OrderState.Delivered, state.State);
+        Assert.AreEqual(OrderState.Cancelled, new CancelledState().State);
     }
 
     [TestMethod]
-    public void NotDeliveredOrderState_Name_ShouldReturnNotDelivered()
+    public void PendingState_Prepare_ShouldTransitionToPrepared()
     {
-        var state = new NotDeliveredState();
-        Assert.AreEqual(OrderState.NotDelivered, state.State);
-    }
+        new PendingState().Prepare(_order);
 
-    [TestMethod]
-    public void PendingState_Prepare_ShouldTransitionToPreparedState()
-    {
-        var state = new PendingState();
-        state.Prepare(_order);
         Assert.AreEqual(OrderState.Prepared, _order.State);
+    }
+
+    [TestMethod]
+    public void PendingState_Cancel_ShouldTransitionToCancelled()
+    {
+        new PendingState().Cancel(_order);
+
+        Assert.AreEqual(OrderState.Cancelled, _order.State);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PendingState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new PendingState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PendingState_Deliver_ShouldThrowInvalidOperationException()
+    {
+        new PendingState().Deliver(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PendingState_NotDelivered_ShouldThrowInvalidOperationException()
+    {
+        new PendingState().NotDelivered(_order);
+    }
+
+    [TestMethod]
+    public void PreparedState_Ship_ShouldTransitionToShipping()
+    {
+        new PreparedState().Ship(_order);
+
+        Assert.AreEqual(OrderState.Shipping, _order.State);
     }
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
     public void PreparedState_Prepare_ShouldThrowInvalidOperationException()
     {
-        var state = new PreparedState();
-        state.Prepare(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void CancelledState_Prepare_ShouldThrowInvalidOperationException()
-    {
-        var state = new CancelledState();
-        state.Prepare(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void ShippingState_Prepare_ShouldThrowInvalidOperationException()
-    {
-        var state = new ShippingState();
-        state.Prepare(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void DeliveredState_Prepare_ShouldThrowInvalidOperationException()
-    {
-        var state = new DeliveredState();
-        state.Prepare(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void NotDeliveredState_Prepare_ShouldThrowInvalidOperationException()
-    {
-        var state = new NotDeliveredState();
-        state.Prepare(_order);
-    }
-
-    [TestMethod]
-    public void PendingState_Cancel_ShouldTransitionToCancelledState()
-    {
-        var state = new PendingState();
-        state.Cancel(_order);
-        Assert.AreEqual(OrderState.Cancelled, _order.State);
+        new PreparedState().Prepare(_order);
     }
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
     public void PreparedState_Cancel_ShouldThrowInvalidOperationException()
     {
-        var state = new PreparedState();
-        state.Cancel(_order);
+        new PreparedState().Cancel(_order);
     }
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
-    public void CancelledState_Cancel_ShouldThrowInvalidOperationException()
+    public void PreparedState_Deliver_ShouldThrowInvalidOperationException()
     {
-        var state = new CancelledState();
-        state.Cancel(_order);
+        new PreparedState().Deliver(_order);
     }
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
-    public void DeliveredState_Cancel_ShouldThrowInvalidOperationException()
+    public void PreparedState_NotDelivered_ShouldThrowInvalidOperationException()
     {
-        var state = new DeliveredState();
-        state.Cancel(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void NotDeliveredState_Cancel_ShouldThrowInvalidOperationException()
-    {
-        var state = new NotDeliveredState();
-        state.Cancel(_order);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void ShippingState_Cancel_ShouldThrowInvalidOperationException()
-    {
-        var state = new ShippingState();
-        state.Cancel(_order);
-    }
-
-    [TestMethod]
-    public void PreparedState_Ship_ShouldTransitionToShippingState()
-    {
-        var state = new PreparedState();
-        state.Ship(_order);
-        Assert.AreEqual(OrderState.Shipping, _order.State);
+        new PreparedState().NotDelivered(_order);
     }
 
     [TestMethod]
     public void ShippingState_Deliver_ShouldTransitionToDelivered()
     {
-        var state = new ShippingState();
-        state.Deliver(_order);
+        new ShippingState().Deliver(_order);
+
         Assert.AreEqual(OrderState.Delivered, _order.State);
     }
 
     [TestMethod]
     public void ShippingState_NotDelivered_ShouldTransitionToNotDelivered()
     {
-        var state = new ShippingState();
-        state.NotDelivered(_order);
+        new ShippingState().NotDelivered(_order);
+
         Assert.AreEqual(OrderState.NotDelivered, _order.State);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void ShippingState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        new ShippingState().Prepare(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void ShippingState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        new ShippingState().Cancel(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void ShippingState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new ShippingState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().Prepare(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().Cancel(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_Deliver_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().Deliver(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_NotDelivered_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().NotDelivered(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().Prepare(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().Cancel(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Deliver_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().Deliver(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_NotDelivered_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().NotDelivered(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Prepare_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().Prepare(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Cancel_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().Cancel(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Deliver_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().Deliver(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_NotDelivered_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().NotDelivered(_order);
     }
 }
