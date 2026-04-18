@@ -15,6 +15,8 @@ public class OrderTests
         _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
         _clientId = Guid.NewGuid();
+
+        Order.SetShippingCostCalculator(null!);
     }
 
     [TestMethod]
@@ -113,5 +115,16 @@ public class OrderTests
         Assert.AreEqual(OrderState.Prepared, order.State);
         Assert.IsTrue(order.LastTransitionDate > originalDate);
     }
+
+    [TestMethod]
+    public void Subtotal_WithMultipleItems_ShouldCalculateCorrectly()
+    {
+        var items = new List<OrderItem>
+        {
+            new(Guid.NewGuid(), 2, 50m), new(Guid.NewGuid(), 3, 30m), new(Guid.NewGuid(), 1, 20m)
+        };
+        var order = new Order(_clientId, _address, DeliveryType.Express, items);
+
+        Assert.AreEqual(210m, order.Subtotal);
     }
 }
