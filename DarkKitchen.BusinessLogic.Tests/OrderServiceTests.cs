@@ -33,4 +33,17 @@ public class OrderServiceTests
         Assert.AreEqual(_clientId, order.ClientId);
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
+
+    [TestMethod]
+    public void Prepare_WhenOrderExists_ShouldTransitionAndUpdate()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+
+        _orderService.Prepare(orderId);
+
+        Assert.AreEqual(OrderState.Prepared, order.State);
+        _orderRepositoryMock.Verify(r => r.Update(order), Times.Once);
+    }
 }
