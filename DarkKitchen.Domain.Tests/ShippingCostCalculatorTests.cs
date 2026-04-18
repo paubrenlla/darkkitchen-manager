@@ -14,4 +14,14 @@ public class ShippingCostCalculatorTests
 
         Assert.AreEqual(250m, cost);
     }
+
+    [TestMethod]
+    public void CalculateShippingCost_TwentyFourHours_ShouldReturnStandardPrice()
+    {
+        var calculator = new ShippingCostCalculator(200m, 80m);
+
+        var cost = calculator.CalculateShippingCost(DeliveryType.TwentyFourHours);
+
+        Assert.AreEqual(80m, cost);
+    }
 }
