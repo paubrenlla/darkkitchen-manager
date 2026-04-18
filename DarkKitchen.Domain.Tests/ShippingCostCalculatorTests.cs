@@ -24,4 +24,11 @@ public class ShippingCostCalculatorTests
 
         Assert.AreEqual(80m, cost);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Constructor_WithNegativeExpressPrice_ShouldThrowException()
+    {
+        new ShippingCostCalculator(-50m, 100m);
+    }
 }
