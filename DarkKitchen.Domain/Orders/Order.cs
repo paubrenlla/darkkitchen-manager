@@ -38,6 +38,11 @@ public class Order
 
     public void AssignOrderNumber(int orderNumber)
     {
+        if(OrderNumber.HasValue)
+        {
+            throw new InvalidOperationException("El número de pedido ya fue asignado.");
+        }
+
         OrderNumber = orderNumber;
     }
 }
