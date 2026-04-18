@@ -13,4 +13,10 @@ public class OrderService : IOrderService
         _orderRepository = orderRepository;
     }
 
+    public Order CreateOrder(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items)
+    {
+        var order = new Order(clientId, deliveryAddress, type, items);
+        _orderRepository.Add(order);
+        return order;
+    }
 }
