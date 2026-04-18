@@ -2,6 +2,7 @@ using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
+using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -11,11 +12,13 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
     private readonly IPhoneStrategyFactory _strategyFactory = strategyFactory;
     private readonly IUserRepository _userRepository = userRepository;
 
-    public User CreateUser(UserCreateRequest request)
+    public UserCreateResponse CreateUser(UserCreateRequest request)
     {
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
 
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+
+        var role = request.Role != null ? Enum.Parse<Role>(request.Role) : Role.Cliente;
 
         var user = new User(
             request.Name,
@@ -23,9 +26,9 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
             request.Email,
             validPhone,
             request.Password,
-            Role.Cliente);
+            role);
 
         _userRepository.Add(user);
-        return user;
+        return Converter.ToUserCreateResponse(user);
     }
 }

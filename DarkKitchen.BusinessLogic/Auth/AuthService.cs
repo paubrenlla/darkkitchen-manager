@@ -1,14 +1,17 @@
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
+using DarkKitchen.Models.Converters;
+using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic.Auth;
 
-public class AuthService(IUserRepository userRepository) : IAuthService
+public class AuthService(IUserRepository userRepository, ITokenService tokenService) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly ITokenService _tokenService = tokenService;
 
-    public User Login(string email, string password)
+    public LoginResponse Login(string email, string password)
     {
         User? user = _userRepository.GetUserByEmail(email);
 
@@ -17,6 +20,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
             throw new UnauthorizedAccessException("Credenciales inválidas.");
         }
 
-        return user;
+        var token = _tokenService.GenerateToken(user);
+        return Converter.ToLoginResponse(token, user);
     }
 }
