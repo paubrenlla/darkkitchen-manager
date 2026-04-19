@@ -30,4 +30,41 @@ public class OrderRepositoryTests
         Assert.IsNotNull(found);
         Assert.AreEqual(1, found.OrderNumber);
     }
+
+    [TestMethod]
+    public void Add_MultiplOrders_ShouldIncrementOrderNumber()
+    {
+        var order1 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        var order2 = new Order(_clientId, _address, DeliveryType.Express, _items);
+
+        _repository.Add(order1);
+        _repository.Add(order2);
+
+        Assert.AreEqual(1, order1.OrderNumber);
+        Assert.AreEqual(2, order2.OrderNumber);
+    }
+
+    [TestMethod]
+    public void GetById_NonExistent_ShouldReturnNull()
+    {
+        var result = _repository.GetById(Guid.NewGuid());
+
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void GetByClient_ShouldFilterByClientId()
+    {
+        var otherClientId = Guid.NewGuid();
+        var order1 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        var order2 = new Order(otherClientId, _address, DeliveryType.Express, _items);
+
+        _repository.Add(order1);
+        _repository.Add(order2);
+
+        var result = _repository.GetByClient(_clientId).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(_clientId, result[0].ClientId);
+    }
 }
