@@ -60,4 +60,9 @@ public class OrderService : IOrderService
         return _orderRepository.GetById(orderId)
                ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
     }
+
+    public IEnumerable<Order> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
+    {
+        return _orderRepository.GetByClient(clientId, from, to, state);
+    }
 }

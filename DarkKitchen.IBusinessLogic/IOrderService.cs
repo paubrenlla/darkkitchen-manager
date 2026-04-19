@@ -10,4 +10,5 @@ public interface IOrderService
     void Ship(Guid orderId);
     void Deliver(Guid orderId);
     void NotDelivered(Guid orderId);
+    IEnumerable<Order> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state);
 }

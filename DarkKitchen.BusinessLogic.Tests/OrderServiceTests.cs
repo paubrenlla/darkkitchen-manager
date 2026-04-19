@@ -153,7 +153,7 @@ public class OrderServiceTests
 
         _orderService.NotDelivered(orderId);
     }
-    
+
     [TestMethod]
     public void GetOrdersByClient_ShouldDelegateToRepository()
     {
