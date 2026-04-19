@@ -38,6 +38,10 @@ public class InMemoryOrderRepository : IOrderRepository
     public IEnumerable<Order> GetByStatus(DateTime from, DateTime to, string? state = null, string? city = null)
     {
         var query = _orders.Where(o => o.CreatedAt >= from && o.CreatedAt <= to);
+        if(!string.IsNullOrWhiteSpace(state))
+        {
+            query = query.Where(o => o.State.ToString().Equals(state, StringComparison.OrdinalIgnoreCase));
+        }
 
         return query;
     }
