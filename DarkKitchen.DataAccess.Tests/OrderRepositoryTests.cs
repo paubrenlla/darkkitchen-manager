@@ -67,4 +67,19 @@ public class OrderRepositoryTests
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(_clientId, result[0].ClientId);
     }
+
+    [TestMethod]
+    public void GetByClient_WithStateFilter_ShouldFilterByState()
+    {
+        var order1 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        var order2 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        order2.TransitionTo(OrderState.Prepared);
+
+        _repository.Add(order1);
+        _repository.Add(order2);
+
+        var result = _repository.GetByClient(_clientId, state: "Prepared").ToList();
+
+        Assert.AreEqual(1, result.Count);
+    }
 }
