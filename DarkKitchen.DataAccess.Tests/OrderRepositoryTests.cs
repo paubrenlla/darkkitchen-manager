@@ -130,4 +130,18 @@ public class OrderRepositoryTests
 
         Assert.AreEqual(1, result.Count);
     }
+
+    [TestMethod]
+    public void Update_ShouldPersistChanges()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        _repository.Add(order);
+
+        order.TransitionTo(OrderState.Prepared);
+        _repository.Update(order);
+
+        var found = _repository.GetById(order.Id);
+        Assert.IsNotNull(found);
+        Assert.AreEqual(OrderState.Prepared, found.State);
+    }
 }
