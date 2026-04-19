@@ -82,4 +82,17 @@ public class OrderRepositoryTests
 
         Assert.AreEqual(1, result.Count);
     }
+
+    [TestMethod]
+    public void GetByStatus_ShouldFilterByDateRange()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        _repository.Add(order);
+
+        var from = DateTime.Now.AddHours(-1);
+        var to = DateTime.Now.AddHours(1);
+        var result = _repository.GetByStatus(from, to).ToList();
+
+        Assert.AreEqual(1, result.Count);
+    }
 }
