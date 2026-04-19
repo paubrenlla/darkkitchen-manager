@@ -26,7 +26,8 @@ public class InMemoryOrderRepository : IOrderRepository
 
     public IEnumerable<Order> GetByClient(Guid clientId, DateTime? from = null, DateTime? to = null, string? state = null)
     {
-        return null;
+        var query = _orders.Where(o => o.ClientId == clientId);
+        return query;
     }
 
     public IEnumerable<Order> GetByStatus(DateTime from, DateTime to, string? state = null, string? city = null)
