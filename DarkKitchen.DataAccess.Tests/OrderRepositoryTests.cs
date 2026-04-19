@@ -121,7 +121,7 @@ public class OrderRepositoryTests
         _repository.Add(order);
 
         Address address2 = new Address("Sarandi", "1234", null, "Rosario", "Uruguay");
-        var order2 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        var order2 = new Order(_clientId, address2, DeliveryType.Express, _items);
         _repository.Add(order2);
 
         var from = DateTime.Now.AddHours(-1);

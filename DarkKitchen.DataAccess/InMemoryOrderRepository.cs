@@ -43,6 +43,11 @@ public class InMemoryOrderRepository : IOrderRepository
             query = query.Where(o => o.State.ToString().Equals(state, StringComparison.OrdinalIgnoreCase));
         }
 
+        if(!string.IsNullOrWhiteSpace(city))
+        {
+            query = query.Where(o => o.DeliveryAddress.City.Contains(city, StringComparison.OrdinalIgnoreCase));
+        }
+
         return query;
     }
 }
