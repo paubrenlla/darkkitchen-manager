@@ -16,7 +16,11 @@ public class InMemoryOrderRepository : IOrderRepository
 
     public void Update(Order order)
     {
-        return;
+        var index = _orders.FindIndex(o => o.Id == order.Id);
+        if(index >= 0)
+        {
+            _orders[index] = order;
+        }
     }
 
     public Order? GetById(Guid id)
