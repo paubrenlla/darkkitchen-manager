@@ -168,4 +168,19 @@ public class OrderServiceTests
         Assert.AreEqual(1, result.Count);
         _orderRepositoryMock.Verify(r => r.GetByClient(_clientId, from, to, "Pending"), Times.Once);
     }
+    
+    [TestMethod]
+    public void GetOrdersByStatus_ShouldDelegateToRepository()
+    {
+        var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items) };
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
+
+        _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, "Pending", "Montevideo")).Returns(orders);
+
+        var result = _orderService.GetOrdersByStatus(from, to, "Pending", "Montevideo").ToList();
+
+        Assert.AreEqual(1, result.Count);
+        _orderRepositoryMock.Verify(r => r.GetByStatus(from, to, "Pending", "Montevideo"), Times.Once);
+    }
 }
