@@ -95,4 +95,21 @@ public class OrderRepositoryTests
 
         Assert.AreEqual(1, result.Count);
     }
+
+    [TestMethod]
+    public void GetByStatus_ShouldFilterByState()
+    {
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        order.TransitionTo(OrderState.Prepared);
+        _repository.Add(order);
+
+        var order2 = new Order(_clientId, _address, DeliveryType.Express, _items);
+        _repository.Add(order2);
+
+        var from = DateTime.Now.AddHours(-1);
+        var to = DateTime.Now.AddHours(1);
+        var result = _repository.GetByStatus(from, to,"Prepared").ToList();
+
+        Assert.AreEqual(1, result.Count);
+    }
 }
