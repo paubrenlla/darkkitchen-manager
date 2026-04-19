@@ -153,4 +153,19 @@ public class OrderServiceTests
 
         _orderService.NotDelivered(orderId);
     }
+    
+    [TestMethod]
+    public void GetOrdersByClient_ShouldDelegateToRepository()
+    {
+        var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items) };
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
+
+        _orderRepositoryMock.Setup(r => r.GetByClient(_clientId, from, to, "Pending")).Returns(orders);
+
+        var result = _orderService.GetOrdersByClient(_clientId, from, to, "Pending").ToList();
+
+        Assert.AreEqual(1, result.Count);
+        _orderRepositoryMock.Verify(r => r.GetByClient(_clientId, from, to, "Pending"), Times.Once);
+    }
 }
