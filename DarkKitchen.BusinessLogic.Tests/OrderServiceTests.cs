@@ -168,7 +168,7 @@ public class OrderServiceTests
         Assert.AreEqual(1, result.Count);
         _orderRepositoryMock.Verify(r => r.GetByClient(_clientId, from, to, "Pending"), Times.Once);
     }
-    
+
     [TestMethod]
     public void GetOrdersByStatus_ShouldDelegateToRepository()
     {

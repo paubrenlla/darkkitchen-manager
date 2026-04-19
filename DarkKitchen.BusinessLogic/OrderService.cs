@@ -65,4 +65,9 @@ public class OrderService : IOrderService
     {
         return _orderRepository.GetByClient(clientId, from, to, state);
     }
+
+    public IEnumerable<Order> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city)
+    {
+        return _orderRepository.GetByStatus(from, to, state, city);
+    }
 }

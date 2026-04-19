@@ -11,4 +11,5 @@ public interface IOrderService
     void Deliver(Guid orderId);
     void NotDelivered(Guid orderId);
     IEnumerable<Order> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state);
+    IEnumerable<Order> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city);
 }
