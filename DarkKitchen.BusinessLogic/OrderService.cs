@@ -22,40 +22,40 @@ public class OrderService : IOrderService
 
     public void Prepare(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
+        Order order = GetOrderById(orderId);
         OrderStateFactory.Create(order.State).Prepare(order);
         _orderRepository.Update(order);
     }
 
     public void Cancel(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
+        Order order = GetOrderById(orderId);
         OrderStateFactory.Create(order.State).Cancel(order);
         _orderRepository.Update(order);
     }
 
     public void Ship(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
+        Order order = GetOrderById(orderId);
         OrderStateFactory.Create(order.State).Ship(order);
         _orderRepository.Update(order);
     }
 
     public void Deliver(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
+        Order order = GetOrderById(orderId);
         OrderStateFactory.Create(order.State).Deliver(order);
         _orderRepository.Update(order);
     }
 
     public void NotDelivered(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
+        Order order = GetOrderById(orderId);
         OrderStateFactory.Create(order.State).NotDelivered(order);
         _orderRepository.Update(order);
     }
 
-    private Order GetOrderOrThrow(Guid orderId)
+    public Order GetOrderById(Guid orderId)
     {
         return _orderRepository.GetById(orderId)
                ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");

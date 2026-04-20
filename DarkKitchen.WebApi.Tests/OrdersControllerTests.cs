@@ -106,7 +106,7 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(400, result.StatusCode);
    }
-   
+
    [TestMethod]
    public void UpdateStatus_Cancelado_ReturnsOk()
    {
@@ -116,7 +116,7 @@ public class OrdersControllerTests
        var order = new Order(_clientId, address, DeliveryType.Express, items);
 
        _mockOrderService.Setup(s => s.Cancel(orderId));
-       _mockOrderService.Setup(s => s.GetOrderDetail(orderId)).Returns(order);
+       _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
        var request = new OrderStatusUpdateRequest { Status = "Cancelado" };
        var result = _controller.UpdateStatus(orderId, request) as OkObjectResult;

@@ -44,4 +44,19 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpPatch("{id}/status")]
+    public IActionResult UpdateStatus(Guid id, [FromBody] OrderStatusUpdateRequest request)
+    {
+        switch(request.Status.ToLower())
+        {
+            case "cancelado":
+                _orderService.Cancel(id);
+                break;
+        }
+
+        var order = _orderService.GetOrderById(id);
+        var response = Converter.ToOrderStatusResponse(order);
+        return Ok(response);
+    }
 }
