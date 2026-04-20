@@ -196,4 +196,15 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        _mockOrderService.Verify(s => s.NotDelivered(orderId), Times.Once);
    }
+
+   [TestMethod]
+   public void UpdateStatus_InvalidState_ReturnsBadRequest()
+   {
+       var request = new OrderStatusUpdateRequest { Status = "EstadoInvalido" };
+
+       var result = _controller.UpdateStatus(Guid.NewGuid(), request) as BadRequestObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(400, result.StatusCode);
+   }
 }
