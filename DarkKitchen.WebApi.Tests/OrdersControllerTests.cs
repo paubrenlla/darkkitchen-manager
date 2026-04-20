@@ -237,4 +237,20 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(400, result.StatusCode);
    }
+
+   [TestMethod]
+   public void GetOrderDetail_Exists_ReturnsOk()
+   {
+       var orderId = Guid.NewGuid();
+       var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+       var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+       var order = new Order(_clientId, address, DeliveryType.Express, items);
+
+       _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
+
+       var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(200, result.StatusCode);
+   }
 }
