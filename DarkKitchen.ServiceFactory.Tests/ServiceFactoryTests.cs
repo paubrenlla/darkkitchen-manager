@@ -1,8 +1,12 @@
+using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.DataAccess;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace DarkKitchen.ServiceFactory.Tests;
 
@@ -15,6 +19,12 @@ public class ServiceFactoryTests
     public void Setup()
     {
         _services = new ServiceCollection();
+
+        var configMock = new Mock<IConfiguration>();
+        var configSectionMock = new Mock<IConfigurationSection>();
+        configSectionMock.Setup(s => s.Value).Returns("test_secret_key_that_is_long_enough_for_hmac");
+        configMock.Setup(c => c.GetSection("JwtConfig:Secret")).Returns(configSectionMock.Object);
+        _services.AddSingleton(configMock.Object);
     }
 
     [TestMethod]
@@ -44,10 +54,6 @@ public class ServiceFactoryTests
     [TestMethod]
     public void AddProjectServices_RegistersITokenService()
     {
-        // TokenService requires IConfiguration, so we need to register it
-        var configMock = new Moq.Mock<Microsoft.Extensions.Configuration.IConfiguration>();
-        _services.AddSingleton(configMock.Object);
-
         _services.AddProjectServices();
 
         var provider = _services.BuildServiceProvider();
@@ -55,6 +61,18 @@ public class ServiceFactoryTests
 
         Assert.IsNotNull(tokenService);
         Assert.IsInstanceOfType(tokenService, typeof(TokenService));
+    }
+
+    [TestMethod]
+    public void AddProjectServices_RegistersIProductService()
+    {
+        _services.AddProjectServices();
+
+        var provider = _services.BuildServiceProvider();
+        var productService = provider.GetService<IProductService>();
+
+        Assert.IsNotNull(productService);
+        Assert.IsInstanceOfType(productService, typeof(ProductService));
     }
 
     [TestMethod]

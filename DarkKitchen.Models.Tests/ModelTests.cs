@@ -36,7 +36,7 @@ public class ModelTests
             Email = "juan@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Pass123!"
+            Password = "Pass123!",
         };
 
         var validationResults = new List<ValidationResult>();
