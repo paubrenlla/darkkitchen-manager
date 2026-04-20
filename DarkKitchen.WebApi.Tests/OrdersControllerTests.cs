@@ -253,4 +253,16 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(200, result.StatusCode);
    }
+
+   [TestMethod]
+   public void GetOrderDetail_NotFound_ReturnsNotFound()
+   {
+       _mockOrderService.Setup(s => s.GetOrderById(It.IsAny<Guid>()))
+           .Throws(new KeyNotFoundException("Pedido no encontrado."));
+
+       var result = _controller.GetOrderDetail(Guid.NewGuid()) as NotFoundObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(404, result.StatusCode);
+   }
 }
