@@ -197,4 +197,47 @@ public class OrderServiceTests
         Assert.AreEqual(1, result.Count);
         _orderRepositoryMock.Verify(r => r.GetByStatus(from, to, "Pending", "Montevideo"), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateOrder_InvalidDeliveryType_ShouldThrow()
+    {
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = "InvalidType",
+            Address = new OrderAddressDto
+            {
+                Street = "Rivera",
+                Number = "1234",
+                City = "Montevideo",
+                Country = "Uruguay",
+            },
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
+        };
+
+        _orderService.CreateOrder(_clientId, request);
+    }
+
+    [TestMethod]
+    public void GetOrderById_WhenExists_ShouldReturnDetailResponse()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+
+        var result = _orderService.GetOrderById(orderId);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(_clientId, result.ClientId);
+        Assert.AreEqual("Pending", result.Status);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void GetOrderById_WhenNotFound_ShouldThrow()
+    {
+        _orderRepositoryMock.Setup(r => r.GetById(It.IsAny<Guid>())).Returns((Order?)null);
+
+        _orderService.GetOrderById(Guid.NewGuid());
+    }
 }
