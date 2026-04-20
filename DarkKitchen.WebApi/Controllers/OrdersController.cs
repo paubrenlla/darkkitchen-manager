@@ -88,8 +88,15 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetOrderDetail(Guid id)
     {
-        var order = _orderService.GetOrderById(id);
-        var response = Converter.ToOrderDetailResponse(order);
-        return Ok(response);
+        try
+        {
+            var order = _orderService.GetOrderById(id);
+            var response = Converter.ToOrderDetailResponse(order);
+            return Ok(response);
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
     }
 }
