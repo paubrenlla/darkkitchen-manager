@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.Models.DTOs;
 
@@ -24,5 +23,5 @@ public class UserCreateRequest
     [Required(ErrorMessage = "La contraseña es obligatoria.")]
     public required string Password { get; set; }
 
-    public Role? Role { get; set; }
+    public string? Role { get; set; }
 }

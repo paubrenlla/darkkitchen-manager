@@ -1,4 +1,3 @@
-using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
     {
         try
         {
-            User user = _userService.CreateUser(request);
-            var response = UserCreateResponse.FromUser(user);
+            var response = _userService.CreateUser(request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
         catch(ArgumentException ex)
