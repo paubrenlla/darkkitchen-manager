@@ -62,6 +62,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 break;
             case "noentregado": _orderService.NotDelivered(id);
                 break;
+            default:
+                return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
         }
 
         var order = _orderService.GetOrderById(id);
