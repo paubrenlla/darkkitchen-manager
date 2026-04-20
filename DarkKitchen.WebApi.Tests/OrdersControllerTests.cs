@@ -106,4 +106,22 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(400, result.StatusCode);
    }
+   
+   [TestMethod]
+   public void UpdateStatus_Cancelado_ReturnsOk()
+   {
+       var orderId = Guid.NewGuid();
+       var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+       var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+       var order = new Order(_clientId, address, DeliveryType.Express, items);
+
+       _mockOrderService.Setup(s => s.Cancel(orderId));
+       _mockOrderService.Setup(s => s.GetOrderDetail(orderId)).Returns(order);
+
+       var request = new OrderStatusUpdateRequest { Status = "Cancelado" };
+       var result = _controller.UpdateStatus(orderId, request) as OkObjectResult;
+
+       Assert.IsNotNull(result);
+       _mockOrderService.Verify(s => s.Cancel(orderId), Times.Once);
+   }
 }
