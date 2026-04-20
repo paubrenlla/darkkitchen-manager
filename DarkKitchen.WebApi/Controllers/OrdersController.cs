@@ -58,6 +58,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 break;
             case "preparado": _orderService.Prepare(id);
                 break;
+            case "encamino": _orderService.Ship(id);
+                break;
         }
 
         var order = _orderService.GetOrderById(id);
