@@ -99,4 +99,16 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             return NotFound(new { error = ex.Message });
         }
     }
+
+    [HttpGet]
+    public IActionResult GetOrders(
+        [FromHeader(Name = "X-Client-Id")] Guid clientId,
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
+        [FromQuery] string? status)
+    {
+        var orders = _orderService.GetOrdersByClient(clientId, fromDate, toDate, status);
+        var response = orders.Select(Converter.ToOrderListResponse);
+        return Ok(response);
+    }
 }
