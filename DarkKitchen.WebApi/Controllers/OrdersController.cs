@@ -17,7 +17,10 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     [HttpPost]
     public IActionResult CreateOrder([FromBody] OrderCreateRequest request, [FromHeader(Name = "X-Client-Id")] Guid clientId)
     {
-        Enum.TryParse<DeliveryType>(request.DeliveryType, true, out var deliveryType);
+        if(!Enum.TryParse<DeliveryType>(request.DeliveryType, true, out var deliveryType))
+        {
+            return BadRequest(new { error = "Tipo de entrega inválido." });
+        }
 
         var address = new Address(
             request.Address.Street,
