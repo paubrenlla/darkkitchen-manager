@@ -77,4 +77,33 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(400, result.StatusCode);
    }
+
+   [TestMethod]
+   public void CreateOrder_ServiceThrowsArgumentException_ReturnsBadRequest()
+   {
+       var request = new OrderCreateRequest
+       {
+           DeliveryType = "Express",
+           Address = new OrderAddressDto
+           {
+               Street = "Rivera",
+               Number = "1234",
+               City = "Montevideo",
+               Country = "Uruguay",
+           },
+           Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
+       };
+
+       _mockOrderService.Setup(s => s.CreateOrder(
+               It.IsAny<Guid>(),
+               It.IsAny<Address>(),
+               It.IsAny<DeliveryType>(),
+               It.IsAny<List<OrderItem>>()))
+           .Throws(new ArgumentException("El pedido debe tener al menos un producto."));
+
+       var result = _controller.CreateOrder(request, _clientId) as BadRequestObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(400, result.StatusCode);
+   }
 }
