@@ -222,4 +222,19 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(404, result.StatusCode);
    }
+
+   [TestMethod]
+   public void UpdateStatus_InvalidTransition_ReturnsBadRequest()
+   {
+       var orderId = Guid.NewGuid();
+
+       _mockOrderService.Setup(s => s.Ship(orderId))
+           .Throws(new InvalidOperationException("No se puede enviar en estado Pending"));
+
+       var request = new OrderStatusUpdateRequest { Status = "EnCamino" };
+       var result = _controller.UpdateStatus(orderId, request) as BadRequestObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(400, result.StatusCode);
+   }
 }
