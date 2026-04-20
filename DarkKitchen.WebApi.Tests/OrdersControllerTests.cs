@@ -55,4 +55,26 @@ public class OrdersControllerTests
        Assert.IsNotNull(result);
        Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
    }
+
+   [TestMethod]
+   public void CreateOrder_InvalidDeliveryType_ReturnsBadRequest()
+   {
+       var request = new OrderCreateRequest
+       {
+           DeliveryType = "InvalidType",
+           Address = new OrderAddressDto
+           {
+               Street = "Rivera",
+               Number = "1234",
+               City = "Montevideo",
+               Country = "Uruguay",
+           },
+           Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
+       };
+
+       var result = _controller.CreateOrder(request, _clientId) as BadRequestObjectResult;
+
+       Assert.IsNotNull(result);
+       Assert.AreEqual(400, result.StatusCode);
+   }
 }
