@@ -56,6 +56,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             case "entregado":
                 _orderService.Deliver(id);
                 break;
+            case "preparado": _orderService.Prepare(id);
+                break;
         }
 
         var order = _orderService.GetOrderById(id);
