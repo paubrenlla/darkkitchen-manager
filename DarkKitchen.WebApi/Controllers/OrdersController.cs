@@ -84,4 +84,12 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpGet("{id}")]
+    public IActionResult GetOrderDetail(Guid id)
+    {
+        var order = _orderService.GetOrderById(id);
+        var response = Converter.ToOrderDetailResponse(order);
+        return Ok(response);
+    }
 }
