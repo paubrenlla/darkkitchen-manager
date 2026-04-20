@@ -53,6 +53,9 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             case "cancelado":
                 _orderService.Cancel(id);
                 break;
+            case "entregado":
+                _orderService.Deliver(id);
+                break;
         }
 
         var order = _orderService.GetOrderById(id);
