@@ -1,5 +1,4 @@
 ﻿using DarkKitchen.IBusinessLogic;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,24 +17,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         try
         {
-            if(!Enum.TryParse<DeliveryType>(request.DeliveryType, true, out var deliveryType))
-            {
-                return BadRequest(new { error = "Tipo de entrega inválido." });
-            }
-
-            var address = new Address(
-                request.Address.Street,
-                request.Address.Number,
-                request.Address.Apartment,
-                request.Address.City,
-                request.Address.Country);
-
-            var items = request.Items.Select(i =>
-                new OrderItem(i.ProductId, i.Quantity, 0m)).ToList();
-
-            var order = _orderService.CreateOrder(clientId, address, deliveryType, items);
-            var response = Converter.ToOrderCreateResponse(order);
-
+            var response = _orderService.CreateOrder(clientId, request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
         catch(ArgumentException ex)
@@ -70,8 +52,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                     return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
             }
 
-            var order = _orderService.GetOrderById(id);
-            var response = Converter.ToOrderStatusResponse(order);
+            var response = _orderService.GetOrderById(id);
             return Ok(response);
         }
         catch(KeyNotFoundException ex)
@@ -89,8 +70,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         try
         {
-            var order = _orderService.GetOrderById(id);
-            var response = Converter.ToOrderDetailResponse(order);
+            var response = _orderService.GetOrderById(id);
             return Ok(response);
         }
         catch(KeyNotFoundException ex)
@@ -107,7 +87,6 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         [FromQuery] string? status)
     {
         var orders = _orderService.GetOrdersByClient(clientId, fromDate, toDate, status);
-        var response = orders.Select(Converter.ToOrderListResponse);
-        return Ok(response);
+        return Ok(orders);
     }
 }

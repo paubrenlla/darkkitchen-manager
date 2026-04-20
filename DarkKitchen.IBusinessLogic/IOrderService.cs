@@ -1,16 +1,16 @@
-using DarkKitchen.Domain.Orders;
+using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.IBusinessLogic;
 
 public interface IOrderService
 {
-    Order CreateOrder(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items);
+    OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request);
+    OrderDetailResponse GetOrderById(Guid orderId);
+    IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state);
+    IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city);
     void Prepare(Guid orderId);
     void Cancel(Guid orderId);
     void Ship(Guid orderId);
     void Deliver(Guid orderId);
     void NotDelivered(Guid orderId);
-    Order GetOrderById(Guid orderId);
-    IEnumerable<Order> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state);
-    IEnumerable<Order> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city);
 }

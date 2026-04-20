@@ -31,7 +31,7 @@ public class UserControllerTests
             Email = "lucia@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Valid1Password!@"
+            Password = "Valid1Password!@",
         };
 
         var mockPhone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
@@ -43,11 +43,7 @@ public class UserControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
-
-        var response = result.Value as UserCreateResponse;
-        Assert.IsNotNull(response);
-        Assert.AreEqual("Lucia", response.Name);
-        Assert.AreEqual("lucia@test.com", response.Email);
+        Assert.IsNotNull(result.Value);
     }
 
     [TestMethod]

@@ -1,6 +1,7 @@
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
+using DarkKitchen.Models.DTOs;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;
@@ -25,12 +26,25 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    public void CreateOrder_ShouldCreateOrderAndAddToRepository()
+    public void CreateOrder_ShouldReturnResponseAndAddToRepository()
     {
-        Order order = _orderService.CreateOrder(_clientId, _address, DeliveryType.Express, _items);
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = "Express",
+            Address = new OrderAddressDto
+            {
+                Street = "Rivera",
+                Number = "1234",
+                City = "Montevideo",
+                Country = "Uruguay",
+            },
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
+        };
 
-        Assert.IsNotNull(order);
-        Assert.AreEqual(_clientId, order.ClientId);
+        var result = _orderService.CreateOrder(_clientId, request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(_clientId, result.ClientId);
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
 
