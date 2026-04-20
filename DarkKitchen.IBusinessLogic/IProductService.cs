@@ -1,8 +1,8 @@
-﻿using DarkKitchen.Domain;
+﻿using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.IBusinessLogic;
 
 public interface IProductService
 {
-    IEnumerable<Product> GetProducts(string? name, string? line, string? category);
+    IEnumerable<ProductResponse> GetProducts(string? name, string? line, string? category);
 }

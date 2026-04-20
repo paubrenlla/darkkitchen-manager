@@ -1,4 +1,3 @@
-using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -34,16 +33,27 @@ public class UserControllerTests
             Password = "Valid1Password!@",
         };
 
-        var mockPhone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var createdUser = new User(request.Name, request.Surname, request.Email, mockPhone, request.Password, Role.Cliente);
+        var response = new UserCreateResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "Lucia",
+            Surname = "Gomez",
+            Email = "lucia@test.com",
+            Phone = "+598094111222",
+            Role = "Cliente",
+        };
 
-        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(createdUser);
+        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(response);
 
         var result = _userController.CreateUser(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
-        Assert.IsNotNull(result.Value);
+
+        var body = result.Value as UserCreateResponse;
+        Assert.IsNotNull(body);
+        Assert.AreEqual("Lucia", body.Name);
+        Assert.AreEqual("lucia@test.com", body.Email);
     }
 
     [TestMethod]
@@ -56,7 +66,7 @@ public class UserControllerTests
             Email = "lucia@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Valid1Password!@"
+            Password = "Valid1Password!@",
         };
 
         _userServiceMock.Setup(s => s.CreateUser(request))

@@ -1,5 +1,6 @@
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
 using Moq;
 
@@ -13,37 +14,33 @@ public class AuthServiceTests
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
-
-    private static readonly Domain.Users.PhoneNumber ValidPhone =
-        Domain.Users.PhoneNumber.Create("+598", "094123456", UruguayStrategy);
+    private static readonly Domain.Users.PhoneNumber ValidPhone = Domain.Users.PhoneNumber.Create("+598", "094123456", UruguayStrategy);
 
     private AuthService _authService = null!;
-    private Mock<IPhoneValidationStrategy> _phoneStrategyMock = null!;
     private Mock<IUserRepository> _userRepositoryMock = null!;
+    private Mock<ITokenService> _tokenServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
-        _phoneStrategyMock = new Mock<IPhoneValidationStrategy>();
-        _phoneStrategyMock.Setup(s => s.IsValid(It.IsAny<string>())).Returns(true);
-        _authService = new AuthService(_userRepositoryMock.Object);
+        _tokenServiceMock = new Mock<ITokenService>();
+        _authService = new AuthService(_userRepositoryMock.Object, _tokenServiceMock.Object);
     }
 
     [TestMethod]
-    public void LoginWithValidCredentials_ReturnsUser()
+    public void LoginWithValidCredentials_ReturnsLoginResponse()
     {
         var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
-            .Returns(expectedUser);
+        _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(expectedUser);
+        _tokenServiceMock.Setup(t => t.GenerateToken(expectedUser)).Returns("mocked.token");
 
-        User result = _authService.Login(ValidEmail, ValidPassword);
+        var result = _authService.Login(ValidEmail, ValidPassword);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(expectedUser.Id, result.Id);
-        Assert.AreEqual(expectedUser.Email, result.Email);
-        Assert.AreEqual(expectedUser.Role, result.Role);
+        Assert.AreEqual("mocked.token", result.Token);
+        Assert.AreEqual("Cliente", result.Role);
         _userRepositoryMock.Verify(repo => repo.GetUserByEmail(ValidEmail), Times.Once);
     }
 
@@ -51,24 +48,19 @@ public class AuthServiceTests
     [ExpectedException(typeof(UnauthorizedAccessException))]
     public void LoginWithInvalidPassword_ThrowsUnauthorized()
     {
-        var invalidPassword = "WrongPassword";
         var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
 
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail))
-            .Returns(existingUser);
+        _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(existingUser);
 
-        _authService.Login(ValidEmail, invalidPassword);
+        _authService.Login(ValidEmail, "WrongPassword");
     }
 
     [TestMethod]
     [ExpectedException(typeof(UnauthorizedAccessException))]
     public void LoginWithNonExistentEmail_ThrowsUnauthorized()
     {
-        var email = "nonexistent@bmb.com";
+        _userRepositoryMock.Setup(repo => repo.GetUserByEmail("nonexistent@bmb.com")).Returns((User)null!);
 
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmail(email))
-            .Returns((User)null!);
-
-        _authService.Login(email, ValidPassword);
+        _authService.Login("nonexistent@bmb.com", ValidPassword);
     }
 }

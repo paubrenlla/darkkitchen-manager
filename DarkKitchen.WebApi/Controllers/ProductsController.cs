@@ -18,17 +18,6 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromQuery] string? category)
     {
         var products = _productService.GetProducts(name, line, category);
-
-        var result = products.Select(p => new
-        {
-            p.Code,
-            p.Name,
-            p.Description,
-            p.Price,
-            Line = p.Line.Name,
-            Category = p.Category.Name,
-        });
-
-        return Ok(result);
+        return Ok(products);
     }
 }
