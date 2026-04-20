@@ -66,4 +66,30 @@ public class UserServiceTests
 
         _userService.CreateUser(request);
     }
+
+    [TestMethod]
+    public void CreateUser_WithExplicitRole_ShouldUseProvidedRole()
+    {
+        var request = new UserCreateRequest
+        {
+            Name = "Carlos",
+            Surname = "Perez",
+            Email = "carlos@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = "Administrativo",
+        };
+
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        var result = _userService.CreateUser(request);
+
+        Assert.IsNotNull(result);
+        _userRepositoryMock.Verify(repo => repo.Add(It.IsAny<User>()), Times.Once);
+    }
 }

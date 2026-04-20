@@ -1,4 +1,5 @@
-﻿using DarkKitchen.Domain;
+using DarkKitchen.Domain;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.DTOs;
 
@@ -38,6 +39,59 @@ public static class Converter
             Email = user.Email,
             Phone = $"{user.Phone.CountryPrefix}{user.Phone.Number}",
             Role = user.Role.ToString(),
+        };
+    }
+
+    public static OrderCreateResponse ToOrderCreateResponse(Order order)
+    {
+        return new OrderCreateResponse
+        {
+            ClientId = order.ClientId,
+            OrderNumber = order.OrderNumber ?? 0,
+            Subtotal = order.Subtotal,
+            ShippingCost = order.ShippingCost,
+            Total = order.Total,
+        };
+    }
+
+    public static OrderStatusResponse ToOrderStatusResponse(Order order)
+    {
+        return new OrderStatusResponse
+        {
+            Status = order.State.ToString(),
+            LastTransitionDate = order.LastTransitionDate,
+        };
+    }
+
+    public static OrderDetailResponse ToOrderDetailResponse(Order order)
+    {
+        return new OrderDetailResponse
+        {
+            OrderNumber = order.OrderNumber,
+            ClientId = order.ClientId,
+            CreatedAt = order.CreatedAt,
+            Status = order.State.ToString(),
+            Total = order.Total,
+            Items = order.Items.Select(i => new OrderItemDetailDto
+            {
+                ProductId = i.ProductId,
+                Quantity = i.Quantity,
+                Price = i.Price,
+                ItemTotal = i.CalculateItemTotal(),
+            }).ToList(),
+        };
+    }
+
+    public static OrderListResponse ToOrderListResponse(Order order)
+    {
+        return new OrderListResponse
+        {
+            OrderNumber = order.OrderNumber,
+            ClientId = order.ClientId,
+            CreatedAt = order.CreatedAt,
+            Status = order.State.ToString(),
+            Total = order.Total,
+            ProductCount = order.Items.Sum(i => i.Quantity),
         };
     }
 }
