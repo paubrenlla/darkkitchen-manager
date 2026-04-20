@@ -79,5 +79,9 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         {
             return NotFound(new { error = ex.Message });
         }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
