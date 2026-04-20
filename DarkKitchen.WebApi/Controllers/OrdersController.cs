@@ -48,26 +48,36 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     [HttpPatch("{id}/status")]
     public IActionResult UpdateStatus(Guid id, [FromBody] OrderStatusUpdateRequest request)
     {
-        switch(request.Status.ToLower())
+        try
         {
-            case "cancelado":
-                _orderService.Cancel(id);
-                break;
-            case "entregado":
-                _orderService.Deliver(id);
-                break;
-            case "preparado": _orderService.Prepare(id);
-                break;
-            case "encamino": _orderService.Ship(id);
-                break;
-            case "noentregado": _orderService.NotDelivered(id);
-                break;
-            default:
-                return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
-        }
+            switch(request.Status.ToLower())
+            {
+                case "cancelado":
+                    _orderService.Cancel(id);
+                    break;
+                case "entregado":
+                    _orderService.Deliver(id);
+                    break;
+                case "preparado":
+                    _orderService.Prepare(id);
+                    break;
+                case "encamino":
+                    _orderService.Ship(id);
+                    break;
+                case "noentregado":
+                    _orderService.NotDelivered(id);
+                    break;
+                default:
+                    return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
+            }
 
-        var order = _orderService.GetOrderById(id);
-        var response = Converter.ToOrderStatusResponse(order);
-        return Ok(response);
+            var order = _orderService.GetOrderById(id);
+            var response = Converter.ToOrderStatusResponse(order);
+            return Ok(response);
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
     }
 }
