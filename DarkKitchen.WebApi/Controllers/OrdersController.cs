@@ -60,6 +60,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 break;
             case "encamino": _orderService.Ship(id);
                 break;
+            case "noentregado": _orderService.NotDelivered(id);
+                break;
         }
 
         var order = _orderService.GetOrderById(id);
