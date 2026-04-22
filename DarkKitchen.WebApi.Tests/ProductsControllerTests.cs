@@ -1,5 +1,5 @@
-﻿using DarkKitchen.Domain;
-using DarkKitchen.IBusinessLogic;
+﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -11,20 +11,17 @@ public class ProductsControllerTests
 {
     private Mock<IProductService> _mockService = null!;
     private ProductsController _controller = null!;
-    private List<Product> _testProducts = null!;
+    private List<ProductResponse> _testProducts = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _mockService = new Mock<IProductService>();
 
-        var lineCombo = new ProductLine("Combo burgers");
-        var categoryParrilla = new ProductCategory("Parrilla");
-
         _testProducts =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m),
-            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m),
+            new ProductResponse { Code = "BURG01", Name = "Hamburguesa Clasica", Description = "Hamburguesa clasica con queso cheddar", Price = 150m, Line = "Combo burgers", Category = "Parrilla" },
+            new ProductResponse { Code = "BURG02", Name = "Hamburguesa Doble Grande", Description = "Hamburguesa doble con queso y bacon", Price = 200m, Line = "Combo burgers", Category = "Parrilla" },
         ];
 
         _controller = new ProductsController(_mockService.Object);
@@ -40,7 +37,7 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
 
-        var products = (result.Value as IEnumerable<object>)?.ToList();
+        var products = (result.Value as IEnumerable<ProductResponse>)?.ToList();
         Assert.IsNotNull(products);
         Assert.AreEqual(2, products.Count);
     }

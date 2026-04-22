@@ -16,6 +16,7 @@ public static class DependencyResolution
     public static IServiceCollection AddProjectServices(this IServiceCollection services)
     {
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IOrderService, OrderService>();
         services.AddSingleton<IUserRepository, InMemoryUserRepository>();
         services.AddSingleton<IProductRepository, InMemoryProductRepository>();
         services.AddScoped<ITokenService, TokenService>();

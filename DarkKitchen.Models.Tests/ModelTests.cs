@@ -1,5 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using DarkKitchen.Domain;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.Models.Tests;
@@ -8,12 +11,12 @@ namespace DarkKitchen.Models.Tests;
 public class ModelTests
 {
     [TestMethod]
-    public void UserCreateResponse_FromUser_MapsCorrectData()
+    public void Converter_ToUserCreateResponse_MapsCorrectData()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
 
-        var result = UserCreateResponse.FromUser(user);
+        var result = Converter.ToUserCreateResponse(user);
 
         Assert.AreEqual(user.Id, result.Id);
         Assert.AreEqual("Juan", result.Name);
@@ -33,7 +36,7 @@ public class ModelTests
             Email = "juan@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Pass123!"
+            Password = "Pass123!",
         };
 
         var validationResults = new List<ValidationResult>();
@@ -68,9 +71,128 @@ public class ModelTests
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
             Password = "Pass123!",
-            Role = Role.Administrativo
+            Role = "Administrativo",
         };
 
-        Assert.AreEqual(Role.Administrativo, request.Role);
+        Assert.AreEqual("Administrativo", request.Role);
+    }
+
+    [TestMethod]
+    public void ToLoginResponse_ShouldMapCorrectly()
+    {
+        var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+
+        var result = Converter.ToLoginResponse("my.jwt.token", user);
+
+        Assert.AreEqual("my.jwt.token", result.Token);
+        Assert.AreEqual("Cliente", result.Role);
+    }
+
+    [TestMethod]
+    public void ToProductResponse_ShouldMapCorrectly()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m);
+
+        var result = Converter.ToProductResponse(product);
+
+        Assert.AreEqual("BURG01", result.Code);
+        Assert.AreEqual("Hamburguesa Clasica", result.Name);
+        Assert.AreEqual("Hamburguesa clasica con queso cheddar", result.Description);
+        Assert.AreEqual(150m, result.Price);
+        Assert.AreEqual("Combo burgers", result.Line);
+        Assert.AreEqual("Parrilla", result.Category);
+    }
+
+    [TestMethod]
+    public void ToUserCreateResponse_ShouldMapCorrectly()
+    {
+        var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+
+        var result = Converter.ToUserCreateResponse(user);
+
+        Assert.AreEqual(user.Id, result.Id);
+        Assert.AreEqual("Juan", result.Name);
+        Assert.AreEqual("Perez", result.Surname);
+        Assert.AreEqual("juan@test.com", result.Email);
+        Assert.AreEqual("+598094111222", result.Phone);
+        Assert.AreEqual("Cliente", result.Role);
+    }
+
+    [TestMethod]
+    public void ToOrderCreateResponse_ShouldMapCorrectly()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m) };
+        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        order.AssignOrderNumber(42);
+
+        var result = Converter.ToOrderCreateResponse(order);
+
+        Assert.AreEqual(order.ClientId, result.ClientId);
+        Assert.AreEqual(42, result.OrderNumber);
+        Assert.AreEqual(order.Subtotal, result.Subtotal);
+        Assert.AreEqual(order.Total, result.Total);
+    }
+
+    [TestMethod]
+    public void ToOrderStatusResponse_ShouldMapCorrectly()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+
+        var result = Converter.ToOrderStatusResponse(order);
+
+        Assert.AreEqual("Pending", result.Status);
+        Assert.AreEqual(order.LastTransitionDate, result.LastTransitionDate);
+    }
+
+    [TestMethod]
+    public void ToOrderDetailResponse_ShouldMapCorrectly()
+    {
+        var productId = Guid.NewGuid();
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(productId, 3, 50m) };
+        var clientId = Guid.NewGuid();
+        var order = new Order(clientId, address, DeliveryType.Express, items);
+        order.AssignOrderNumber(10);
+
+        var result = Converter.ToOrderDetailResponse(order);
+
+        Assert.AreEqual(10, result.OrderNumber);
+        Assert.AreEqual(clientId, result.ClientId);
+        Assert.AreEqual("Pending", result.Status);
+        Assert.AreEqual(order.Total, result.Total);
+        Assert.AreEqual(1, result.Items.Count);
+        Assert.AreEqual(productId, result.Items[0].ProductId);
+        Assert.AreEqual(3, result.Items[0].Quantity);
+        Assert.AreEqual(50m, result.Items[0].Price);
+        Assert.AreEqual(150m, result.Items[0].ItemTotal);
+    }
+
+    [TestMethod]
+    public void ToOrderListResponse_ShouldMapCorrectly()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem>
+        {
+            new(Guid.NewGuid(), 2, 100m),
+            new(Guid.NewGuid(), 3, 50m),
+        };
+        var clientId = Guid.NewGuid();
+        var order = new Order(clientId, address, DeliveryType.Express, items);
+        order.AssignOrderNumber(5);
+
+        var result = Converter.ToOrderListResponse(order);
+
+        Assert.AreEqual(5, result.OrderNumber);
+        Assert.AreEqual(clientId, result.ClientId);
+        Assert.AreEqual("Pending", result.Status);
+        Assert.AreEqual(order.Total, result.Total);
+        Assert.AreEqual(5, result.ProductCount);
     }
 }
