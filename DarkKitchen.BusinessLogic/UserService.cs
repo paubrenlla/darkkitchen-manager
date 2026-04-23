@@ -31,4 +31,9 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
     }
+
+    public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
+    {
+        return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
+    }
 }

@@ -97,7 +97,7 @@ public class UserServiceTests
     public void GetUsers_ShouldDelegateToRepository()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber phone = PhoneNumber.Create("+598", "094123456", strategy);
+        Domain.Users.PhoneNumber phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
         List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente)];
 
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);

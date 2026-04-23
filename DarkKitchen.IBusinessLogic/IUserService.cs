@@ -5,4 +5,5 @@ namespace DarkKitchen.IBusinessLogic;
 public interface IUserService
 {
     UserCreateResponse CreateUser(UserCreateRequest request);
+    IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname);
 }
