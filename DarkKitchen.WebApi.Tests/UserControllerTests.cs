@@ -184,4 +184,18 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
     }
+
+    [TestMethod]
+    public void DeleteUser_ValidRequest_ReturnsNoContent()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        _userServiceMock.Setup(s => s.DeleteUser(adminId, userId));
+
+        NoContentResult? result = _userController.DeleteUser(userId, adminId) as NoContentResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(204, result.StatusCode);
+    }
 }
