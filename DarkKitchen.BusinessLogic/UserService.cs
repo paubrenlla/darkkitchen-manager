@@ -60,4 +60,9 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         _userRepository.Update(userId, existingUser);
         return Converter.ToUserCreateResponse(existingUser);
     }
+
+    public void DeleteUser(Guid adminId, Guid userId)
+    {
+        _userRepository.Delete(userId);
+    }
 }
