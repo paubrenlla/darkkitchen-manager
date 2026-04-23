@@ -160,4 +160,15 @@ public class UserServiceTests
 
         _userService.UpdateUser(adminId, adminId, request);
     }
+
+    [TestMethod]
+    public void DeleteUser_ValidRequest_ShouldCallRepositoryDelete()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        _userService.DeleteUser(adminId, userId);
+
+        _userRepositoryMock.Verify(r => r.Delete(userId), Times.Once);
+    }
 }
