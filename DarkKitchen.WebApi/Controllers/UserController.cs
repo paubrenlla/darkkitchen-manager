@@ -54,7 +54,14 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteUser(Guid id, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
     {
-        _userService.DeleteUser(adminId, id);
-        return NoContent();
+        try
+        {
+            _userService.DeleteUser(adminId, id);
+            return NoContent();
+        }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
