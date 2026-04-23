@@ -141,4 +141,23 @@ public class UserServiceTests
         Assert.AreEqual("Nuevo", result.Name);
         _userRepositoryMock.Verify(r => r.Update(userId, It.IsAny<User>()), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void UpdateUser_SelfModification_ShouldThrow()
+    {
+        Guid adminId = Guid.NewGuid();
+
+        UserUpdateRequest request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        _userService.UpdateUser(adminId, adminId, request);
+    }
 }
