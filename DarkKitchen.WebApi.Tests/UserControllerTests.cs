@@ -135,4 +135,28 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateUser_SelfModification_ReturnsBadRequest()
+    {
+        Guid adminId = Guid.NewGuid();
+
+        UserUpdateRequest request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        _userServiceMock.Setup(s => s.UpdateUser(adminId, adminId, request))
+            .Throws(new InvalidOperationException("Un usuario no puede modificarse a sí mismo."));
+
+        BadRequestObjectResult? result = _userController.UpdateUser(adminId, request, adminId) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
