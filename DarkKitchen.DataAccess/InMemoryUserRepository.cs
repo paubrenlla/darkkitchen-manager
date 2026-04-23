@@ -60,6 +60,11 @@ public class InMemoryUserRepository : IUserRepository
             query = query.Where(u => u.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        if(!string.IsNullOrWhiteSpace(surname))
+        {
+            query = query.Where(u => u.Surname.Contains(surname, StringComparison.OrdinalIgnoreCase));
+        }
+
         return query;
     }
 }
