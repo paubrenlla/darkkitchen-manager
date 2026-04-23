@@ -63,4 +63,15 @@ public class UserRepositoryTests
         Assert.IsNotNull(retrievedUser);
         Assert.AreEqual("Marta", retrievedUser.Name);
     }
+
+    [TestMethod]
+    public void GetById_ExistingUser_ReturnsUser()
+    {
+        User user = _userRepository.GetUserByEmail("admin@bmb.com")!;
+
+        User? result = _userRepository.GetById(user.Id);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(user.Id, result.Id);
+    }
 }
