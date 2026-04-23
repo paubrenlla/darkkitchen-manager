@@ -50,4 +50,16 @@ public class InMemoryUserRepository : IUserRepository
     {
         return _users.FirstOrDefault(u => u.Id == id);
     }
+
+    public IEnumerable<User> GetByNameAndSurname(string? name, string? surname)
+    {
+        IEnumerable<User> query = _users;
+
+        if(!string.IsNullOrWhiteSpace(name))
+        {
+            query = query.Where(u => u.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return query;
+    }
 }
