@@ -116,4 +116,22 @@ public class UserRepositoryTests
 
         Assert.IsTrue(result.Any());
     }
+
+    [TestMethod]
+    public void Update_ExistingUser_ShouldPersistChanges()
+    {
+        User user = _userRepository.GetUserByEmail("admin@bmb.com")!;
+        Guid originalId = user.Id;
+
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        PhoneNumber newPhone = PhoneNumber.Create("+598", "094999888", strategy);
+
+        user.UpdateDetails("NuevoNombre", "NuevoApellido", "admin@bmb.com", newPhone, Role.Administrativo);
+        _userRepository.Update(user.Id, user);
+
+        User? result = _userRepository.GetById(originalId);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("NuevoNombre", result.Name);
+        Assert.AreEqual(originalId, result.Id);
+    }
 }
