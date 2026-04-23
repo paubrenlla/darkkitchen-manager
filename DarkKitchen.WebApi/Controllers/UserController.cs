@@ -45,5 +45,9 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
