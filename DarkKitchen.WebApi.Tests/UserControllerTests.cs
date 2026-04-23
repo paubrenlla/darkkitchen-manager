@@ -212,4 +212,19 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
     }
+
+    [TestMethod]
+    public void DeleteUser_NotFound_ReturnsNotFound()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        _userServiceMock.Setup(s => s.DeleteUser(adminId, userId))
+            .Throws(new KeyNotFoundException("Usuario no encontrado."));
+
+        NotFoundObjectResult? result = _userController.DeleteUser(userId, adminId) as NotFoundObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(404, result.StatusCode);
+    }
 }
