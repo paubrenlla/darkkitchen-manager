@@ -36,4 +36,23 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
     {
         return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
     }
+
+    public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    {
+        User existingUser = _userRepository.GetById(userId);
+
+        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
+        Domain.Users.PhoneNumber validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        Role role = Enum.Parse<Role>(request.Role);
+
+        existingUser.UpdateDetails(
+            request.Name,
+            request.Surname,
+            request.Email,
+            validPhone,
+            role);
+
+        _userRepository.Update(userId, existingUser);
+        return Converter.ToUserCreateResponse(existingUser);
+    }
 }
