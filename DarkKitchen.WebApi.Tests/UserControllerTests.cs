@@ -101,4 +101,38 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateUser_ValidRequest_ReturnsOk()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        UserUpdateRequest request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        UserCreateResponse response = new UserCreateResponse
+        {
+            Id = userId,
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            Phone = "+598094999888",
+            Role = "Administrativo",
+        };
+
+        _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request)).Returns(response);
+
+        OkObjectResult? result = _userController.UpdateUser(userId, request, adminId) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
 }
