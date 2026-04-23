@@ -45,4 +45,9 @@ public class InMemoryUserRepository : IUserRepository
     {
         _users.Add(user);
     }
+
+    public User? GetById(Guid id)
+    {
+        return _users.FirstOrDefault(u => u.Id == id);
+    }
 }
