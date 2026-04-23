@@ -198,4 +198,18 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
     }
+
+    [TestMethod]
+    public void DeleteUser_SelfDeletion_ReturnsBadRequest()
+    {
+        Guid adminId = Guid.NewGuid();
+
+        _userServiceMock.Setup(s => s.DeleteUser(adminId, adminId))
+            .Throws(new InvalidOperationException("Un usuario no puede eliminarse a sí mismo."));
+
+        BadRequestObjectResult? result = _userController.DeleteUser(adminId, adminId) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
