@@ -108,4 +108,12 @@ public class UserRepositoryTests
 
         Assert.AreEqual(1, result.Count());
     }
+
+    [TestMethod]
+    public void GetByNameAndSurname_NoFilters_ReturnsAllUsers()
+    {
+        IEnumerable<User> result = _userRepository.GetByNameAndSurname(null, null);
+
+        Assert.IsTrue(result.Any());
+    }
 }
