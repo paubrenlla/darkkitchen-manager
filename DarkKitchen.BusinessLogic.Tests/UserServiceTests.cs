@@ -171,4 +171,13 @@ public class UserServiceTests
 
         _userRepositoryMock.Verify(r => r.Delete(userId), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeleteUser_SelfDeletion_ShouldThrow()
+    {
+        Guid adminId = Guid.NewGuid();
+
+        _userService.DeleteUser(adminId, adminId);
+    }
 }
