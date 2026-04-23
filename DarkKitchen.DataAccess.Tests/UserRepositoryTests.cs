@@ -156,4 +156,11 @@ public class UserRepositoryTests
         User? result = _userRepository.GetById(user.Id);
         Assert.IsNull(result);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Delete_NonExistingUser_ShouldThrow()
+    {
+        _userRepository.Delete(Guid.NewGuid());
+    }
 }
