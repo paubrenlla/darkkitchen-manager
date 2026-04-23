@@ -39,6 +39,11 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
     public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
     {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
+        }
+
         User existingUser = _userRepository.GetById(userId);
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
