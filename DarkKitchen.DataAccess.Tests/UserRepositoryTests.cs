@@ -134,4 +134,15 @@ public class UserRepositoryTests
         Assert.AreEqual("NuevoNombre", result.Name);
         Assert.AreEqual(originalId, result.Id);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Update_NonExistingUser_ShouldThrow()
+    {
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
+        User user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente);
+
+        _userRepository.Update(Guid.NewGuid(), user);
+    }
 }
