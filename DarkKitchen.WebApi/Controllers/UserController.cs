@@ -23,4 +23,13 @@ public class UserController(IUserService userService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpGet]
+    public IActionResult GetUsers(
+        [FromQuery] string? name,
+        [FromQuery] string? surname)
+    {
+        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname);
+        return Ok(users);
+    }
 }
