@@ -36,7 +36,14 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPut("{id}")]
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
     {
-        UserCreateResponse response = _userService.UpdateUser(adminId, id, request);
-        return Ok(response);
+        try
+        {
+            UserCreateResponse response = _userService.UpdateUser(adminId, id, request);
+            return Ok(response);
+        }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
