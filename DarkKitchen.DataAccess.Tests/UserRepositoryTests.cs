@@ -95,4 +95,17 @@ public class UserRepositoryTests
 
         Assert.AreEqual(1, result.Count());
     }
+
+    [TestMethod]
+    public void GetByNameAndSurname_FilterBySurname_ReturnsMatchingUsers()
+    {
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
+        User user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente);
+        _userRepository.Add(user);
+
+        IEnumerable<User> result = _userRepository.GetByNameAndSurname(null, "Perez");
+
+        Assert.AreEqual(1, result.Count());
+    }
 }
