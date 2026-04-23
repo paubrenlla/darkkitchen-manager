@@ -32,4 +32,11 @@ public class UserController(IUserService userService) : ControllerBase
         IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname);
         return Ok(users);
     }
+
+    [HttpPut("{id}")]
+    public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
+    {
+        UserCreateResponse response = _userService.UpdateUser(adminId, id, request);
+        return Ok(response);
+    }
 }
