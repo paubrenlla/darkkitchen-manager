@@ -63,5 +63,9 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
     }
 }
