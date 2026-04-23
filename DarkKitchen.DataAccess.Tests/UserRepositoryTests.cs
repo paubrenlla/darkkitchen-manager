@@ -145,4 +145,15 @@ public class UserRepositoryTests
 
         _userRepository.Update(Guid.NewGuid(), user);
     }
+
+    [TestMethod]
+    public void Delete_ExistingUser_ShouldRemoveUser()
+    {
+        User user = _userRepository.GetUserByEmail("admin@bmb.com")!;
+
+        _userRepository.Delete(user.Id);
+
+        User? result = _userRepository.GetById(user.Id);
+        Assert.IsNull(result);
+    }
 }
