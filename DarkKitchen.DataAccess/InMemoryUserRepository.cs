@@ -82,8 +82,9 @@ public class InMemoryUserRepository : IUserRepository
 
     public void Delete(Guid id)
     {
-        User user = _users.FirstOrDefault(u => u.Id == id);
+        User user = _users.FirstOrDefault(u => u.Id == id)
+                    ?? throw new KeyNotFoundException($"Usuario {id} no encontrado.");
 
-        _users.Remove(user!);
+        _users.Remove(user);
     }
 }
