@@ -31,4 +31,43 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
     }
+
+    public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
+    {
+        return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
+    }
+
+    public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
+        }
+
+        User existingUser = _userRepository.GetById(userId);
+
+        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
+        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        Role role = Enum.Parse<Role>(request.Role);
+
+        existingUser.UpdateDetails(
+            request.Name,
+            request.Surname,
+            request.Email,
+            validPhone,
+            role);
+
+        _userRepository.Update(userId, existingUser);
+        return Converter.ToUserCreateResponse(existingUser);
+    }
+
+    public void DeleteUser(Guid adminId, Guid userId)
+    {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
+        }
+
+        _userRepository.Delete(userId);
+    }
 }

@@ -133,4 +133,22 @@ public class UserTests
         var withDescendingSequence = "Valid1Password!@321";
         new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withDescendingSequence);
     }
+
+    [TestMethod]
+    public void UpdateDetails_ShouldUpdateFieldsAndPreserveId()
+    {
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        var phone = PhoneNumber.Create("+598", "094123456", strategy);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        Guid originalId = user.Id;
+
+        var newPhone = PhoneNumber.Create("+598", "094999888", strategy);
+        user.UpdateDetails("Nuevo", "Nombre", "nuevo@test.com", newPhone, Role.Administrativo);
+
+        Assert.AreEqual(originalId, user.Id);
+        Assert.AreEqual("Nuevo", user.Name);
+        Assert.AreEqual("Nombre", user.Surname);
+        Assert.AreEqual("nuevo@test.com", user.Email);
+        Assert.AreEqual(Role.Administrativo, user.Role);
+    }
 }

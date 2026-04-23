@@ -23,4 +23,49 @@ public class UserController(IUserService userService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpGet]
+    public IActionResult GetUsers(
+        [FromQuery] string? name,
+        [FromQuery] string? surname)
+    {
+        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname);
+        return Ok(users);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
+    {
+        try
+        {
+            UserCreateResponse response = _userService.UpdateUser(adminId, id, request);
+            return Ok(response);
+        }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteUser(Guid id, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
+    {
+        try
+        {
+            _userService.DeleteUser(adminId, id);
+            return NoContent();
+        }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+    }
 }

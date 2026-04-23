@@ -45,4 +45,46 @@ public class InMemoryUserRepository : IUserRepository
     {
         _users.Add(user);
     }
+
+    public User? GetById(Guid id)
+    {
+        return _users.FirstOrDefault(u => u.Id == id);
+    }
+
+    public IEnumerable<User> GetByNameAndSurname(string? name, string? surname)
+    {
+        IEnumerable<User> query = _users;
+
+        if(!string.IsNullOrWhiteSpace(name))
+        {
+            query = query.Where(u => u.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if(!string.IsNullOrWhiteSpace(surname))
+        {
+            query = query.Where(u => u.Surname.Contains(surname, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return query;
+    }
+
+    public void Update(Guid id, User user)
+    {
+        var index = _users.FindIndex(u => u.Id == id);
+
+        if(index < 0)
+        {
+            throw new KeyNotFoundException($"Usuario {id} no encontrado.");
+        }
+
+        _users[index] = user;
+    }
+
+    public void Delete(Guid id)
+    {
+        User user = _users.FirstOrDefault(u => u.Id == id)
+                    ?? throw new KeyNotFoundException($"Usuario {id} no encontrado.");
+
+        _users.Remove(user);
+    }
 }
