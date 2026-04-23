@@ -74,4 +74,25 @@ public class UserRepositoryTests
         Assert.IsNotNull(result);
         Assert.AreEqual(user.Id, result.Id);
     }
+
+    [TestMethod]
+    public void GetById_NonExistingId_ReturnsNull()
+    {
+        User? result = _userRepository.GetById(Guid.NewGuid());
+
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void FilterByName_ReturnsMatchingUsers()
+    {
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
+        User user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente);
+        _userRepository.Add(user);
+
+        IEnumerable<User> result = _userRepository.GetByNameAndSurname("Lucia", null);
+
+        Assert.AreEqual(1, result.Count());
+    }
 }
