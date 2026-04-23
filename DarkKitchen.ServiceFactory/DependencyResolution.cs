@@ -19,6 +19,7 @@ public static class DependencyResolution
         services.AddScoped<IOrderService, OrderService>();
         services.AddSingleton<IUserRepository, InMemoryUserRepository>();
         services.AddSingleton<IProductRepository, InMemoryProductRepository>();
+        services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
 
