@@ -9,4 +9,5 @@ public interface IUserRepository
     User? GetById(Guid id);
     IEnumerable<User> GetByNameAndSurname(string? name, string? surname);
     void Update(Guid id, User user);
+    void Delete(Guid id);
 }

@@ -79,4 +79,11 @@ public class InMemoryUserRepository : IUserRepository
 
         _users[index] = user;
     }
+
+    public void Delete(Guid id)
+    {
+        User user = _users.FirstOrDefault(u => u.Id == id);
+
+        _users.Remove(user!);
+    }
 }
