@@ -159,4 +159,29 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateUser_InvalidData_ReturnsBadRequest()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        UserUpdateRequest request = new UserUpdateRequest
+        {
+            Name = string.Empty,
+            Surname = "Nombre",
+            Email = "test@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request))
+            .Throws(new ArgumentException("Nombre inválido."));
+
+        BadRequestObjectResult? result = _userController.UpdateUser(userId, request, adminId) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
