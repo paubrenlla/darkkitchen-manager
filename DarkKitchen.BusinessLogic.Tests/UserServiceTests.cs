@@ -92,4 +92,19 @@ public class UserServiceTests
         Assert.IsNotNull(result);
         _userRepositoryMock.Verify(repo => repo.Add(It.IsAny<User>()), Times.Once);
     }
+
+    [TestMethod]
+    public void GetUsers_ShouldDelegateToRepository()
+    {
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        PhoneNumber phone = PhoneNumber.Create("+598", "094123456", strategy);
+        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente)];
+
+        _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
+
+        IEnumerable<UserCreateResponse> result = _userService.GetUsers("Juan", "Perez");
+
+        Assert.AreEqual(1, result.Count());
+        _userRepositoryMock.Verify(r => r.GetByNameAndSurname("Juan", "Perez"), Times.Once);
+    }
 }
