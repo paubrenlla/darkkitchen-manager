@@ -50,4 +50,11 @@ public class UserController(IUserService userService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteUser(Guid id, [FromHeader(Name = "X-Admin-Id")] Guid adminId)
+    {
+        _userService.DeleteUser(adminId, id);
+        return NoContent();
+    }
 }
