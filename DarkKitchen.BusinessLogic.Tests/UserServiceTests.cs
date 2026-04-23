@@ -97,7 +97,7 @@ public class UserServiceTests
     public void GetUsers_ShouldDelegateToRepository()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        Domain.Users.PhoneNumber phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
         List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente)];
 
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
@@ -111,21 +111,21 @@ public class UserServiceTests
     [TestMethod]
     public void UpdateUser_ValidRequest_ShouldUpdateAndReturn()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        Domain.Users.PhoneNumber phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        User existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador);
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador);
 
         _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
 
-        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
         mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
         mockStrategy.Setup(s => s.IsValid("094999888")).Returns(true);
         _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
 
-        UserUpdateRequest request = new UserUpdateRequest
+        var request = new UserUpdateRequest
         {
             Name = "Nuevo",
             Surname = "Nombre",
@@ -146,9 +146,9 @@ public class UserServiceTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void UpdateUser_SelfModification_ShouldThrow()
     {
-        Guid adminId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
-        UserUpdateRequest request = new UserUpdateRequest
+        var request = new UserUpdateRequest
         {
             Name = "Nuevo",
             Surname = "Nombre",
@@ -164,8 +164,8 @@ public class UserServiceTests
     [TestMethod]
     public void DeleteUser_ValidRequest_ShouldCallRepositoryDelete()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         _userService.DeleteUser(adminId, userId);
 
@@ -176,7 +176,7 @@ public class UserServiceTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void DeleteUser_SelfDeletion_ShouldThrow()
     {
-        Guid adminId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
         _userService.DeleteUser(adminId, adminId);
     }

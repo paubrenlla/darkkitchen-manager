@@ -138,11 +138,11 @@ public class UserTests
     public void UpdateDetails_ShouldUpdateFieldsAndPreserveId()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber phone = PhoneNumber.Create("+598", "094123456", strategy);
-        User user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var phone = PhoneNumber.Create("+598", "094123456", strategy);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
         Guid originalId = user.Id;
 
-        PhoneNumber newPhone = PhoneNumber.Create("+598", "094999888", strategy);
+        var newPhone = PhoneNumber.Create("+598", "094999888", strategy);
         user.UpdateDetails("Nuevo", "Nombre", "nuevo@test.com", newPhone, Role.Administrativo);
 
         Assert.AreEqual(originalId, user.Id);

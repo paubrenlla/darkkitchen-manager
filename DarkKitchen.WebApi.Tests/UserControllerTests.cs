@@ -96,7 +96,7 @@ public class UserControllerTests
 
         _userServiceMock.Setup(s => s.GetUsers("Juan", null)).Returns(users);
 
-        OkObjectResult? result = _userController.GetUsers("Juan", null) as OkObjectResult;
+        var result = _userController.GetUsers("Juan", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -105,10 +105,10 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_ValidRequest_ReturnsOk()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
-        UserUpdateRequest request = new UserUpdateRequest
+        var request = new UserUpdateRequest
         {
             Name = "Nuevo",
             Surname = "Nombre",
@@ -118,7 +118,7 @@ public class UserControllerTests
             Role = "Administrativo",
         };
 
-        UserCreateResponse response = new UserCreateResponse
+        var response = new UserCreateResponse
         {
             Id = userId,
             Name = "Nuevo",
@@ -130,7 +130,7 @@ public class UserControllerTests
 
         _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request)).Returns(response);
 
-        OkObjectResult? result = _userController.UpdateUser(userId, request, adminId) as OkObjectResult;
+        var result = _userController.UpdateUser(userId, request, adminId) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -139,9 +139,9 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_SelfModification_ReturnsBadRequest()
     {
-        Guid adminId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
-        UserUpdateRequest request = new UserUpdateRequest
+        var request = new UserUpdateRequest
         {
             Name = "Nuevo",
             Surname = "Nombre",
@@ -154,7 +154,7 @@ public class UserControllerTests
         _userServiceMock.Setup(s => s.UpdateUser(adminId, adminId, request))
             .Throws(new InvalidOperationException("Un usuario no puede modificarse a sí mismo."));
 
-        BadRequestObjectResult? result = _userController.UpdateUser(adminId, request, adminId) as BadRequestObjectResult;
+        var result = _userController.UpdateUser(adminId, request, adminId) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -163,10 +163,10 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_InvalidData_ReturnsBadRequest()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
-        UserUpdateRequest request = new UserUpdateRequest
+        var request = new UserUpdateRequest
         {
             Name = string.Empty,
             Surname = "Nombre",
@@ -179,7 +179,7 @@ public class UserControllerTests
         _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request))
             .Throws(new ArgumentException("Nombre inválido."));
 
-        BadRequestObjectResult? result = _userController.UpdateUser(userId, request, adminId) as BadRequestObjectResult;
+        var result = _userController.UpdateUser(userId, request, adminId) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -188,12 +188,12 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_ValidRequest_ReturnsNoContent()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         _userServiceMock.Setup(s => s.DeleteUser(adminId, userId));
 
-        NoContentResult? result = _userController.DeleteUser(userId, adminId) as NoContentResult;
+        var result = _userController.DeleteUser(userId, adminId) as NoContentResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
@@ -202,12 +202,12 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_SelfDeletion_ReturnsBadRequest()
     {
-        Guid adminId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
         _userServiceMock.Setup(s => s.DeleteUser(adminId, adminId))
             .Throws(new InvalidOperationException("Un usuario no puede eliminarse a sí mismo."));
 
-        BadRequestObjectResult? result = _userController.DeleteUser(adminId, adminId) as BadRequestObjectResult;
+        var result = _userController.DeleteUser(adminId, adminId) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -216,13 +216,13 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_NotFound_ReturnsNotFound()
     {
-        Guid adminId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         _userServiceMock.Setup(s => s.DeleteUser(adminId, userId))
             .Throws(new KeyNotFoundException("Usuario no encontrado."));
 
-        NotFoundObjectResult? result = _userController.DeleteUser(userId, adminId) as NotFoundObjectResult;
+        var result = _userController.DeleteUser(userId, adminId) as NotFoundObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);

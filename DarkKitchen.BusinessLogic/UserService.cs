@@ -47,7 +47,7 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         User existingUser = _userRepository.GetById(userId);
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        Domain.Users.PhoneNumber validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
         Role role = Enum.Parse<Role>(request.Role);
 
         existingUser.UpdateDetails(

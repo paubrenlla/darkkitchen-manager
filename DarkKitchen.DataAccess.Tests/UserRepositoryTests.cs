@@ -87,8 +87,8 @@ public class UserRepositoryTests
     public void FilterByName_ReturnsMatchingUsers()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
-        User user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var phone = PhoneNumber.Create("+598", "094111222", strategy);
+        var user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname("Lucia", null);
@@ -100,8 +100,8 @@ public class UserRepositoryTests
     public void GetByNameAndSurname_FilterBySurname_ReturnsMatchingUsers()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
-        User user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var phone = PhoneNumber.Create("+598", "094111222", strategy);
+        var user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname(null, "Perez");
@@ -124,7 +124,7 @@ public class UserRepositoryTests
         Guid originalId = user.Id;
 
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber newPhone = PhoneNumber.Create("+598", "094999888", strategy);
+        var newPhone = PhoneNumber.Create("+598", "094999888", strategy);
 
         user.UpdateDetails("NuevoNombre", "NuevoApellido", "admin@bmb.com", newPhone, Role.Administrativo);
         _userRepository.Update(user.Id, user);
@@ -140,8 +140,8 @@ public class UserRepositoryTests
     public void Update_NonExistingUser_ShouldThrow()
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
-        PhoneNumber phone = PhoneNumber.Create("+598", "094111222", strategy);
-        User user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var phone = PhoneNumber.Create("+598", "094111222", strategy);
+        var user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente);
 
         _userRepository.Update(Guid.NewGuid(), user);
     }
