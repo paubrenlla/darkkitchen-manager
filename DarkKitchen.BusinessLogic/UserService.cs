@@ -63,6 +63,11 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
     public void DeleteUser(Guid adminId, Guid userId)
     {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
+        }
+
         _userRepository.Delete(userId);
     }
 }
