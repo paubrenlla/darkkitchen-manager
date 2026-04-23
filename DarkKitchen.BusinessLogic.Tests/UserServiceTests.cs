@@ -107,4 +107,38 @@ public class UserServiceTests
         Assert.AreEqual(1, result.Count());
         _userRepositoryMock.Verify(r => r.GetByNameAndSurname("Juan", "Perez"), Times.Once);
     }
+
+    [TestMethod]
+    public void UpdateUser_ValidRequest_ShouldUpdateAndReturn()
+    {
+        Guid adminId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        Domain.Users.PhoneNumber phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        User existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador);
+
+        _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
+
+        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094999888")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        UserUpdateRequest request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        UserCreateResponse result = _userService.UpdateUser(adminId, userId, request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Nuevo", result.Name);
+        _userRepositoryMock.Verify(r => r.Update(userId, It.IsAny<User>()), Times.Once);
+    }
 }
