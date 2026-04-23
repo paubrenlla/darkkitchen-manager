@@ -77,4 +77,28 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
     }
+
+    [TestMethod]
+    public void GetUsers_ReturnsOkWithList()
+    {
+        List<UserCreateResponse> users =
+        [
+            new UserCreateResponse
+            {
+                Id = Guid.NewGuid(),
+                Name = "Juan",
+                Surname = "Perez",
+                Email = "juan@test.com",
+                Phone = "+598094123456",
+                Role = "Cliente",
+            },
+        ];
+
+        _userServiceMock.Setup(s => s.GetUsers("Juan", null)).Returns(users);
+
+        OkObjectResult? result = _userController.GetUsers("Juan", null) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
 }
