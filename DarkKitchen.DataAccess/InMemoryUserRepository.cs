@@ -67,4 +67,13 @@ public class InMemoryUserRepository : IUserRepository
 
         return query;
     }
+
+    public void Update(Guid id, User user)
+    {
+        var index = _users.FindIndex(u => u.Id == id);
+        if(index >= 0)
+        {
+            _users[index] = user;
+        }
+    }
 }
