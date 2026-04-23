@@ -71,9 +71,12 @@ public class InMemoryUserRepository : IUserRepository
     public void Update(Guid id, User user)
     {
         var index = _users.FindIndex(u => u.Id == id);
-        if(index >= 0)
+
+        if(index < 0)
         {
-            _users[index] = user;
+            throw new KeyNotFoundException($"Usuario {id} no encontrado.");
         }
+
+        _users[index] = user;
     }
 }
