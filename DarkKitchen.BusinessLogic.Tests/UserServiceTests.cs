@@ -185,7 +185,7 @@ public class UserServiceTests
     [ExpectedException(typeof(ArgumentException))]
     public void CreateUser_WithClienteRole_ShouldThrow()
     {
-        UserCreateRequest request = new UserCreateRequest
+        var request = new UserCreateRequest
         {
             Name = "Juan",
             Surname = "Perez",
@@ -202,7 +202,7 @@ public class UserServiceTests
     [TestMethod]
     public void CreateUser_WithAdministrativoRole_ShouldSucceed()
     {
-        UserCreateRequest request = new UserCreateRequest
+        var request = new UserCreateRequest
         {
             Name = "Juan",
             Surname = "Perez",
@@ -213,7 +213,7 @@ public class UserServiceTests
             Role = "Administrativo",
         };
 
-        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
         mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
         mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
         _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
@@ -227,7 +227,7 @@ public class UserServiceTests
     [TestMethod]
     public void CreateUser_WithPreparadorRole_ShouldSucceed()
     {
-        UserCreateRequest request = new UserCreateRequest
+        var request = new UserCreateRequest
         {
             Name = "Juan",
             Surname = "Perez",
@@ -238,7 +238,7 @@ public class UserServiceTests
             Role = "Preparador",
         };
 
-        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
         mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
         mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
         _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
@@ -252,7 +252,7 @@ public class UserServiceTests
     [TestMethod]
     public void CreateUser_WithNullRole_ShouldCreateCliente()
     {
-        UserCreateRequest request = new UserCreateRequest
+        var request = new UserCreateRequest
         {
             Name = "Juan",
             Surname = "Perez",
@@ -263,7 +263,7 @@ public class UserServiceTests
             Role = null,
         };
 
-        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
         mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
         mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
         _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
@@ -278,7 +278,7 @@ public class UserServiceTests
     [ExpectedException(typeof(ArgumentException))]
     public void CreateUser_WithEmptyRole_ShouldThrow()
     {
-        UserCreateRequest request = new UserCreateRequest
+        var request = new UserCreateRequest
         {
             Name = "Juan",
             Surname = "Perez",

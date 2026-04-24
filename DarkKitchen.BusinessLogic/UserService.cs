@@ -31,8 +31,8 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         }
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        Domain.Users.PhoneNumber validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
-        User user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role);
+        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role);
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
     }

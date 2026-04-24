@@ -51,7 +51,7 @@ public class UserController(IUserService userService) : ControllerBase
     {
         try
         {
-            Guid callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             UserCreateResponse response = _userService.UpdateUser(callerId, id, request);
             return Ok(response);
         }
@@ -70,7 +70,7 @@ public class UserController(IUserService userService) : ControllerBase
     {
         try
         {
-            Guid callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             _userService.DeleteUser(callerId, id);
             return NoContent();
         }
