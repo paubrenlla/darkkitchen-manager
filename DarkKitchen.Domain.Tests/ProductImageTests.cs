@@ -13,4 +13,11 @@ public class ProductImageTests
         Assert.AreEqual("photo.jpg", image.FileName);
         Assert.AreEqual(100000, image.SizeInBytes);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateImage_WithEmptyFileName_ShouldThrow()
+    {
+        new ProductImage(string.Empty, 100000);
+    }
 }

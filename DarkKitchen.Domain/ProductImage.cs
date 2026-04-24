@@ -7,7 +7,16 @@ public class ProductImage
 
     public ProductImage(string fileName, long sizeInBytes)
     {
+        ValidateFileName(fileName);
         FileName = fileName;
         SizeInBytes = sizeInBytes;
+    }
+
+    private static void ValidateFileName(string fileName)
+    {
+        if(string.IsNullOrWhiteSpace(fileName))
+        {
+            throw new ArgumentException("Image file name is required.");
+        }
     }
 }
