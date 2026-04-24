@@ -26,7 +26,7 @@ public static class Converter
             Price = product.Price,
             Line = product.Line.Name,
             Category = product.Category.Name,
-            Images = product.Images.Select(i => i.FileName).ToList(),
+            Images = product.Images.Select(i => i.Url).ToList(),
         };
     }
 

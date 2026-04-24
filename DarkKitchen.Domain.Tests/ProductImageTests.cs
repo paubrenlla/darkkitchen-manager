@@ -10,7 +10,7 @@ public class ProductImageTests
     {
         var image = new ProductImage("photo.jpg", 100000);
 
-        Assert.AreEqual("photo.jpg", image.FileName);
+        Assert.AreEqual("photo.jpg", image.Url);
         Assert.AreEqual(100000, image.SizeInBytes);
     }
 
