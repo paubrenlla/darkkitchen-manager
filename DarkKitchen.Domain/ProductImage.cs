@@ -9,6 +9,7 @@ public class ProductImage
     public ProductImage(string fileName, long sizeInBytes)
     {
         ValidateFileName(fileName);
+        ValidateSize(sizeInBytes);
         FileName = fileName;
         SizeInBytes = sizeInBytes;
     }
@@ -23,6 +24,14 @@ public class ProductImage
         if(!fileName.EndsWith(RequiredExtension, StringComparison.OrdinalIgnoreCase))
         {
             throw new ArgumentException("Image must be in jpg format.");
+        }
+    }
+
+    private static void ValidateSize(long sizeInBytes)
+    {
+        if(sizeInBytes <= 0)
+        {
+            throw new ArgumentException("Image size must be greater than zero.");
         }
     }
 }

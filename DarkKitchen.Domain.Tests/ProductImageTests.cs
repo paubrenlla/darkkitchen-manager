@@ -27,4 +27,11 @@ public class ProductImageTests
     {
         new ProductImage("photo.png", 100000);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateImage_WithZeroSize_ShouldThrow()
+    {
+        new ProductImage("photo.jpg", 0);
+    }
 }
