@@ -34,4 +34,19 @@ public class ProductImageTests
     {
         new ProductImage("photo.jpg", 0);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateImage_ExceedingMaxSize_ShouldThrow()
+    {
+        new ProductImage("photo.jpg", 512001);
+    }
+
+    [TestMethod]
+    public void CreateImage_AtExactMaxSize_ShouldSucceed()
+    {
+        ProductImage image = new ProductImage("photo.jpg", 512000);
+
+        Assert.AreEqual(512000, image.SizeInBytes);
+    }
 }
