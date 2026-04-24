@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -12,12 +13,32 @@ public class UserControllerTests
 {
     private Mock<IUserService> _userServiceMock = null!;
     private UserController _userController = null!;
+    private Guid _callerId;
 
     [TestInitialize]
     public void Setup()
     {
         _userServiceMock = new Mock<IUserService>();
+        _callerId = Guid.NewGuid();
         _userController = new UserController(_userServiceMock.Object);
+        SetCallerContext(_callerId, "Administrativo");
+    }
+
+    private void SetCallerContext(Guid callerId, string role)
+    {
+        List<Claim> claims =
+        [
+            new Claim(ClaimTypes.NameIdentifier, callerId.ToString()),
+            new Claim(ClaimTypes.Role, role),
+        ];
+
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
+
+        _userController.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal },
+        };
     }
 
     [TestMethod]
@@ -105,7 +126,6 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_ValidRequest_ReturnsOk()
     {
-        var adminId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
         var request = new UserUpdateRequest
@@ -128,9 +148,9 @@ public class UserControllerTests
             Role = "Administrativo",
         };
 
-        _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request)).Returns(response);
+        _userServiceMock.Setup(s => s.UpdateUser(_callerId, userId, request)).Returns(response);
 
-        var result = _userController.UpdateUser(userId, request, adminId) as OkObjectResult;
+        var result = _userController.UpdateUser(userId, request) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -139,8 +159,6 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_SelfModification_ReturnsBadRequest()
     {
-        var adminId = Guid.NewGuid();
-
         var request = new UserUpdateRequest
         {
             Name = "Nuevo",
@@ -151,10 +169,10 @@ public class UserControllerTests
             Role = "Administrativo",
         };
 
-        _userServiceMock.Setup(s => s.UpdateUser(adminId, adminId, request))
+        _userServiceMock.Setup(s => s.UpdateUser(_callerId, _callerId, request))
             .Throws(new InvalidOperationException("Un usuario no puede modificarse a sí mismo."));
 
-        var result = _userController.UpdateUser(adminId, request, adminId) as BadRequestObjectResult;
+        var result = _userController.UpdateUser(_callerId, request) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -163,7 +181,6 @@ public class UserControllerTests
     [TestMethod]
     public void UpdateUser_InvalidData_ReturnsBadRequest()
     {
-        var adminId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
         var request = new UserUpdateRequest
@@ -176,10 +193,10 @@ public class UserControllerTests
             Role = "Administrativo",
         };
 
-        _userServiceMock.Setup(s => s.UpdateUser(adminId, userId, request))
+        _userServiceMock.Setup(s => s.UpdateUser(_callerId, userId, request))
             .Throws(new ArgumentException("Nombre inválido."));
 
-        var result = _userController.UpdateUser(userId, request, adminId) as BadRequestObjectResult;
+        var result = _userController.UpdateUser(userId, request) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -188,12 +205,11 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_ValidRequest_ReturnsNoContent()
     {
-        var adminId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        _userServiceMock.Setup(s => s.DeleteUser(adminId, userId));
+        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId));
 
-        var result = _userController.DeleteUser(userId, adminId) as NoContentResult;
+        var result = _userController.DeleteUser(userId) as NoContentResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
@@ -202,12 +218,10 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_SelfDeletion_ReturnsBadRequest()
     {
-        var adminId = Guid.NewGuid();
-
-        _userServiceMock.Setup(s => s.DeleteUser(adminId, adminId))
+        _userServiceMock.Setup(s => s.DeleteUser(_callerId, _callerId))
             .Throws(new InvalidOperationException("Un usuario no puede eliminarse a sí mismo."));
 
-        var result = _userController.DeleteUser(adminId, adminId) as BadRequestObjectResult;
+        var result = _userController.DeleteUser(_callerId) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -216,15 +230,35 @@ public class UserControllerTests
     [TestMethod]
     public void DeleteUser_NotFound_ReturnsNotFound()
     {
-        var adminId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        _userServiceMock.Setup(s => s.DeleteUser(adminId, userId))
+        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId))
             .Throws(new KeyNotFoundException("Usuario no encontrado."));
 
-        var result = _userController.DeleteUser(userId, adminId) as NotFoundObjectResult;
+        var result = _userController.DeleteUser(userId) as NotFoundObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void CreateUser_PreparadorCreatesWithRole_ReturnsForbid()
+    {
+        SetCallerContext(_callerId, "Preparador");
+
+        var request = new UserCreateRequest
+        {
+            Name = "Carlos",
+            Surname = "Lopez",
+            Email = "carlos@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094111333",
+            Password = "Valid1Password!@",
+            Role = "Preparador",
+        };
+
+        var result = _userController.CreateUser(request) as ForbidResult;
+
+        Assert.IsNotNull(result);
     }
 }
