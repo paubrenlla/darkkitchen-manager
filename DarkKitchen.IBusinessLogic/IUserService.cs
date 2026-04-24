@@ -6,6 +6,6 @@ public interface IUserService
 {
     UserCreateResponse CreateUser(UserCreateRequest request);
     IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname);
-    UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request);
+    UserCreateResponse UpdateUser(Guid callerId, Guid userId, UserUpdateRequest request);
     void DeleteUser(Guid adminId, Guid userId);
 }
