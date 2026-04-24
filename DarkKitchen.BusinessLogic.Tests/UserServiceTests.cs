@@ -180,4 +180,115 @@ public class UserServiceTests
 
         _userService.DeleteUser(adminId, adminId);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateUser_WithClienteRole_ShouldThrow()
+    {
+        UserCreateRequest request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = "Cliente",
+        };
+
+        _userService.CreateUser(request);
+    }
+
+    [TestMethod]
+    public void CreateUser_WithAdministrativoRole_ShouldSucceed()
+    {
+        UserCreateRequest request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = "Administrativo",
+        };
+
+        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        UserCreateResponse result = _userService.CreateUser(request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Administrativo", result.Role);
+    }
+
+    [TestMethod]
+    public void CreateUser_WithPreparadorRole_ShouldSucceed()
+    {
+        UserCreateRequest request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = "Preparador",
+        };
+
+        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        UserCreateResponse result = _userService.CreateUser(request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Preparador", result.Role);
+    }
+
+    [TestMethod]
+    public void CreateUser_WithNullRole_ShouldCreateCliente()
+    {
+        UserCreateRequest request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = null,
+        };
+
+        Mock<IPhoneValidationStrategy> mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        UserCreateResponse result = _userService.CreateUser(request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Cliente", result.Role);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateUser_WithEmptyRole_ShouldThrow()
+    {
+        UserCreateRequest request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+            Role = string.Empty,
+        };
+
+        _userService.CreateUser(request);
+    }
 }
