@@ -1,4 +1,4 @@
-using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using Moq;
 

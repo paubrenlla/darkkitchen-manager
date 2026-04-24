@@ -1,4 +1,4 @@
-﻿namespace DarkKitchen.Domain;
+﻿namespace DarkKitchen.Domain.Products;
 
 public class ProductImage
 {

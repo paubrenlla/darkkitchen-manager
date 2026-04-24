@@ -1,5 +1,5 @@
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.DTOs;
 

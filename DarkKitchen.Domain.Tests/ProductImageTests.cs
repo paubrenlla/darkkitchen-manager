@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain;
+﻿using DarkKitchen.Domain.Products;
 
 namespace DarkKitchen.Domain.Tests;
 
@@ -8,7 +8,7 @@ public class ProductImageTests
     [TestMethod]
     public void CreateImage_WithValidData_ShouldSucceed()
     {
-        ProductImage image = new ProductImage("photo.jpg", 100000);
+        var image = new ProductImage("photo.jpg", 100000);
 
         Assert.AreEqual("photo.jpg", image.FileName);
         Assert.AreEqual(100000, image.SizeInBytes);
@@ -45,7 +45,7 @@ public class ProductImageTests
     [TestMethod]
     public void CreateImage_AtExactMaxSize_ShouldSucceed()
     {
-        ProductImage image = new ProductImage("photo.jpg", 512000);
+        var image = new ProductImage("photo.jpg", 512000);
 
         Assert.AreEqual(512000, image.SizeInBytes);
     }

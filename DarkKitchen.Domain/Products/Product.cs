@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DarkKitchen.Domain;
+namespace DarkKitchen.Domain.Products;
 
 public class Product
 {

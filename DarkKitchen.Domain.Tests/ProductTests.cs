@@ -1,4 +1,4 @@
-using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 
 namespace DarkKitchen.Domain.Tests;
 
@@ -20,7 +20,7 @@ public class ProductTests
     [TestMethod]
     public void CreateProduct_WithValidData_ShouldCreateSuccessfully()
     {
-        Product product = new Product(
+        var product = new Product(
             "ABC12",
             "Hamburguesa",
             "Hamburguesa con queso cheddar",
@@ -148,7 +148,7 @@ public class ProductTests
             new ProductImage("c.jpg", 1000),
         ];
 
-        Product product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, images);
+        var product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, images);
 
         Assert.AreEqual(3, product.Images.Count);
     }
@@ -156,7 +156,7 @@ public class ProductTests
     [TestMethod]
     public void Deactivate_ShouldSetIsActiveToFalse()
     {
-        Product product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
+        var product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
 
         product.Deactivate();
 
@@ -166,7 +166,7 @@ public class ProductTests
     [TestMethod]
     public void Activate_ShouldSetIsActiveToTrue()
     {
-        Product product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
+        var product = new Product("ABC12", "Hamburguesa", "Hamburguesa con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
         product.Deactivate();
 
         product.Activate();
