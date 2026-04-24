@@ -20,4 +20,11 @@ public class ProductImageTests
     {
         new ProductImage(string.Empty, 100000);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateImage_WithNonJpgFormat_ShouldThrow()
+    {
+        new ProductImage("photo.png", 100000);
+    }
 }
