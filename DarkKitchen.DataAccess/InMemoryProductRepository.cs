@@ -13,12 +13,13 @@ public class InMemoryProductRepository : IProductRepository
         var lineDesayunos = new ProductLine("Desayunos");
         var categoryParrilla = new ProductCategory("Parrilla");
         var categoryBebidas = new ProductCategory("Bebidas");
+        List<ProductImage> defaultImages = [new ProductImage("default.jpg", 50000)];
 
         _products =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m),
-            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m),
-            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m),
+            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m, new List<ProductImage> { new ProductImage("default.jpg", 50000) }),
+            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m, new List<ProductImage> { new ProductImage("default.jpg", 50000) }),
+            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m, new List<ProductImage> { new ProductImage("default.jpg", 50000) }),
         ];
     }
 

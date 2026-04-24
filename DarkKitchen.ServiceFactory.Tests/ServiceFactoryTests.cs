@@ -25,6 +25,7 @@ public class ServiceFactoryTests
         configSectionMock.Setup(s => s.Value).Returns("test_secret_key_that_is_long_enough_for_hmac");
         configMock.Setup(c => c.GetSection("JwtConfig:Secret")).Returns(configSectionMock.Object);
         _services.AddSingleton(configMock.Object);
+        _services.AddSingleton<IProductRepository, InMemoryProductRepository>();
     }
 
     [TestMethod]
