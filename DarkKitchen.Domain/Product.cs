@@ -4,6 +4,8 @@ namespace DarkKitchen.Domain;
 
 public class Product
 {
+    private const int MinImages = 1;
+    private const int MaxImages = 3;
     public Guid Id { get; private set; }
     public string Code { get; private set; }
     public string Name { get; private set; }
@@ -12,8 +14,11 @@ public class Product
     public ProductCategory Category { get; private set; }
     public decimal Price { get; private set; }
     public bool IsActive { get; private set; }
+    public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
-    public Product(string code, string name, string description, ProductLine line, ProductCategory category, decimal price)
+    private readonly List<ProductImage> _images;
+
+    public Product(string code, string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
     {
         ValidateCode(code);
         ValidateName(name);
@@ -21,6 +26,7 @@ public class Product
         ValidateLine(line);
         ValidateCategory(category);
         ValidatePrice(price);
+        ValidateImages(images);
 
         Id = Guid.NewGuid();
         Code = code;
@@ -29,6 +35,17 @@ public class Product
         Line = line;
         Category = category;
         Price = price;
+        IsActive = true;
+        _images = new List<ProductImage>(images);
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
+
+    public void Activate()
+    {
         IsActive = true;
     }
 
@@ -82,6 +99,14 @@ public class Product
         if(price <= 0)
         {
             throw new ArgumentException("Price must be greater than zero.");
+        }
+    }
+
+    private static void ValidateImages(List<ProductImage> images)
+    {
+        if(images == null || images.Count < MinImages || images.Count > MaxImages)
+        {
+            throw new ArgumentException($"Product must have between {MinImages} and {MaxImages} images.");
         }
     }
 }
