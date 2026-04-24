@@ -1,4 +1,4 @@
-using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using Moq;
 
@@ -11,10 +11,13 @@ public class ProductServiceTests
     private ProductService _productService = null!;
     private List<Product> _testProducts = null!;
 
+    private List<ProductImage> _defaultImages = null!;
+
     [TestInitialize]
     public void Setup()
     {
         _mockRepository = new Mock<IProductRepository>();
+        _defaultImages = [new ProductImage("photo.jpg", 100000)];
 
         var lineCombo = new ProductLine("Combo burgers");
         var lineDesayunos = new ProductLine("Desayunos");
@@ -23,9 +26,9 @@ public class ProductServiceTests
 
         _testProducts =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m),
-            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m),
-            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m),
+            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m, _defaultImages),
+            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m, _defaultImages),
+            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m, _defaultImages),
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);

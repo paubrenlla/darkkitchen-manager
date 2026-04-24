@@ -20,8 +20,8 @@ public class ProductsControllerTests
 
         _testProducts =
         [
-            new ProductResponse { Code = "BURG01", Name = "Hamburguesa Clasica", Description = "Hamburguesa clasica con queso cheddar", Price = 150m, Line = "Combo burgers", Category = "Parrilla" },
-            new ProductResponse { Code = "BURG02", Name = "Hamburguesa Doble Grande", Description = "Hamburguesa doble con queso y bacon", Price = 200m, Line = "Combo burgers", Category = "Parrilla" },
+            new ProductResponse { Code = "BURG01", Name = "Hamburguesa Clasica", Description = "Hamburguesa clasica con queso cheddar", Price = 150m, Line = "Combo burgers", Category = "Parrilla", Images = [] },
+            new ProductResponse { Code = "BURG02", Name = "Hamburguesa Doble Grande", Description = "Hamburguesa doble con queso y bacon", Price = 200m, Line = "Combo burgers", Category = "Parrilla", Images = [] },
         ];
 
         _controller = new ProductsController(_mockService.Object);

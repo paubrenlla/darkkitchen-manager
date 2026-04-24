@@ -1,5 +1,5 @@
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.DTOs;
 
@@ -26,6 +26,7 @@ public static class Converter
             Price = product.Price,
             Line = product.Line.Name,
             Category = product.Category.Name,
+            Images = product.Images.Select(i => i.Url).ToList(),
         };
     }
 

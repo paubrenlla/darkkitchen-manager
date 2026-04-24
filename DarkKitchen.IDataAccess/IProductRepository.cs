@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain;
+﻿using DarkKitchen.Domain.Products;
 
 namespace DarkKitchen.IDataAccess;
 
