@@ -1,6 +1,7 @@
 ﻿using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -36,7 +37,6 @@ public class PromotionsControllerTests
                 EndDate = new DateTime(2025, 12, 31),
                 Products = ["BURG02"]
             }
-
         ];
 
         _controller = new PromotionsController(_mockService.Object);
@@ -77,5 +77,33 @@ public class PromotionsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void CreatePromotion_ValidRequest_ShouldReturn201WithResponse()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["BURG01"]
+        };
+        var expected = new PromotionCreateResponse
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            Products = ["BURG01"]
+        };
+        _mockService.Setup(s => s.CreatePromotion(request)).Returns(expected);
+
+        var result = _controller.CreatePromotion(request) as ObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+        Assert.AreEqual(expected, result.Value);
     }
 }
