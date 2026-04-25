@@ -84,4 +84,19 @@ public class PromotionServiceTests
 
         _mockPromotionRepository.Verify(r => r.Add(It.IsAny<Promotion>()), Times.Once);
     }
+
+    [TestMethod]
+    public void CreatePromotion_InvalidProductCode_ThrowsArgumentException()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["INVALID99"]
+        };
+
+        Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request));
+    }
 }
