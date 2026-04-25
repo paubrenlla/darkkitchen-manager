@@ -36,7 +36,7 @@ public class ModelTests
             Email = "juan@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Pass123!",
+            Password = "Pass123!"
         };
 
         var validationResults = new List<ValidationResult>();
@@ -71,7 +71,7 @@ public class ModelTests
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
             Password = "Pass123!",
-            Role = "Administrativo",
+            Role = "Administrativo"
         };
 
         Assert.AreEqual("Administrativo", request.Role);
@@ -94,7 +94,8 @@ public class ModelTests
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m);
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m);
 
         var result = Converter.ToProductResponse(product);
 
@@ -178,11 +179,7 @@ public class ModelTests
     public void ToOrderListResponse_ShouldMapCorrectly()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem>
-        {
-            new(Guid.NewGuid(), 2, 100m),
-            new(Guid.NewGuid(), 3, 50m),
-        };
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m), new(Guid.NewGuid(), 3, 50m) };
         var clientId = Guid.NewGuid();
         var order = new Order(clientId, address, DeliveryType.Express, items);
         order.AssignOrderNumber(5);
@@ -194,5 +191,31 @@ public class ModelTests
         Assert.AreEqual("Pending", result.Status);
         Assert.AreEqual(order.Total, result.Total);
         Assert.AreEqual(5, result.ProductCount);
+    }
+
+    [TestMethod]
+    public void ToPromotionCreateResponse_ShouldMapCorrectly()
+    {
+        var start = new DateTime(2025, 1, 1);
+        var end = new DateTime(2025, 1, 31);
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var products = new List<Product>
+        {
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m),
+            new("BURG02", "Hamburguesa Doble", "Hamburguesa doble con queso cheddar y bacon", line, category, 200m)
+        };
+        var promotion = new Promotion("Promo Verano", 20, start, end, products);
+
+        var
+            result = Converter.ToPromotionCreateResponse(promotion);
+
+        Assert.AreEqual("Promo Verano", result.Name);
+        Assert.AreEqual(20, result.DiscountPercentage);
+        Assert.AreEqual(start, result.StartDate);
+        Assert.AreEqual(end, result.EndDate);
+        Assert.AreEqual(2, result.Products.Count);
+        Assert.IsTrue(result.Products.Contains("BURG01"));
+        Assert.IsTrue(result.Products.Contains("BURG02"));
     }
 }
