@@ -28,6 +28,12 @@ public class PromotionService(
                 prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
         }
 
+        if(!string.IsNullOrWhiteSpace(productCode))
+        {
+            promotions = promotions.Where(p => p.Products.Any(prod =>
+                prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
+        }
+
         return promotions.Select(Converter.ToPromotionCreateResponse);
     }
 
