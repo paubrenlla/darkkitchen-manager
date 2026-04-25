@@ -1,5 +1,6 @@
 ﻿using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -35,6 +36,7 @@ public class PromotionsControllerTests
                 EndDate = new DateTime(2025, 12, 31),
                 Products = ["BURG02"]
             }
+
         ];
 
         _controller = new PromotionsController(_mockService.Object);
