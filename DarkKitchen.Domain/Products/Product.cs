@@ -16,7 +16,7 @@ public class Product
     public bool IsActive { get; private set; }
     public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
-    private readonly List<ProductImage> _images;
+    private List<ProductImage> _images;
 
     public Product(string code, string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
     {
@@ -108,5 +108,22 @@ public class Product
         {
             throw new ArgumentException($"Product must have between {MinImages} and {MaxImages} images.");
         }
+    }
+
+    public void UpdateDetails(string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
+    {
+        ValidateName(name);
+        ValidateDescription(description);
+        ValidateLine(line);
+        ValidateCategory(category);
+        ValidatePrice(price);
+        ValidateImages(images);
+
+        Name = name;
+        Description = description;
+        Line = line;
+        Category = category;
+        Price = price;
+        _images = new List<ProductImage>(images);
     }
 }
