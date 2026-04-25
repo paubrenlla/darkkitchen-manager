@@ -6,12 +6,13 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class ReportService(IOrderRepository orderRepository, IProductRepository productRepository) : IReportService
+public class ReportService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository) : IReportService
 {
     private const int TopProductsLimit = 5;
 
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IProductRepository _productRepository = productRepository;
+    private readonly IUserRepository _userRepository = userRepository;
 
     public IEnumerable<TopProductResponse> GetTopProducts(DateTime from, DateTime to)
     {

@@ -11,6 +11,7 @@ public class ReportServiceTests
 {
     private Mock<IOrderRepository> _orderRepositoryMock = null!;
     private Mock<IProductRepository> _productRepositoryMock = null!;
+    private Mock<IUserRepository> _userRepositoryMock = null!;
     private ReportService _reportService = null!;
     private List<Product> _products = null!;
     private Guid _product1Id;
@@ -22,7 +23,11 @@ public class ReportServiceTests
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _productRepositoryMock = new Mock<IProductRepository>();
-        _reportService = new ReportService(_orderRepositoryMock.Object, _productRepositoryMock.Object);
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _reportService = new ReportService(
+            _orderRepositoryMock.Object,
+            _productRepositoryMock.Object,
+            _userRepositoryMock.Object);
 
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
@@ -181,5 +186,16 @@ public class ReportServiceTests
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("BURG01", result.First().Code);
+    }
+
+    [TestMethod]
+    public void GetSalesReport_NoOrders_ShouldReturnEmptyReport()
+    {
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(0, result.Periods.Count);
+        Assert.AreEqual(0, result.GrandTotal);
     }
 }
