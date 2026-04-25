@@ -141,4 +141,12 @@ public class PromotionServiceTests
 
         Assert.AreEqual(0, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByLine_ReturnsMatchingPromotions()
+    {
+        var result = _promotionService.GetPromotions(null, "Combo burgers", null).ToList();
+
+        Assert.AreEqual(2, result.Count);
+    }
 }
