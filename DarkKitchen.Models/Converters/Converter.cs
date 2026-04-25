@@ -27,6 +27,7 @@ public static class Converter
             Line = product.Line.Name,
             Category = product.Category.Name,
             Images = product.Images.Select(i => i.Url).ToList(),
+            IsActive = product.IsActive
         };
     }
 

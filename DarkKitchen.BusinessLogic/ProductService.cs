@@ -51,8 +51,20 @@ public class ProductService(IProductRepository productRepository) : IProductServ
             .ToList();
 
         product.UpdateDetails(request.Name, request.Description, line, category, request.Price, images);
-        _productRepository.Update(id, product);
 
+        if(request.IsActive.HasValue)
+        {
+            if(request.IsActive.Value)
+            {
+                product.Activate();
+            }
+            else
+            {
+                product.Deactivate();
+            }
+        }
+
+        _productRepository.Update(id, product);
         return Converter.ToProductResponse(product);
     }
 }
