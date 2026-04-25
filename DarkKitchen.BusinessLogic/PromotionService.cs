@@ -15,24 +15,11 @@ public class PromotionService(
 
     public IEnumerable<PromotionCreateResponse> GetPromotions(DateTime? date, string? line, string? productCode)
     {
-        IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
+        IEnumerable<Promotion>? promotions = _promotionRepository.GetAll();
 
-        if(date.HasValue)
-        {
-            promotions = promotions.Where(p => date.Value >= p.StartDate && date.Value <= p.EndDate);
-        }
-
-        if(!string.IsNullOrWhiteSpace(line))
-        {
-            promotions = promotions.Where(p => p.Products.Any(prod =>
-                prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
-        }
-
-        if(!string.IsNullOrWhiteSpace(productCode))
-        {
-            promotions = promotions.Where(p => p.Products.Any(prod =>
-                prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
-        }
+        promotions = FilterByDate(promotions, date);
+        promotions = FilterByLine(promotions, line);
+        promotions = FilterByProductCode(promotions, productCode);
 
         return promotions.Select(Converter.ToPromotionCreateResponse);
     }
@@ -58,5 +45,40 @@ public class PromotionService(
 
         _promotionRepository.Add(promotion);
         return Converter.ToPromotionCreateResponse(promotion);
+    }
+
+    private IEnumerable<Promotion> FilterByDate(IEnumerable<Promotion> promotions, DateTime? date)
+    {
+        if(!date.HasValue)
+        {
+            return promotions;
+        }
+
+        return promotions.Where(p =>
+            date.Value >= p.StartDate && date.Value <= p.EndDate);
+    }
+
+    private IEnumerable<Promotion> FilterByLine(IEnumerable<Promotion> promotions, string? line)
+    {
+        if(string.IsNullOrWhiteSpace(line))
+        {
+            return promotions;
+        }
+
+        return promotions.Where(p =>
+            p.Products.Any(prod =>
+                prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    private IEnumerable<Promotion> FilterByProductCode(IEnumerable<Promotion> promotions, string? productCode)
+    {
+        if(string.IsNullOrWhiteSpace(productCode))
+        {
+            return promotions;
+        }
+
+        return promotions.Where(p =>
+            p.Products.Any(prod =>
+                prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
     }
 }
