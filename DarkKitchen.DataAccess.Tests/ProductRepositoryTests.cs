@@ -42,4 +42,17 @@ public class ProductRepositoryTests
 
         Assert.IsNull(result);
     }
+
+    [TestMethod]
+    public void Add_ShouldAddProductToRepository()
+    {
+        ProductLine line = new ProductLine("Desayunos");
+        ProductCategory category = new ProductCategory("Bebidas");
+        List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
+        Product product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
+
+        _productRepository.Add(product);
+
+        Assert.IsNotNull(_productRepository.GetById(product.Id));
+    }
 }
