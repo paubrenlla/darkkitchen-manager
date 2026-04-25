@@ -98,4 +98,27 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
     }
+
+    [TestMethod]
+    public void CreateProduct_InvalidData_ReturnsBadRequest()
+    {
+        ProductCreateRequest request = new ProductCreateRequest
+        {
+            Code = "AB",
+            Name = "Corto",
+            Description = "Corta",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 100m,
+            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }],
+        };
+
+        _mockService.Setup(s => s.CreateProduct(request))
+            .Throws(new ArgumentException("Code must be between 5 and 20 alphanumeric characters."));
+
+        BadRequestObjectResult? result = _controller.CreateProduct(request) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
