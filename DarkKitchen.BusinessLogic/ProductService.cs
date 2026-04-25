@@ -41,7 +41,8 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public ProductResponse UpdateProduct(Guid id, ProductUpdateRequest request)
     {
-        Product product = _productRepository.GetById(id);
+        Product product = _productRepository.GetById(id)
+                          ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
         ProductLine line = new ProductLine(request.Line);
         ProductCategory category = new ProductCategory(request.Category);
