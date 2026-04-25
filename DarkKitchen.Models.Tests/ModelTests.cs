@@ -234,4 +234,23 @@ public class ModelTests
         Assert.IsFalse(isValid);
         Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El nombre es obligatorio."));
     }
+
+    [TestMethod]
+    public void PromotionCreateRequest_DiscountBelowRange_ReturnsValidationError()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 0,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7)
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsFalse(isValid);
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe estar entre 1 y 100."));
+    }
 }
