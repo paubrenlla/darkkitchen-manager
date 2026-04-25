@@ -35,6 +35,7 @@ public class PromotionService(
             selectedProducts
         );
 
+        _promotionRepository.Add(promotion);
         return Converter.ToPromotionCreateResponse(promotion);
     }
 }
