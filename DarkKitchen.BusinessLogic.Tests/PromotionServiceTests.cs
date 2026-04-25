@@ -125,4 +125,12 @@ public class PromotionServiceTests
 
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByDate_ReturnsMatchingPromotions()
+    {
+        var result = _promotionService.GetPromotions(new DateTime(2025, 6, 1), null, null).ToList();
+
+        Assert.AreEqual(2, result.Count);
+    }
 }
