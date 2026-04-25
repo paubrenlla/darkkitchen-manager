@@ -22,6 +22,7 @@ public static class DependencyResolution
         services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IReportService, ReportService>();
 
         services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
