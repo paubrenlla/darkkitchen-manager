@@ -67,4 +67,21 @@ public class PromotionServiceTests
         Assert.AreEqual(1, result.Products.Count);
         Assert.IsTrue(result.Products.Contains("BURG01"));
     }
+
+    [TestMethod]
+    public void CreatePromotion_ValidRequest_CallsRepositoryAdd()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["BURG01"]
+        };
+
+        _promotionService.CreatePromotion(request);
+
+        _mockPromotionRepository.Verify(r => r.Add(It.IsAny<Promotion>()), Times.Once);
+    }
 }
