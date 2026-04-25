@@ -114,4 +114,28 @@ public class ProductServiceTests
         Assert.AreEqual("NEW01", result.Code);
         _mockRepository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
     }
+
+    [TestMethod]
+    public void UpdateProduct_ValidRequest_ShouldUpdateAndReturnResponse()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+        };
+
+        _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
+
+        ProductResponse result = _productService.UpdateProduct(productId, request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Hamburguesa Actualizada", result.Name);
+        _mockRepository.Verify(r => r.Update(productId, It.IsAny<Product>()), Times.Once);
+    }
 }
