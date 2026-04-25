@@ -15,7 +15,9 @@ public class PromotionService(
 
     public IEnumerable<PromotionCreateResponse> GetPromotions(DateTime? date, string? line, string? productCode)
     {
-        
+        IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
+
+        return promotions.Select(Converter.ToPromotionCreateResponse);
     }
 
     public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request)
