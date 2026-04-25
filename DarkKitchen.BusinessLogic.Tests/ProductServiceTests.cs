@@ -1,5 +1,6 @@
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
+using DarkKitchen.Models.DTOs;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;
@@ -91,5 +92,26 @@ public class ProductServiceTests
         var result = _productService.GetProducts("Grande", null, null).ToList();
 
         Assert.AreEqual(2, result.Count);
+    }
+
+    [TestMethod]
+    public void CreateProduct_ValidRequest_ShouldAddAndReturnResponse()
+    {
+        ProductCreateRequest request = new ProductCreateRequest
+        {
+            Code = "NEW01",
+            Name = "Nuevo Producto Test",
+            Description = "Descripcion del nuevo producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 100m,
+            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }],
+        };
+
+        ProductResponse result = _productService.CreateProduct(request);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("NEW01", result.Code);
+        _mockRepository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
     }
 }
