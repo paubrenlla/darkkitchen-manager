@@ -133,4 +133,12 @@ public class PromotionServiceTests
 
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByDateOutOfRange_ReturnsEmpty()
+    {
+        var result = _promotionService.GetPromotions(new DateTime(2030, 1, 1), null, null).ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
 }
