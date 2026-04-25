@@ -1,4 +1,5 @@
-﻿using DarkKitchen.IBusinessLogic;
+﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
@@ -29,5 +30,12 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         }
 
         return products.Select(Converter.ToProductResponse);
+    }
+
+    public ProductResponse CreateProduct(ProductCreateRequest request)
+    {
+        Product product = Converter.ToProduct(request);
+        _productRepository.Add(product);
+        return Converter.ToProductResponse(product);
     }
 }
