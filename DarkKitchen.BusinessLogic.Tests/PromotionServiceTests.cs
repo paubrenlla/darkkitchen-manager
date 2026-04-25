@@ -166,4 +166,21 @@ public class PromotionServiceTests
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(result[0].Products.Contains("BURG01"));
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByProductCode_NoMatches_ReturnsEmpty()
+    {
+        var result = _promotionService.GetPromotions(null, null, "INVALID99").ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetPromotions_CombinedFilters_ReturnsMatchingPromotion()
+    {
+        var result = _promotionService.GetPromotions(new DateTime(2025, 6, 1), "Combo burgers", "BURG01").ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+    }
 }
