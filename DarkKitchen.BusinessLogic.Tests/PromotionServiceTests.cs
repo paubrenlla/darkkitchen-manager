@@ -117,4 +117,12 @@ public class PromotionServiceTests
         Assert.AreEqual("Promo Sin Productos", result.Name);
         Assert.AreEqual(0, result.Products.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_NoFilters_ReturnsAllPromotions()
+    {
+        var result = _promotionService.GetPromotions(null, null, null).ToList();
+
+        Assert.AreEqual(2, result.Count);
+    }
 }
