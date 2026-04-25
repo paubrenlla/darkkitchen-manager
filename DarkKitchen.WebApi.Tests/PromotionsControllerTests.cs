@@ -107,4 +107,24 @@ public class PromotionsControllerTests
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
         Assert.AreEqual(expected, result.Value);
     }
+
+    [TestMethod]
+    public void CreatePromotion_InvalidProductCode_ShouldReturnBadRequest()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["INVALID99"]
+        };
+        _mockService.Setup(s => s.CreatePromotion(request))
+            .Throws(new ArgumentException("Uno o más códigos de producto no son válidos."));
+
+        var result = _controller.CreatePromotion(request) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
