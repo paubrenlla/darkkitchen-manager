@@ -11,7 +11,10 @@ public class PromotionCreateRequest
 
     public int DiscountPercentage { get; set; }
 
+    [Required]
     public DateTime StartDate { get; set; }
+
+    [Required]
     public DateTime EndDate { get; set; }
 
     public List<string> ProductCodes { get; set; } = [];
