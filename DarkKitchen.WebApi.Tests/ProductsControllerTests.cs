@@ -180,4 +180,28 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateProduct_InvalidData_ReturnsBadRequest()
+    {
+        Guid productId = Guid.NewGuid();
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Corto",
+            Description = "Corta",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+        };
+
+        _mockService.Setup(s => s.UpdateProduct(productId, request))
+            .Throws(new ArgumentException("Name must be between 10 and 50 characters."));
+
+        BadRequestObjectResult? result = _controller.UpdateProduct(productId, request) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
 }
