@@ -1,4 +1,5 @@
 ﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,5 +20,13 @@ public class ProductsController(IProductService productService) : ControllerBase
     {
         var products = _productService.GetProducts(name, line, category);
         return Ok(products);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Administrativo")]
+    public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
+    {
+        ProductResponse response = _productService.CreateProduct(request);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 }
