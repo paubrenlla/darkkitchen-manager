@@ -72,4 +72,16 @@ public class ProductRepositoryTests
         Assert.IsNotNull(result);
         Assert.AreEqual("Nombre Actualizado Largo", result.Name);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Update_NonExistingProduct_ShouldThrow()
+    {
+        ProductLine line = new ProductLine("Desayunos");
+        ProductCategory category = new ProductCategory("Bebidas");
+        List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
+        Product product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
+
+        _productRepository.Update(Guid.NewGuid(), product);
+    }
 }
