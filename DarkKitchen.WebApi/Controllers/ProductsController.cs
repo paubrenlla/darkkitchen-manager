@@ -36,4 +36,12 @@ public class ProductsController(IProductService productService) : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrativo")]
+    public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
+    {
+        ProductResponse response = _productService.UpdateProduct(id, request);
+        return Ok(response);
+    }
 }
