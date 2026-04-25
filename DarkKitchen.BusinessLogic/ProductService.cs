@@ -38,4 +38,20 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         _productRepository.Add(product);
         return Converter.ToProductResponse(product);
     }
+
+    public ProductResponse UpdateProduct(Guid id, ProductUpdateRequest request)
+    {
+        Product product = _productRepository.GetById(id);
+
+        ProductLine line = new ProductLine(request.Line);
+        ProductCategory category = new ProductCategory(request.Category);
+        List<ProductImage> images = request.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
+
+        product.UpdateDetails(request.Name, request.Description, line, category, request.Price, images);
+        _productRepository.Update(id, product);
+
+        return Converter.ToProductResponse(product);
+    }
 }
