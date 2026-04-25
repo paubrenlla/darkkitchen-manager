@@ -89,4 +89,16 @@ public static class Converter
             ProductCount = order.Items.Sum(i => i.Quantity)
         };
     }
+
+    public static PromotionCreateResponse ToPromotionCreateResponse(Promotion promotion)
+    {
+        return new PromotionCreateResponse
+        {
+            Name = promotion.Name,
+            DiscountPercentage = promotion.DiscountPercentage,
+            StartDate = promotion.StartDate,
+            EndDate = promotion.EndDate,
+            Products = promotion.Products.Select(p => p.Code).ToList()
+        };
+    }
 }
