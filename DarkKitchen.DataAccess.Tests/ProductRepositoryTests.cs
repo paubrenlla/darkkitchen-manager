@@ -55,4 +55,21 @@ public class ProductRepositoryTests
 
         Assert.IsNotNull(_productRepository.GetById(product.Id));
     }
+
+    [TestMethod]
+    public void Update_ExistingProduct_ShouldPersistChanges()
+    {
+        Product product = _productRepository.GetAll().First();
+        Guid originalId = product.Id;
+        ProductLine newLine = new ProductLine("Desayunos");
+        ProductCategory newCategory = new ProductCategory("Bebidas");
+        List<ProductImage> newImages = [new ProductImage("https://example.com/new.jpg", 50000)];
+
+        product.UpdateDetails("Nombre Actualizado Largo", "Descripcion actualizada del producto de prueba", newLine, newCategory, 999m, newImages);
+        _productRepository.Update(product.Id, product);
+
+        Product? result = _productRepository.GetById(originalId);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Nombre Actualizado Largo", result.Name);
+    }
 }
