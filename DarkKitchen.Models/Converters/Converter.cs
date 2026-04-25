@@ -99,9 +99,9 @@ public static class Converter
 
     public static Product ToProduct(ProductCreateRequest request)
     {
-        ProductLine line = new ProductLine(request.Line);
-        ProductCategory category = new ProductCategory(request.Category);
-        List<ProductImage> images = request.Images
+        var line = new ProductLine(request.Line);
+        var category = new ProductCategory(request.Category);
+        var images = request.Images
             .Select(i => new ProductImage(i.Url, i.SizeInBytes))
             .ToList();
 

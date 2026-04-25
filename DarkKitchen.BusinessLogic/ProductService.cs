@@ -34,7 +34,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public ProductResponse CreateProduct(ProductCreateRequest request)
     {
-        Product product = Converter.ToProduct(request);
+        var product = Converter.ToProduct(request);
         _productRepository.Add(product);
         return Converter.ToProductResponse(product);
     }
@@ -44,9 +44,9 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         Product product = _productRepository.GetById(id)
                           ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
-        ProductLine line = new ProductLine(request.Line);
-        ProductCategory category = new ProductCategory(request.Category);
-        List<ProductImage> images = request.Images
+        var line = new ProductLine(request.Line);
+        var category = new ProductCategory(request.Category);
+        var images = request.Images
             .Select(i => new ProductImage(i.Url, i.SizeInBytes))
             .ToList();
 

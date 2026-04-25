@@ -177,10 +177,10 @@ public class ProductTests
     [TestMethod]
     public void UpdateDetails_ShouldUpdateFieldsAndPreserveId()
     {
-        Product product = new Product("ABC12", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
+        var product = new Product("ABC12", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
         Guid originalId = product.Id;
-        ProductLine newLine = new ProductLine("Desayunos");
-        ProductCategory newCategory = new ProductCategory("Bebidas");
+        var newLine = new ProductLine("Desayunos");
+        var newCategory = new ProductCategory("Bebidas");
         List<ProductImage> newImages = [new ProductImage("https://example.com/new.jpg", 50000)];
 
         product.UpdateDetails("Hamburguesa Nueva", "Hamburguesa nueva con ingredientes frescos", newLine, newCategory, 200m, newImages);

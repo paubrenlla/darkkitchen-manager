@@ -46,10 +46,10 @@ public class ProductRepositoryTests
     [TestMethod]
     public void Add_ShouldAddProductToRepository()
     {
-        ProductLine line = new ProductLine("Desayunos");
-        ProductCategory category = new ProductCategory("Bebidas");
+        var line = new ProductLine("Desayunos");
+        var category = new ProductCategory("Bebidas");
         List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
-        Product product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
+        var product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
 
         _productRepository.Add(product);
 
@@ -61,8 +61,8 @@ public class ProductRepositoryTests
     {
         Product product = _productRepository.GetAll().First();
         Guid originalId = product.Id;
-        ProductLine newLine = new ProductLine("Desayunos");
-        ProductCategory newCategory = new ProductCategory("Bebidas");
+        var newLine = new ProductLine("Desayunos");
+        var newCategory = new ProductCategory("Bebidas");
         List<ProductImage> newImages = [new ProductImage("https://example.com/new.jpg", 50000)];
 
         product.UpdateDetails("Nombre Actualizado Largo", "Descripcion actualizada del producto de prueba", newLine, newCategory, 999m, newImages);
@@ -77,10 +77,10 @@ public class ProductRepositoryTests
     [ExpectedException(typeof(KeyNotFoundException))]
     public void Update_NonExistingProduct_ShouldThrow()
     {
-        ProductLine line = new ProductLine("Desayunos");
-        ProductCategory category = new ProductCategory("Bebidas");
+        var line = new ProductLine("Desayunos");
+        var category = new ProductCategory("Bebidas");
         List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
-        Product product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
+        var product = new Product("NEWPR", "Nuevo Producto Test", "Descripcion del nuevo producto de prueba", line, category, 100m, images);
 
         _productRepository.Update(Guid.NewGuid(), product);
     }

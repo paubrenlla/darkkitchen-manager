@@ -68,7 +68,7 @@ public class ProductsControllerTests
     [TestMethod]
     public void CreateProduct_ValidRequest_Returns201()
     {
-        ProductCreateRequest request = new ProductCreateRequest
+        var request = new ProductCreateRequest
         {
             Code = "NEW01",
             Name = "Nuevo Producto Test",
@@ -79,7 +79,7 @@ public class ProductsControllerTests
             Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }],
         };
 
-        ProductResponse response = new ProductResponse
+        var response = new ProductResponse
         {
             Code = "NEW01",
             Name = "Nuevo Producto Test",
@@ -93,7 +93,7 @@ public class ProductsControllerTests
 
         _mockService.Setup(s => s.CreateProduct(request)).Returns(response);
 
-        ObjectResult? result = _controller.CreateProduct(request) as ObjectResult;
+        var result = _controller.CreateProduct(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
@@ -102,7 +102,7 @@ public class ProductsControllerTests
     [TestMethod]
     public void CreateProduct_InvalidData_ReturnsBadRequest()
     {
-        ProductCreateRequest request = new ProductCreateRequest
+        var request = new ProductCreateRequest
         {
             Code = "AB",
             Name = "Corto",
@@ -116,7 +116,7 @@ public class ProductsControllerTests
         _mockService.Setup(s => s.CreateProduct(request))
             .Throws(new ArgumentException("Code must be between 5 and 20 alphanumeric characters."));
 
-        BadRequestObjectResult? result = _controller.CreateProduct(request) as BadRequestObjectResult;
+        var result = _controller.CreateProduct(request) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -125,9 +125,9 @@ public class ProductsControllerTests
     [TestMethod]
     public void UpdateProduct_ValidRequest_ReturnsOk()
     {
-        Guid productId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
@@ -137,7 +137,7 @@ public class ProductsControllerTests
             Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
         };
 
-        ProductResponse response = new ProductResponse
+        var response = new ProductResponse
         {
             Code = "BURG01",
             Name = "Hamburguesa Actualizada",
@@ -151,7 +151,7 @@ public class ProductsControllerTests
 
         _mockService.Setup(s => s.UpdateProduct(productId, request)).Returns(response);
 
-        OkObjectResult? result = _controller.UpdateProduct(productId, request) as OkObjectResult;
+        var result = _controller.UpdateProduct(productId, request) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -160,9 +160,9 @@ public class ProductsControllerTests
     [TestMethod]
     public void UpdateProduct_NotFound_ReturnsNotFound()
     {
-        Guid productId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
@@ -175,7 +175,7 @@ public class ProductsControllerTests
         _mockService.Setup(s => s.UpdateProduct(productId, request))
             .Throws(new KeyNotFoundException("Producto no encontrado."));
 
-        NotFoundObjectResult? result = _controller.UpdateProduct(productId, request) as NotFoundObjectResult;
+        var result = _controller.UpdateProduct(productId, request) as NotFoundObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);
@@ -184,9 +184,9 @@ public class ProductsControllerTests
     [TestMethod]
     public void UpdateProduct_InvalidData_ReturnsBadRequest()
     {
-        Guid productId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Corto",
             Description = "Corta",
@@ -199,7 +199,7 @@ public class ProductsControllerTests
         _mockService.Setup(s => s.UpdateProduct(productId, request))
             .Throws(new ArgumentException("Name must be between 10 and 50 characters."));
 
-        BadRequestObjectResult? result = _controller.UpdateProduct(productId, request) as BadRequestObjectResult;
+        var result = _controller.UpdateProduct(productId, request) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);

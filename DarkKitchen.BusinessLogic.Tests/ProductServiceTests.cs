@@ -97,7 +97,7 @@ public class ProductServiceTests
     [TestMethod]
     public void CreateProduct_ValidRequest_ShouldAddAndReturnResponse()
     {
-        ProductCreateRequest request = new ProductCreateRequest
+        var request = new ProductCreateRequest
         {
             Code = "NEW01",
             Name = "Nuevo Producto Test",
@@ -120,7 +120,7 @@ public class ProductServiceTests
     {
         Guid productId = _testProducts[0].Id;
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
@@ -145,7 +145,7 @@ public class ProductServiceTests
     {
         _mockRepository.Setup(r => r.GetById(It.IsAny<Guid>())).Returns((Product?)null);
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
@@ -163,7 +163,7 @@ public class ProductServiceTests
     {
         Guid productId = _testProducts[0].Id;
 
-        ProductUpdateRequest request = new ProductUpdateRequest
+        var request = new ProductUpdateRequest
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
