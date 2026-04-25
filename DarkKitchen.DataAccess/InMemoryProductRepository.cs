@@ -36,4 +36,13 @@ public class InMemoryProductRepository : IProductRepository
     {
         _products.Add(product);
     }
+
+    public void Update(Guid id, Product product)
+    {
+        var index = _products.FindIndex(p => p.Id == id);
+        if(index >= 0)
+        {
+            _products[index] = product;
+        }
+    }
 }
