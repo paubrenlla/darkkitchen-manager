@@ -41,7 +41,14 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
     {
-        ProductResponse response = _productService.UpdateProduct(id, request);
-        return Ok(response);
+        try
+        {
+            ProductResponse response = _productService.UpdateProduct(id, request);
+            return Ok(response);
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
     }
 }
