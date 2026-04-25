@@ -27,6 +27,7 @@ public static class Converter
             Line = product.Line.Name,
             Category = product.Category.Name,
             Images = product.Images.Select(i => i.Url).ToList(),
+            IsActive = product.IsActive
         };
     }
 
@@ -94,5 +95,16 @@ public static class Converter
             Total = order.Total,
             ProductCount = order.Items.Sum(i => i.Quantity),
         };
+    }
+
+    public static Product ToProduct(ProductCreateRequest request)
+    {
+        var line = new ProductLine(request.Line);
+        var category = new ProductCategory(request.Category);
+        var images = request.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
+
+        return new Product(request.Code, request.Name, request.Description, line, category, request.Price, images);
     }
 }

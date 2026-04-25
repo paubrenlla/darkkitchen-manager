@@ -173,4 +173,24 @@ public class ProductTests
 
         Assert.IsTrue(product.IsActive);
     }
+
+    [TestMethod]
+    public void UpdateDetails_ShouldUpdateFieldsAndPreserveId()
+    {
+        var product = new Product("ABC12", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", defaultLine, defaultCategory, 100m, defaultImages);
+        Guid originalId = product.Id;
+        var newLine = new ProductLine("Desayunos");
+        var newCategory = new ProductCategory("Bebidas");
+        List<ProductImage> newImages = [new ProductImage("https://example.com/new.jpg", 50000)];
+
+        product.UpdateDetails("Hamburguesa Nueva", "Hamburguesa nueva con ingredientes frescos", newLine, newCategory, 200m, newImages);
+
+        Assert.AreEqual(originalId, product.Id);
+        Assert.AreEqual("Hamburguesa Nueva", product.Name);
+        Assert.AreEqual("Hamburguesa nueva con ingredientes frescos", product.Description);
+        Assert.AreEqual(newLine, product.Line);
+        Assert.AreEqual(newCategory, product.Category);
+        Assert.AreEqual(200m, product.Price);
+        Assert.AreEqual(1, product.Images.Count);
+    }
 }

@@ -9,4 +9,5 @@ public class ProductResponse
     public required string Line { get; set; }
     public required string Category { get; set; }
     public required List<string> Images { get; set; }
+    public bool IsActive { get; set; }
 }
