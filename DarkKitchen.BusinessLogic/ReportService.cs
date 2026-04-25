@@ -51,4 +51,13 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
 
         return topProducts;
     }
+
+    public SalesReportResponse GetSalesReport()
+    {
+        return new SalesReportResponse
+        {
+            Periods = [],
+            GrandTotal = 0,
+        };
+    }
 }
