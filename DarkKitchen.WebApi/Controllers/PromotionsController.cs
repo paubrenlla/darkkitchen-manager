@@ -16,7 +16,21 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
-        IEnumerable<PromotionCreateResponse> result = _promotionService.GetPromotions(date, line, productCode);
+        var result = _promotionService.GetPromotions(date, line, productCode);
         return Ok(result);
+    }
+
+    [HttpPost]
+    public IActionResult CreatePromotion([FromBody] PromotionCreateRequest request)
+    {
+        try
+        {
+            var response = _promotionService.CreatePromotion(request);
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
