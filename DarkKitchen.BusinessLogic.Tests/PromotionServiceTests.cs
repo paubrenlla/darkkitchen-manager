@@ -149,4 +149,12 @@ public class PromotionServiceTests
 
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByLine_NoMatches_ReturnsEmpty()
+    {
+        var result = _promotionService.GetPromotions(null, "Desayunos", null).ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
 }
