@@ -99,4 +99,22 @@ public class PromotionServiceTests
 
         Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request));
     }
+
+    [TestMethod]
+    public void CreatePromotion_NoProducts_CreatesPromotionSuccessfully()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Sin Productos",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+
+        PromotionCreateResponse result = _promotionService.CreatePromotion(request);
+
+        Assert.AreEqual("Promo Sin Productos", result.Name);
+        Assert.AreEqual(0, result.Products.Count);
+    }
 }
