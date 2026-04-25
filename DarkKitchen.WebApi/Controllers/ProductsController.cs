@@ -26,7 +26,14 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
     {
-        ProductResponse response = _productService.CreateProduct(request);
-        return StatusCode(StatusCodes.Status201Created, response);
+        try
+        {
+            ProductResponse response = _productService.CreateProduct(request);
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }

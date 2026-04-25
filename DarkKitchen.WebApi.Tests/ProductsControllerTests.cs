@@ -121,4 +121,39 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateProduct_ValidRequest_ReturnsOk()
+    {
+        Guid productId = Guid.NewGuid();
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+        };
+
+        ProductResponse response = new ProductResponse
+        {
+            Code = "BURG01",
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Price = 200m,
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Images = ["https://example.com/new.jpg"],
+            IsActive = true,
+        };
+
+        _mockService.Setup(s => s.UpdateProduct(productId, request)).Returns(response);
+
+        OkObjectResult? result = _controller.UpdateProduct(productId, request) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
 }
