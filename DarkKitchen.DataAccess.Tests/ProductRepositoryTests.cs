@@ -26,4 +26,20 @@ public class ProductRepositoryTests
         Assert.IsTrue(productList.Any(p => p.Code == "BURG02"));
         Assert.IsTrue(productList.Any(p => p.Code == "DESA01"));
     }
+
+    [TestMethod]
+    public void GetById_ExistingProduct_ReturnsProduct()
+    {
+        Product? result = _productRepository.GetById(_productRepository.GetAll().First().Id);
+
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void GetById_NonExistingProduct_ReturnsNull()
+    {
+        Product? result = _productRepository.GetById(Guid.NewGuid());
+
+        Assert.IsNull(result);
+    }
 }
