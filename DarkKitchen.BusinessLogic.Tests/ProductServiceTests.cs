@@ -157,4 +157,27 @@ public class ProductServiceTests
 
         _productService.UpdateProduct(Guid.NewGuid(), request);
     }
+
+    [TestMethod]
+    public void UpdateProduct_WithIsActiveFalse_ShouldDeactivateProduct()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+            IsActive = false,
+        };
+
+        _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
+
+        ProductResponse result = _productService.UpdateProduct(productId, request);
+
+        Assert.IsFalse(result.IsActive);
+    }
 }
