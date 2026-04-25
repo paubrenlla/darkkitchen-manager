@@ -24,13 +24,13 @@ public class ReportServiceTests
         _productRepositoryMock = new Mock<IProductRepository>();
         _reportService = new ReportService(_orderRepositoryMock.Object, _productRepositoryMock.Object);
 
-        ProductLine line = new ProductLine("Combo burgers");
-        ProductCategory category = new ProductCategory("Parrilla");
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
         List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
 
-        Product product1 = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
-        Product product2 = new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", line, category, 200m, images);
-        Product product3 = new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", line, category, 120m, images);
+        var product1 = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
+        var product2 = new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", line, category, 200m, images);
+        var product3 = new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", line, category, 120m, images);
 
         _product1Id = product1.Id;
         _product2Id = product2.Id;
@@ -45,13 +45,13 @@ public class ReportServiceTests
     [TestMethod]
     public void GetTopProducts_ShouldReturnTopFiveOrderedByQuantity()
     {
-        Address address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        Order order1 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)]);
-        Order order2 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 5, 200m)]);
-        Order order3 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)]);
+        var order1 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)]);
+        var order2 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 5, 200m)]);
+        var order3 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)]);
 
         List<Order> orders = [order1, order2, order3];
 
@@ -69,12 +69,12 @@ public class ReportServiceTests
     [TestMethod]
     public void GetTopProducts_ShouldExcludeCancelledOrders()
     {
-        Address address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        Order validOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)]);
-        Order cancelledOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 100, 200m)]);
+        var validOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)]);
+        var cancelledOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 100, 200m)]);
         cancelledOrder.TransitionTo(OrderState.Cancelled);
 
         List<Order> orders = [validOrder, cancelledOrder];
@@ -91,17 +91,17 @@ public class ReportServiceTests
     [TestMethod]
     public void GetTopProducts_ShouldReturnMaxFiveProducts()
     {
-        Address address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        ProductLine line = new ProductLine("Extras");
-        ProductCategory category = new ProductCategory("Varios");
+        var line = new ProductLine("Extras");
+        var category = new ProductCategory("Varios");
         List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
 
-        Product product4 = new Product("PROD4", "Producto Cuatro Test", "Descripcion del producto cuatro de prueba", line, category, 100m, images);
-        Product product5 = new Product("PROD5", "Producto Cinco Test", "Descripcion del producto cinco de prueba", line, category, 100m, images);
-        Product product6 = new Product("PROD6", "Producto Seis Prueba", "Descripcion del producto seis de prueba", line, category, 100m, images);
+        var product4 = new Product("PROD4", "Producto Cuatro Test", "Descripcion del producto cuatro de prueba", line, category, 100m, images);
+        var product5 = new Product("PROD5", "Producto Cinco Test", "Descripcion del producto cinco de prueba", line, category, 100m, images);
+        var product6 = new Product("PROD6", "Producto Seis Prueba", "Descripcion del producto seis de prueba", line, category, 100m, images);
 
         _productRepositoryMock.Setup(r => r.GetById(product4.Id)).Returns(product4);
         _productRepositoryMock.Setup(r => r.GetById(product5.Id)).Returns(product5);
@@ -119,7 +119,7 @@ public class ReportServiceTests
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
 
-        List<TopProductResponse> result = _reportService.GetTopProducts(from, to).ToList();
+        var result = _reportService.GetTopProducts(from, to).ToList();
 
         Assert.AreEqual(5, result.Count);
     }
@@ -132,7 +132,7 @@ public class ReportServiceTests
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns([]);
 
-        List<TopProductResponse> result = _reportService.GetTopProducts(from, to).ToList();
+        var result = _reportService.GetTopProducts(from, to).ToList();
 
         Assert.AreEqual(0, result.Count);
     }
@@ -140,7 +140,7 @@ public class ReportServiceTests
     [TestMethod]
     public void GetTopProducts_MultipleOrdersSameProduct_ShouldAggregateQuantities()
     {
-        Address address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
@@ -153,7 +153,7 @@ public class ReportServiceTests
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
 
-        List<TopProductResponse> result = _reportService.GetTopProducts(from, to).ToList();
+        var result = _reportService.GetTopProducts(from, to).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(12, result.First().QuantitySold);
@@ -162,11 +162,11 @@ public class ReportServiceTests
     [TestMethod]
     public void GetTopProducts_ProductNotFound_ShouldSkipProduct()
     {
-        Address address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        Guid unknownProductId = Guid.NewGuid();
+        var unknownProductId = Guid.NewGuid();
         _productRepositoryMock.Setup(r => r.GetById(unknownProductId)).Returns((Product?)null);
 
         List<Order> orders =
@@ -177,7 +177,7 @@ public class ReportServiceTests
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
 
-        List<TopProductResponse> result = _reportService.GetTopProducts(from, to).ToList();
+        var result = _reportService.GetTopProducts(from, to).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("BURG01", result.First().Code);

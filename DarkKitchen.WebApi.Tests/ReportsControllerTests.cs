@@ -21,8 +21,8 @@ public class ReportsControllerTests
         _controller = new ReportsController(_mockReportService.Object);
 
         List<Claim> claims = [new Claim(ClaimTypes.Role, "Administrativo")];
-        ClaimsIdentity identity = new ClaimsIdentity(claims, "Test");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
 
         _controller.ControllerContext = new ControllerContext
         {
@@ -49,7 +49,7 @@ public class ReportsControllerTests
 
         _mockReportService.Setup(s => s.GetTopProducts(from, to)).Returns(topProducts);
 
-        OkObjectResult? result = _controller.GetTopProducts(from, to) as OkObjectResult;
+        var result = _controller.GetTopProducts(from, to) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -63,7 +63,7 @@ public class ReportsControllerTests
 
         _mockReportService.Setup(s => s.GetTopProducts(from, to)).Returns([]);
 
-        OkObjectResult? result = _controller.GetTopProducts(from, to) as OkObjectResult;
+        var result = _controller.GetTopProducts(from, to) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
@@ -75,7 +75,7 @@ public class ReportsControllerTests
         DateTime from = DateTime.Now;
         DateTime to = DateTime.Now.AddDays(-30);
 
-        BadRequestObjectResult? result = _controller.GetTopProducts(from, to) as BadRequestObjectResult;
+        var result = _controller.GetTopProducts(from, to) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
