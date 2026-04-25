@@ -251,6 +251,6 @@ public class ModelTests
         var isValid = Validator.TryValidateObject(request, context, validationResults, true);
 
         Assert.IsFalse(isValid);
-        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe estar entre 1 y 100."));
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe ser un número entre 1 y 100."));
     }
 }
