@@ -19,13 +19,13 @@ public class Promotion
         IsActive = true;
     }
 
-    private Guid Id { get; set; }
-    private string Name { get; set; } = null!;
-    private bool IsActive { get; set; }
-    private int DiscountPercentage { get; set; }
-    private DateTime StartDate { get; set; }
-    private DateTime EndDate { get; set; }
-    private List<Product> Products { get; set; } = [];
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = null!;
+    public bool IsActive { get; private set; }
+    public int DiscountPercentage { get; private set; }
+    public DateTime StartDate { get; private set; }
+    public DateTime EndDate { get; private set; }
+    public List<Product> Products { get; private set; } = [];
 
     private static void ValidateDates(DateTime startDate, DateTime endDate)
     {
