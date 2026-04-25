@@ -63,4 +63,38 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void CreateProduct_ValidRequest_Returns201()
+    {
+        ProductCreateRequest request = new ProductCreateRequest
+        {
+            Code = "NEW01",
+            Name = "Nuevo Producto Test",
+            Description = "Descripcion del nuevo producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 100m,
+            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }],
+        };
+
+        ProductResponse response = new ProductResponse
+        {
+            Code = "NEW01",
+            Name = "Nuevo Producto Test",
+            Description = "Descripcion del nuevo producto de prueba",
+            Price = 100m,
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Images = ["https://example.com/photo.jpg"],
+            IsActive = true,
+        };
+
+        _mockService.Setup(s => s.CreateProduct(request)).Returns(response);
+
+        ObjectResult? result = _controller.CreateProduct(request) as ObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+    }
 }
