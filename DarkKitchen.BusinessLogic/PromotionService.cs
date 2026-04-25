@@ -22,6 +22,12 @@ public class PromotionService(
             promotions = promotions.Where(p => date.Value >= p.StartDate && date.Value <= p.EndDate);
         }
 
+        if(!string.IsNullOrWhiteSpace(line))
+        {
+            promotions = promotions.Where(p => p.Products.Any(prod =>
+                prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
+        }
+
         return promotions.Select(Converter.ToPromotionCreateResponse);
     }
 
