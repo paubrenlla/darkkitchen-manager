@@ -157,4 +157,13 @@ public class PromotionServiceTests
 
         Assert.AreEqual(0, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_FilterByProductCode_ReturnsMatchingPromotion()
+    {
+        var result = _promotionService.GetPromotions(null, null, "BURG01").ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+    }
 }
