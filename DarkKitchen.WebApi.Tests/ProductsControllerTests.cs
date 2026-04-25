@@ -156,4 +156,28 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateProduct_NotFound_ReturnsNotFound()
+    {
+        Guid productId = Guid.NewGuid();
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+        };
+
+        _mockService.Setup(s => s.UpdateProduct(productId, request))
+            .Throws(new KeyNotFoundException("Producto no encontrado."));
+
+        NotFoundObjectResult? result = _controller.UpdateProduct(productId, request) as NotFoundObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(404, result.StatusCode);
+    }
 }
