@@ -1,34 +1,38 @@
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DarkKitchen.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PromotionsController(IPromotionService promotionService) : ControllerBase
 {
     private readonly IPromotionService _promotionService = promotionService;
 
     [HttpGet]
+    [Authorize(Roles = "Cliente,Administrativo")]
     public IActionResult GetPromotions(
         [FromQuery] DateTime? date,
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
-        var result = _promotionService.GetPromotions(date, line, productCode);
+        IEnumerable<PromotionCreateResponse> result = _promotionService.GetPromotions(date, line, productCode);
         return Ok(result);
     }
 
     [HttpPost]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult CreatePromotion([FromBody] PromotionCreateRequest request)
     {
         try
         {
-            var response = _promotionService.CreatePromotion(request);
+            PromotionCreateResponse response = _promotionService.CreatePromotion(request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
-        catch (ArgumentException ex)
+        catch(ArgumentException ex)
         {
             return BadRequest(new { error = ex.Message });
         }

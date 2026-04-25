@@ -25,6 +25,8 @@ public static class DependencyResolution
         services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
         services.AddScoped<IUserService, UserService>();
+        services.AddSingleton<IPromotionRepository, InMemoryPromotionRepository>();
+        services.AddScoped<IPromotionService, PromotionService>();
 
         return services;
     }
