@@ -272,4 +272,24 @@ public class ModelTests
         Assert.IsFalse(isValid);
         Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe ser un número entre 1 y 100."));
     }
+
+    [TestMethod]
+    public void PromotionCreateRequest_ValidData_PassesValidation()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7),
+            ProductCodes = ["BURG01", "BURG02"]
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsTrue(isValid);
+        Assert.AreEqual(0, validationResults.Count);
+    }
 }
