@@ -56,4 +56,26 @@ public class PromotionsControllerTests
         Assert.IsNotNull(promotions);
         Assert.AreEqual(2, promotions.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_WithFilters_ShouldPassFiltersToService()
+    {
+        _mockService.Setup(s => s.GetPromotions(null, "Combo burgers", "BURG01")).Returns([_testPromotions[0]]);
+
+        var result = _controller.GetPromotions(null, "Combo burgers", "BURG01") as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        _mockService.Verify(s => s.GetPromotions(null, "Combo burgers", "BURG01"), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetPromotions_NoResults_ShouldReturnOkWithEmptyList()
+    {
+        _mockService.Setup(s => s.GetPromotions(null, "Desayunos", null)).Returns([]);
+
+        var result = _controller.GetPromotions(null, "Desayunos", null) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
 }
