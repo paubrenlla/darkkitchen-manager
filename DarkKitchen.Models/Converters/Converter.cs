@@ -95,4 +95,15 @@ public static class Converter
             ProductCount = order.Items.Sum(i => i.Quantity),
         };
     }
+
+    public static Product ToProduct(ProductCreateRequest request)
+    {
+        ProductLine line = new ProductLine(request.Line);
+        ProductCategory category = new ProductCategory(request.Category);
+        List<ProductImage> images = request.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
+
+        return new Product(request.Code, request.Name, request.Description, line, category, request.Price, images);
+    }
 }
