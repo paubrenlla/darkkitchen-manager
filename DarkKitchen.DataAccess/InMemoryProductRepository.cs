@@ -40,9 +40,12 @@ public class InMemoryProductRepository : IProductRepository
     public void Update(Guid id, Product product)
     {
         var index = _products.FindIndex(p => p.Id == id);
-        if(index >= 0)
+
+        if(index < 0)
         {
-            _products[index] = product;
+            throw new KeyNotFoundException($"Producto {id} no encontrado.");
         }
+
+        _products[index] = product;
     }
 }
