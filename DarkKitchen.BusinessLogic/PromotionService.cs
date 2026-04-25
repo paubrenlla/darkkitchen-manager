@@ -27,13 +27,17 @@ public class PromotionService(
             .Where(p => request.ProductCodes.Contains(p.Code))
             .ToList();
 
+        if(selectedProducts.Count != request.ProductCodes.Count)
+        {
+            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
+        }
+
         var promotion = new Promotion(
             request.Name,
             request.DiscountPercentage,
             request.StartDate,
             request.EndDate,
-            selectedProducts
-        );
+            selectedProducts);
 
         _promotionRepository.Add(promotion);
         return Converter.ToPromotionCreateResponse(promotion);
