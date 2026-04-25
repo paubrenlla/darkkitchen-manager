@@ -138,4 +138,23 @@ public class ProductServiceTests
         Assert.AreEqual("Hamburguesa Actualizada", result.Name);
         _mockRepository.Verify(r => r.Update(productId, It.IsAny<Product>()), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void UpdateProduct_NotFound_ShouldThrow()
+    {
+        _mockRepository.Setup(r => r.GetById(It.IsAny<Guid>())).Returns((Product?)null);
+
+        ProductUpdateRequest request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+        };
+
+        _productService.UpdateProduct(Guid.NewGuid(), request);
+    }
 }
