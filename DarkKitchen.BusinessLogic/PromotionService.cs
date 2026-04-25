@@ -17,6 +17,11 @@ public class PromotionService(
     {
         IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
 
+        if(date.HasValue)
+        {
+            promotions = promotions.Where(p => date.Value >= p.StartDate && date.Value <= p.EndDate);
+        }
+
         return promotions.Select(Converter.ToPromotionCreateResponse);
     }
 
