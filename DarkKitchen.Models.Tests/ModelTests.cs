@@ -218,4 +218,20 @@ public class ModelTests
         Assert.IsTrue(result.Products.Contains("BURG01"));
         Assert.IsTrue(result.Products.Contains("BURG02"));
     }
+
+    [TestMethod]
+    public void PromotionCreateRequest_MissingName_ReturnsValidationError()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = null!, DiscountPercentage = 10, StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(7)
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsFalse(isValid);
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El nombre es obligatorio."));
+    }
 }
