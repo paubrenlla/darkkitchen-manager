@@ -16,6 +16,6 @@ public class ExpressShippingStrategy : IShippingStrategy
 
     public decimal Calculate()
     {
-        return new decimal(null);
+        return _cost;
     }
 }
