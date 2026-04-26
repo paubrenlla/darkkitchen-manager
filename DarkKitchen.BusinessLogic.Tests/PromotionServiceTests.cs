@@ -306,7 +306,8 @@ public class PromotionServiceTests
         var line = new ProductLine("Desayunos");
         var category = new ProductCategory("Fritos");
         var unrelatedProduct = new Product("DESAY01", "Medialunas de manteca",
-            "Medialunas clasicas de manteca artesanal", line, category, 80m, [new ProductImage("medialunas.jpg", 95000)]);
+            "Medialunas clasicas de manteca artesanal", line, category, 80m,
+            [new ProductImage("medialunas.jpg", 95000)]);
 
         var result = _promotionService.GetBestDiscountForProduct(unrelatedProduct.Id, new DateTime(2025, 6, 1));
 
@@ -366,5 +367,16 @@ public class PromotionServiceTests
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_WithActivePromo_ReturnsNameAndDiscount()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now);
+
+        Assert.AreEqual("Black Friday", name);
+        Assert.AreEqual(10m, discount);
     }
 }
