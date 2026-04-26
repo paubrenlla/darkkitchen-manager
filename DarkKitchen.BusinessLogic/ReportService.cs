@@ -84,7 +84,7 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
             Year = year,
             Month = month,
             Clients = clients,
-            PeriodTotal = 0,
+            PeriodTotal = clients.Sum(c => c.Total),
         };
     }
 
