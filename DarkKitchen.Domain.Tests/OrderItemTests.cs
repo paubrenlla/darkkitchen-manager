@@ -86,4 +86,11 @@ public class OrderItemTests
         Assert.AreEqual(10m, item.DiscountPercentage);
         Assert.AreEqual("Black Friday", item.AppliedPromotionName);
     }
+
+    [TestMethod]
+    public void CreateItem_WithNegativeDiscount_ShouldThrowArgumentException()
+    {
+        Assert.ThrowsException<ArgumentException>(() =>
+            new OrderItem(Guid.NewGuid(), 1, 100m, -5m));
+    }
 }
