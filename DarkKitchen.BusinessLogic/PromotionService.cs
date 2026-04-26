@@ -49,7 +49,8 @@ public class PromotionService(
 
     public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request)
     {
-        Promotion existingPromo = _promotionRepository.GetAll().FirstOrDefault(p => p.Id == id);
+        Promotion existingPromo = _promotionRepository.GetAll().FirstOrDefault(p => p.Id == id)
+                                  ?? throw new KeyNotFoundException("La promoción no existe.");
         var selectedProducts = _productRepository.GetAll()
             .Where(p => request.ProductCodes.Contains(p.Code))
             .ToList();
