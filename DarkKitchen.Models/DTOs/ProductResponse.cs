@@ -1,7 +1,8 @@
-﻿namespace DarkKitchen.Models.DTOs;
+namespace DarkKitchen.Models.DTOs;
 
 public class ProductResponse
 {
+    public Guid Id { get; set; }
     public required string Code { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }

@@ -8,11 +8,10 @@ namespace DarkKitchen.BusinessLogic.Tests;
 [TestClass]
 public class ProductServiceTests
 {
+    private List<ProductImage> _defaultImages = null!;
     private Mock<IProductRepository> _mockRepository = null!;
     private ProductService _productService = null!;
     private List<Product> _testProducts = null!;
-
-    private List<ProductImage> _defaultImages = null!;
 
     [TestInitialize]
     public void Setup()
@@ -27,9 +26,12 @@ public class ProductServiceTests
 
         _testProducts =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m, _defaultImages),
-            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m, _defaultImages),
-            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m, _defaultImages),
+            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo,
+                categoryParrilla, 150m, _defaultImages),
+            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo,
+                categoryParrilla, 200m, _defaultImages),
+            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos,
+                categoryBebidas, 120m, _defaultImages)
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);
@@ -105,7 +107,7 @@ public class ProductServiceTests
             Line = "Desayunos",
             Category = "Bebidas",
             Price = 100m,
-            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }],
+            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }]
         };
 
         ProductResponse result = _productService.CreateProduct(request);
@@ -113,6 +115,35 @@ public class ProductServiceTests
         Assert.IsNotNull(result);
         Assert.AreEqual("NEW01", result.Code);
         _mockRepository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateProduct_DuplicatedCode_ShouldThrow()
+    {
+        var request1 = new ProductCreateRequest
+        {
+            Code = "PIE01",
+            Name = "Pie",
+            Description = "Desc",
+            Line = "Pie",
+            Category = "Cakes",
+            Price = 100,
+            Images = []
+        };
+        var request2 = new ProductCreateRequest
+        {
+            Code = "PIE01",
+            Name = "Duplicate",
+            Description = "Desc",
+            Line = "Pie",
+            Category = "Cakes",
+            Price = 100,
+            Images = []
+        };
+
+        _productService.CreateProduct(request1);
+        _productService.CreateProduct(request2);
     }
 
     [TestMethod]
@@ -127,7 +158,7 @@ public class ProductServiceTests
             Line = "Desayunos",
             Category = "Bebidas",
             Price = 200m,
-            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
         };
 
         _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
@@ -152,7 +183,7 @@ public class ProductServiceTests
             Line = "Desayunos",
             Category = "Bebidas",
             Price = 200m,
-            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
         };
 
         _productService.UpdateProduct(Guid.NewGuid(), request);
@@ -171,7 +202,7 @@ public class ProductServiceTests
             Category = "Bebidas",
             Price = 200m,
             Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
-            IsActive = false,
+            IsActive = false
         };
 
         _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
