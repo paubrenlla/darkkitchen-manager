@@ -51,6 +51,7 @@ public class PromotionService(
     {
         Promotion existingPromo = _promotionRepository.GetAll().FirstOrDefault(p => p.Id == id)
                                   ?? throw new KeyNotFoundException("La promoción no existe.");
+
         var selectedProducts = _productRepository.GetAll()
             .Where(p => request.ProductCodes.Contains(p.Code))
             .ToList();
@@ -72,7 +73,12 @@ public class PromotionService(
 
     public decimal GetBestDiscountForProduct(Guid productId, DateTime date)
     {
-        throw new NotImplementedException();
+        var activePromos = _promotionRepository.GetAll()
+            .Where(p => date >= p.StartDate && date <= p.EndDate && p.IsActive)
+            .Where(p => p.Products.Any(prod => prod.Id == productId))
+            .ToList();
+
+        return activePromos.Max(p => p.DiscountPercentage);
     }
 
     private IEnumerable<Promotion> FilterByDate(IEnumerable<Promotion> promotions, DateTime? date)
