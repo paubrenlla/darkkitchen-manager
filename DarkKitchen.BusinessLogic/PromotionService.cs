@@ -47,6 +47,16 @@ public class PromotionService(
         return Converter.ToPromotionCreateResponse(promotion);
     }
 
+    public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public decimal GetBestDiscountForProduct(Guid productId, DateTime date)
+    {
+        throw new NotImplementedException();
+    }
+
     private IEnumerable<Promotion> FilterByDate(IEnumerable<Promotion> promotions, DateTime? date)
     {
         if(!date.HasValue)

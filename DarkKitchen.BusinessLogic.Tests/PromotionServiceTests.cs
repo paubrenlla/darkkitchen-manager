@@ -183,4 +183,24 @@ public class PromotionServiceTests
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(result[0].Products.Contains("BURG01"));
     }
+
+    [TestMethod]
+    public void UpdatePromotion_ValidRequest_ReturnsUpdatedResponse()
+    {
+        Guid promoId = _testPromotions[0].Id;
+        var request = new PromotionCreateRequest
+        {
+            Name = "Black Friday Actualizado",
+            DiscountPercentage = 30,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["BURG02"]
+        };
+
+        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
+
+        Assert.AreEqual("Black Friday Actualizado", result.Name);
+        Assert.AreEqual(30, result.DiscountPercentage);
+        Assert.IsTrue(result.Products.Contains("BURG02"));
+    }
 }
