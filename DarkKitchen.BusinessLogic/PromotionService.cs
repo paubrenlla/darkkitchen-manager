@@ -86,8 +86,7 @@ public class PromotionService(
     public decimal GetBestDiscountForProduct(Guid productId, DateTime date)
     {
         var activePromos = _promotionRepository.GetAll()
-            .Where(p => date >= p.StartDate && date <= p.EndDate && p.IsActive)
-            .Where(p => p.Products.Any(prod => prod.Id == productId))
+            .Where(p => p.IsVigente(date) && p.Products.Any(prod => prod.Id == productId))
             .ToList();
 
         if(!activePromos.Any())
