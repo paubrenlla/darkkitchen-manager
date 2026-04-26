@@ -112,4 +112,12 @@ public class PromotionTests
         Assert.AreEqual(25, promotion.DiscountPercentage);
         Assert.AreEqual(1, promotion.Products.Count);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void UpdatePromotion_WithInvalidName_ShouldThrow()
+    {
+        var promotion = new Promotion("Nombre Valido", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+        promotion.Update("Ab", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+    }
 }
