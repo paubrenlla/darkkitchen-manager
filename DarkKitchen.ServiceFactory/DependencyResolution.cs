@@ -23,7 +23,7 @@ public static class DependencyResolution
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IReportService, ReportService>();
-
+        services.AddSingleton<IPasswordHasher, BCryptHasher>();
         services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
         services.AddScoped<IUserService, UserService>();

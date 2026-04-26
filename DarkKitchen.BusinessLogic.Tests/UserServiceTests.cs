@@ -12,13 +12,19 @@ public class UserServiceTests
     private Mock<IUserRepository> _userRepositoryMock = null!;
     private Mock<IPhoneStrategyFactory> _strategyFactoryMock = null!;
     private UserService _userService = null!;
+    private Mock<IPasswordHasher> _passwordHasherMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _strategyFactoryMock = new Mock<IPhoneStrategyFactory>();
-        _userService = new UserService(_userRepositoryMock.Object, _strategyFactoryMock.Object);
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed_password");
+        _userService = new UserService(
+            _userRepositoryMock.Object,
+            _strategyFactoryMock.Object,
+            _passwordHasherMock.Object);
     }
 
     [TestMethod]
@@ -98,7 +104,7 @@ public class UserServiceTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente)];
+        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object)];
 
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
 
@@ -116,7 +122,7 @@ public class UserServiceTests
 
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador);
+        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
 
@@ -290,5 +296,64 @@ public class UserServiceTests
         };
 
         _userService.CreateUser(request);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CreateUser_DuplicateEmail_ShouldThrow()
+    {
+        var request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+        };
+
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        var existingPhone = Domain.Users.PhoneNumber.Create("+598", "094123456", mockStrategy.Object);
+        var existingUser = new User("Otro", "Usuario", "juan@test.com", existingPhone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
+        _userRepositoryMock.Setup(r => r.GetUserByEmail("juan@test.com")).Returns(existingUser);
+
+        _userService.CreateUser(request);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void UpdateUser_EmailAlreadyUsedByOtherUser_ShouldThrow()
+    {
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador, _passwordHasherMock.Object);
+        var otherUser = new User("Otro", "Usuario", "nuevo@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
+
+        _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
+        _userRepositoryMock.Setup(r => r.GetUserByEmail("nuevo@test.com")).Returns(otherUser);
+
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094999888")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        var request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        _userService.UpdateUser(adminId, userId, request);
     }
 }

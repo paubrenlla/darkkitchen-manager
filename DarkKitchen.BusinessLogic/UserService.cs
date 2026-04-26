@@ -7,10 +7,11 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory) : IUserService
+public class UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory, IPasswordHasher passwordHasher) : IUserService
 {
     private readonly IPhoneStrategyFactory _strategyFactory = strategyFactory;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private static readonly IReadOnlyList<string> AllowedAdminRoles = ["Administrativo", "Preparador"];
 
     public UserCreateResponse CreateUser(UserCreateRequest request)
@@ -32,7 +33,13 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
-        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role);
+        var existingUser = _userRepository.GetUserByEmail(request.Email);
+        if(existingUser != null)
+        {
+            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
+        }
+
+        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
     }
@@ -61,6 +68,11 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
             request.Email,
             validPhone,
             role);
+        User userWithEmail = _userRepository.GetUserByEmail(request.Email);
+        if(userWithEmail != null && userWithEmail.Id != userId)
+        {
+            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
+        }
 
         _userRepository.Update(userId, existingUser);
         return Converter.ToUserCreateResponse(existingUser);

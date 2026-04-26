@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Users;
+using Moq;
 
 namespace DarkKitchen.DataAccess.Tests;
 
@@ -6,11 +7,14 @@ namespace DarkKitchen.DataAccess.Tests;
 public class UserRepositoryTests
 {
     private InMemoryUserRepository _userRepository = null!;
+    private Mock<IPasswordHasher> _passwordHasherMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _userRepository = new InMemoryUserRepository();
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        _userRepository = new InMemoryUserRepository(new BCryptHasher());
     }
 
     [TestMethod]
@@ -55,7 +59,7 @@ public class UserRepositoryTests
             "marta@test.com",
             PhoneNumber.Create("+598", "094444555", new UruguayPhoneValidationStrategy()),
             "Valid1Password!@",
-            Role.Cliente);
+            Role.Cliente, _passwordHasherMock.Object);
 
         _userRepository.Add(user);
 
@@ -88,7 +92,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname("Lucia", null);
@@ -101,7 +105,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname(null, "Perez");
@@ -141,7 +145,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
 
         _userRepository.Update(Guid.NewGuid(), user);
     }
