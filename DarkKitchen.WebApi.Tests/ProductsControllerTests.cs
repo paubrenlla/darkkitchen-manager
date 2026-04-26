@@ -141,6 +141,29 @@ public class ProductsControllerTests
     }
 
     [TestMethod]
+    public void CreateProduct_DuplicatedCode_ReturnsBadRequest()
+    {
+        var request = new ProductCreateRequest
+        {
+            Code = "BURG01",
+            Name = "Duplicate",
+            Description = "Desc",
+            Line = "Combo burgers",
+            Category = "Parrilla",
+            Price = 100m,
+            Images = []
+        };
+
+        _mockService.Setup(s => s.CreateProduct(request))
+            .Throws(new ArgumentException("Product with code BURG01 already exists."));
+
+        var result = _controller.CreateProduct(request) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+    }
+
+    [TestMethod]
     public void UpdateProduct_ValidRequest_ReturnsOk()
     {
         var productId = Guid.NewGuid();
