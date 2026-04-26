@@ -224,4 +224,46 @@ public class OrderServiceTests
 
         _orderService.GetOrderById(Guid.NewGuid());
     }
+
+    [TestMethod]
+    public void CreateOrder_ShouldApplyPromotionAndPriceFromProduct()
+    {
+        var productId = Guid.NewGuid();
+        var validImages = new List<ProductImage> { new("https://darkkitchen.com/pizza.jpg", 100 * 1024) };
+
+        var validName = "Pizza Napolitana Especial";
+        var validDescription = "Deliciosa pizza con muzzarella, tomate y albahaca fresca.";
+        var validCode = "PROD001";
+
+        var product = new Product(
+            validCode,
+            validName,
+            validDescription,
+            new ProductLine("Minutas"),
+            new ProductCategory("Fritos"),
+            500m,
+            validImages);
+
+        _productRepositoryMock.Setup(r => r.GetAll()).Returns([product]);
+
+        _promotionServiceMock.Setup(p => p.GetBestPromotionForProduct(product.Id, It.IsAny<DateTime>()))
+            .Returns(("Promo Test", 10m));
+
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = "Express",
+            Address = new OrderAddressDto
+            {
+                Street = "Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay"
+            },
+            Items = [new OrderItemDto { ProductId = product.Id, Quantity = 2 }]
+        };
+
+        OrderCreateResponse result = _orderService.CreateOrder(_clientId, request);
+
+        Assert.IsNotNull(result);
+
+        Assert.AreEqual(900m, result.Subtotal);
+        _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
+    }
 }
