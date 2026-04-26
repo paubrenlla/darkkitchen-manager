@@ -18,21 +18,22 @@ public class PromotionService(
         IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
 
         DateTime dateToFilter = date ?? DateTime.Now;
-        promotions = promotions.Where(p => p.IsActive && dateToFilter >= p.StartDate && dateToFilter <= p.EndDate);
+
+        IEnumerable<Promotion> filtered = promotions.Where(p => p.IsVigente(dateToFilter));
 
         if(!string.IsNullOrWhiteSpace(line))
         {
-            promotions = promotions.Where(p =>
-                p.Products.Any(prod => prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
+            filtered = filtered.Where(p => p.Products.Any(prod =>
+                prod.Line.Name.Equals(line, StringComparison.OrdinalIgnoreCase)));
         }
 
         if(!string.IsNullOrWhiteSpace(productCode))
         {
-            promotions = promotions.Where(p =>
-                p.Products.Any(prod => prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
+            filtered = filtered.Where(p => p.Products.Any(prod =>
+                prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
         }
 
-        return promotions.Select(Converter.ToPromotionCreateResponse);
+        return filtered.Select(Converter.ToPromotionCreateResponse);
     }
 
     public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request)
