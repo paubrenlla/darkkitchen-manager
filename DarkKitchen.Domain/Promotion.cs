@@ -1,3 +1,5 @@
+using DarkKitchen.Domain.Products;
+
 namespace DarkKitchen.Domain;
 
 public class Promotion

@@ -1,4 +1,5 @@
 using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
 using Moq;
@@ -25,9 +26,10 @@ public class PromotionServiceTests
 
         _testProducts =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m),
+            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m,
+                [new ProductImage("img1.jpg", 100000)]),
             new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", line, category,
-                200m)
+                200m, [new ProductImage("img2.jpg", 150000)])
         ];
 
         DateTime start = DateTime.Now.AddDays(-1);
@@ -284,7 +286,7 @@ public class PromotionServiceTests
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
         var sharedProduct = new Product("SHARED01", "Producto Compartido", "Descripcion larga del producto compartido",
-            line, category, 100m);
+            line, category, 100m, [new ProductImage("shared.jpg", 120000)]);
 
         var start = new DateTime(2025, 1, 1);
         var end = new DateTime(2025, 12, 31);
@@ -305,7 +307,7 @@ public class PromotionServiceTests
         var line = new ProductLine("Desayunos");
         var category = new ProductCategory("Fritos");
         var unrelatedProduct = new Product("DESAY01", "Medialunas de manteca",
-            "Medialunas clasicas de manteca artesanal", line, category, 80m);
+            "Medialunas clasicas de manteca artesanal", line, category, 80m, [new ProductImage("medialunas.jpg", 95000)]);
 
         var result = _promotionService.GetBestDiscountForProduct(unrelatedProduct.Id, new DateTime(2025, 6, 1));
 
@@ -318,7 +320,7 @@ public class PromotionServiceTests
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
         var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m);
+            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
 
         var activePromo = new Promotion("Vigente", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
         var expiredPromo =
@@ -338,7 +340,7 @@ public class PromotionServiceTests
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
         var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m);
+            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
 
         var futurePromo = new Promotion("Futura", 15, DateTime.Now.AddDays(5), DateTime.Now.AddDays(15), [product]);
 
@@ -355,7 +357,7 @@ public class PromotionServiceTests
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
         var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m);
+            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
 
         var promo = new Promotion("Promo Inactiva", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
         promo.Deactivate();

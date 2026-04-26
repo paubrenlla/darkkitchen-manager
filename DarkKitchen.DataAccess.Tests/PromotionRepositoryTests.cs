@@ -1,4 +1,5 @@
 using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 
 namespace DarkKitchen.DataAccess.Tests;
 
@@ -18,14 +19,14 @@ public class PromotionRepositoryTests
     {
         var name = "Black Friday";
         var discount = 20;
-        var startDate = DateTime.Today;
-        var endDate = DateTime.Today.AddDays(7);
+        DateTime startDate = DateTime.Today;
+        DateTime endDate = DateTime.Today.AddDays(7);
         var products = new List<Product>();
         var promotion = new Promotion(name, discount, startDate, endDate, products);
 
         _promotionRepository.Add(promotion);
 
-        var result = _promotionRepository.GetAll();
+        IEnumerable<Promotion> result = _promotionRepository.GetAll();
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(promotion, result.First());
     }

@@ -1,3 +1,5 @@
+using DarkKitchen.Domain.Products;
+
 namespace DarkKitchen.Domain.Tests;
 
 [TestClass]
@@ -102,7 +104,7 @@ public class PromotionTests
         var category = new ProductCategory("Parrilla");
         var products = new List<Product>
         {
-            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m)
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, [new ProductImage("img.jpg", 100000)])
         };
         var promotion = new Promotion("Nombre Viejo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
 
@@ -143,7 +145,7 @@ public class PromotionTests
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
         var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m);
+            category, 150m, [new ProductImage("img.jpg", 100000)]);
         var promotion = new Promotion("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), [product]);
 
         promotion.Update("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);

@@ -1,3 +1,4 @@
+using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
@@ -21,7 +22,6 @@ public static class Converter
             Description = product.Description,
             Price = product.Price,
             Line = product.Line.Name,
-            Category = product.Category.Name
             Category = product.Category.Name,
             Images = product.Images.Select(i => i.Url).ToList(),
             IsActive = product.IsActive

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
@@ -94,11 +95,10 @@ public class ModelTests
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m);
 
-        List<ProductImage> images = [new ProductImage("photo.jpg", 100000)];
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
+        List<ProductImage> images = [new("photo.jpg", 100000)];
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m, images);
         var result = Converter.ToProductResponse(product);
 
         Assert.AreEqual("BURG01", result.Code);
@@ -204,8 +204,9 @@ public class ModelTests
         var category = new ProductCategory("Parrilla");
         var products = new List<Product>
         {
-            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m),
-            new("BURG02", "Hamburguesa Doble", "Hamburguesa doble con queso cheddar y bacon", line, category, 200m)
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, [new ProductImage("img1.jpg", 100000)]),
+            new("BURG02", "Hamburguesa Doble", "Hamburguesa doble con queso cheddar y bacon", line, category, 200m,
+                [new ProductImage("img2.jpg", 150000)])
         };
         var promotion = new Promotion("Promo Verano", 20, start, end, products);
 
