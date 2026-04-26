@@ -54,10 +54,25 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
 
     public SalesReportResponse GetSalesReport()
     {
-        return new SalesReportResponse
+        var validOrders = _orderRepository.GetAll();
+
+    var periods = validOrders
+        .GroupBy(o => new { o.CreatedAt.Year, o.CreatedAt.Month })
+        .OrderBy(g => g.Key.Year)
+        .ThenBy(g => g.Key.Month)
+        .Select(g => new SalesPeriodResponse
         {
-            Periods = [],
-            GrandTotal = 0,
-        };
-    }
+            Year = g.Key.Year,
+            Month = g.Key.Month,
+            Clients = [],
+            PeriodTotal = 0,
+        })
+        .ToList();
+
+    return new SalesReportResponse
+    {
+        Periods = periods,
+        GrandTotal = 0,
+    };
+}
 }
