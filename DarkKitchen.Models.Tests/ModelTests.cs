@@ -130,7 +130,7 @@ public class ModelTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m) };
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items, 0m);
         order.AssignOrderNumber(42);
 
         var result = Converter.ToOrderCreateResponse(order);
@@ -146,7 +146,7 @@ public class ModelTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items, 0m);
 
         var result = Converter.ToOrderStatusResponse(order);
 
@@ -161,7 +161,7 @@ public class ModelTests
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(productId, 3, 50m) };
         var clientId = Guid.NewGuid();
-        var order = new Order(clientId, address, DeliveryType.Express, items);
+        var order = new Order(clientId, address, DeliveryType.Express, items, 0m);
         order.AssignOrderNumber(10);
 
         var result = Converter.ToOrderDetailResponse(order);
@@ -183,7 +183,7 @@ public class ModelTests
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m), new(Guid.NewGuid(), 3, 50m) };
         var clientId = Guid.NewGuid();
-        var order = new Order(clientId, address, DeliveryType.Express, items);
+        var order = new Order(clientId, address, DeliveryType.Express, items, 0m);
         order.AssignOrderNumber(5);
 
         var result = Converter.ToOrderListResponse(order);
@@ -227,10 +227,7 @@ public class ModelTests
     {
         var request = new PromotionCreateRequest
         {
-            Name = null!,
-            DiscountPercentage = 10,
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddDays(7)
+            Name = null!, DiscountPercentage = 10, StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(7)
         };
 
         var validationResults = new List<ValidationResult>();

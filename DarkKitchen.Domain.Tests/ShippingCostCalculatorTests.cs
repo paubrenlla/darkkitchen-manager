@@ -47,29 +47,4 @@ public class ShippingCostCalculatorTests
 
         calculator.CalculateShippingCost((DeliveryType)999);
     }
-
-    [TestMethod]
-    public void CustomCalculator_CanBeSet_OnOrder()
-    {
-        var customCalculator = new ShippingCostCalculator(500m, 50m);
-        Order.SetShippingCostCalculator(customCalculator);
-
-        var address = new Address("Test", "123", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
-
-        Assert.AreEqual(500m, order.ShippingCost);
-    }
-
-    [TestMethod]
-    public void Order_WithoutCalculator_ShippingCostShouldBeZero()
-    {
-        Order.SetShippingCostCalculator(null!);
-
-        var address = new Address("Test", "123", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        var order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
-
-        Assert.AreEqual(0m, order.ShippingCost);
-    }
 }

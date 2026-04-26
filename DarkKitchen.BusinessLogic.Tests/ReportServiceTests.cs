@@ -11,13 +11,13 @@ namespace DarkKitchen.BusinessLogic.Tests;
 public class ReportServiceTests
 {
     private Mock<IOrderRepository> _orderRepositoryMock = null!;
-    private Mock<IProductRepository> _productRepositoryMock = null!;
-    private Mock<IUserRepository> _userRepositoryMock = null!;
-    private ReportService _reportService = null!;
-    private List<Product> _products = null!;
     private Guid _product1Id;
     private Guid _product2Id;
     private Guid _product3Id;
+    private Mock<IProductRepository> _productRepositoryMock = null!;
+    private List<Product> _products = null!;
+    private ReportService _reportService = null!;
+    private Mock<IUserRepository> _userRepositoryMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -32,11 +32,14 @@ public class ReportServiceTests
 
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
+        List<ProductImage> images = [new("https://example.com/photo.jpg", 50000)];
 
-        var product1 = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
-        var product2 = new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", line, category, 200m, images);
-        var product3 = new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", line, category, 120m, images);
+        var product1 = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m, images);
+        var product2 = new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", line,
+            category, 200m, images);
+        var product3 = new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", line,
+            category, 120m, images);
 
         _product1Id = product1.Id;
         _product2Id = product2.Id;
@@ -55,9 +58,12 @@ public class ReportServiceTests
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        var order1 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)]);
-        var order2 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 5, 200m)]);
-        var order3 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)]);
+        var order1 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)],
+            0m);
+        var order2 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 5, 200m)],
+            0m);
+        var order3 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)],
+            0m);
 
         List<Order> orders = [order1, order2, order3];
 
@@ -79,8 +85,10 @@ public class ReportServiceTests
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        var validOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)]);
-        var cancelledOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 100, 200m)]);
+        var validOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express,
+            [new OrderItem(_product1Id, 5, 150m)], 0m);
+        var cancelledOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express,
+            [new OrderItem(_product2Id, 100, 200m)], 0m);
         cancelledOrder.TransitionTo(OrderState.Cancelled);
 
         List<Order> orders = [validOrder, cancelledOrder];
@@ -103,11 +111,14 @@ public class ReportServiceTests
 
         var line = new ProductLine("Extras");
         var category = new ProductCategory("Varios");
-        List<ProductImage> images = [new ProductImage("https://example.com/photo.jpg", 50000)];
+        List<ProductImage> images = [new("https://example.com/photo.jpg", 50000)];
 
-        var product4 = new Product("PROD4", "Producto Cuatro Test", "Descripcion del producto cuatro de prueba", line, category, 100m, images);
-        var product5 = new Product("PROD5", "Producto Cinco Test", "Descripcion del producto cinco de prueba", line, category, 100m, images);
-        var product6 = new Product("PROD6", "Producto Seis Prueba", "Descripcion del producto seis de prueba", line, category, 100m, images);
+        var product4 = new Product("PROD4", "Producto Cuatro Test", "Descripcion del producto cuatro de prueba", line,
+            category, 100m, images);
+        var product5 = new Product("PROD5", "Producto Cinco Test", "Descripcion del producto cinco de prueba", line,
+            category, 100m, images);
+        var product6 = new Product("PROD6", "Producto Seis Prueba", "Descripcion del producto seis de prueba", line,
+            category, 100m, images);
 
         _productRepositoryMock.Setup(r => r.GetById(product4.Id)).Returns(product4);
         _productRepositoryMock.Setup(r => r.GetById(product5.Id)).Returns(product5);
@@ -115,12 +126,12 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 9, 200m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product3Id, 8, 120m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product4.Id, 7, 100m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product5.Id, 6, 100m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product6.Id, 5, 100m)]),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 9, 200m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product3Id, 8, 120m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product4.Id, 7, 100m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product5.Id, 6, 100m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product6.Id, 5, 100m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -152,9 +163,9 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 7, 150m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 2, 150m)]),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 7, 150m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 2, 150m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -177,8 +188,8 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)]),
-            new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(unknownProductId, 100, 50m)]),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)], 0m),
+            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(unknownProductId, 100, 50m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -194,7 +205,7 @@ public class ReportServiceTests
     {
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(0, result.Periods.Count);
         Assert.AreEqual(0, result.GrandTotal);
@@ -207,12 +218,12 @@ public class ReportServiceTests
         var clientId = Guid.NewGuid();
         _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
 
-        var order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
-        var order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
+        Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
+        Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(2, result.Periods.Count);
         Assert.AreEqual(2026, result.Periods[0].Year);
@@ -228,13 +239,13 @@ public class ReportServiceTests
         var clientId = Guid.NewGuid();
         _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
 
-        var validOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
-        var cancelledOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 9999m);
+        Order validOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
+        Order cancelledOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 9999m);
         cancelledOrder.TransitionTo(OrderState.Cancelled);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([validOrder, cancelledOrder]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(1, result.Periods.Count);
     }
@@ -248,12 +259,12 @@ public class ReportServiceTests
         _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
         _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
 
-        var order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
-        var order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
+        Order order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
+        Order order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(2, result.Periods[0].Clients.Count);
     }
@@ -265,10 +276,10 @@ public class ReportServiceTests
         var unknownClientId = Guid.NewGuid();
         _userRepositoryMock.Setup(r => r.GetById(unknownClientId)).Returns((User?)null);
 
-        var order = CreateOrderWithDate(unknownClientId, address, new DateTime(2026, 1, 10), 100m);
+        Order order = CreateOrderWithDate(unknownClientId, address, new DateTime(2026, 1, 10), 100m);
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual("Cliente desconocido", result.Periods[0].Clients[0].ClientName);
     }
@@ -280,12 +291,12 @@ public class ReportServiceTests
         var clientId = Guid.NewGuid();
         _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
 
-        var order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 5), 100m);
-        var order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 200m);
+        Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 5), 100m);
+        Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 200m);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(order1.Total + order2.Total, result.Periods[0].Clients[0].Total);
     }
@@ -299,12 +310,12 @@ public class ReportServiceTests
         _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
         _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
 
-        var order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
-        var order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
+        Order order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
+        Order order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(order1.Total + order2.Total, result.Periods[0].PeriodTotal);
     }
@@ -316,20 +327,20 @@ public class ReportServiceTests
         var clientId = Guid.NewGuid();
         _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
 
-        var order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
-        var order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
+        Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
+        Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
 
         _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
 
-        var result = _reportService.GetSalesReport();
+        SalesReportResponse result = _reportService.GetSalesReport();
 
         Assert.AreEqual(order1.Total + order2.Total, result.GrandTotal);
     }
 
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
-        var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
-        var order = new Order(clientId, address, DeliveryType.Express, items);
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, itemPrice) };
+        var order = new Order(clientId, address, DeliveryType.Express, items, 0m);
         order.SetCreatedAt(date);
         return order;
     }
