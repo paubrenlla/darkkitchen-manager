@@ -11,7 +11,7 @@ public class TwentyFourHoursShippingStrategy : IShippingStrategy
 
     public bool CanHandle(DeliveryType deliveryType)
     {
-        return true;
+        return deliveryType == DeliveryType.TwentyFourHours;
     }
 
     public decimal Calculate()
