@@ -68,7 +68,7 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
         return new SalesReportResponse
         {
             Periods = periods,
-            GrandTotal = 0,
+            GrandTotal = periods.Sum(p => p.PeriodTotal),
         };
     }
 
