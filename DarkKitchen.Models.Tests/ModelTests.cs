@@ -18,7 +18,7 @@ public class ModelTests
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var hasher = new Mock<IPasswordHasher>();
         hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
 
         var result = Converter.ToUserCreateResponse(user);
 
@@ -87,7 +87,7 @@ public class ModelTests
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var hasher = new Mock<IPasswordHasher>();
         hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
 
         var result = Converter.ToLoginResponse("my.jwt.token", user);
 
@@ -120,7 +120,7 @@ public class ModelTests
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var hasher = new Mock<IPasswordHasher>();
         hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
 
         var result = Converter.ToUserCreateResponse(user);
 

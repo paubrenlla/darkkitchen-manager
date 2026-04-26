@@ -104,7 +104,7 @@ public class UserServiceTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,_passwordHasherMock.Object)];
+        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object)];
 
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
 
@@ -122,7 +122,7 @@ public class UserServiceTests
 
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador,_passwordHasherMock.Object);
+        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
 
@@ -294,6 +294,32 @@ public class UserServiceTests
             Password = "Valid1Password!@",
             Role = string.Empty,
         };
+
+        _userService.CreateUser(request);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CreateUser_DuplicateEmail_ShouldThrow()
+    {
+        var request = new UserCreateRequest
+        {
+            Name = "Juan",
+            Surname = "Perez",
+            Email = "juan@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094123456",
+            Password = "Valid1Password!@",
+        };
+
+        var mockStrategy = new Mock<IPhoneValidationStrategy>();
+        mockStrategy.Setup(s => s.CountryPrefix).Returns("+598");
+        mockStrategy.Setup(s => s.IsValid("094123456")).Returns(true);
+        _strategyFactoryMock.Setup(f => f.GetStrategy("+598")).Returns(mockStrategy.Object);
+
+        var existingPhone = Domain.Users.PhoneNumber.Create("+598", "094123456", mockStrategy.Object);
+        var existingUser = new User("Otro", "Usuario", "juan@test.com", existingPhone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
+        _userRepositoryMock.Setup(r => r.GetUserByEmail("juan@test.com")).Returns(existingUser);
 
         _userService.CreateUser(request);
     }

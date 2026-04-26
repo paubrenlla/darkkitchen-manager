@@ -50,7 +50,7 @@ public class TokenServiceTests
     [TestMethod]
     public void GenerateToken_ValidUser_ReturnsJwtFormat()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente,_passwordHasherMock.Object);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
 
         var token = _tokenService.GenerateToken(user);
 

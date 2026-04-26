@@ -59,7 +59,7 @@ public class UserRepositoryTests
             "marta@test.com",
             PhoneNumber.Create("+598", "094444555", new UruguayPhoneValidationStrategy()),
             "Valid1Password!@",
-            Role.Cliente,_passwordHasherMock.Object);
+            Role.Cliente, _passwordHasherMock.Object);
 
         _userRepository.Add(user);
 
@@ -92,7 +92,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente,_passwordHasherMock.Object);
+        var user = new User("Lucia", "Gomez", "lucia@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname("Lucia", null);
@@ -105,7 +105,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente,_passwordHasherMock.Object);
+        var user = new User("Carlos", "Perez", "carlos@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
         _userRepository.Add(user);
 
         IEnumerable<User> result = _userRepository.GetByNameAndSurname(null, "Perez");
@@ -145,7 +145,7 @@ public class UserRepositoryTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094111222", strategy);
-        var user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente,_passwordHasherMock.Object);
+        var user = new User("Test", "Test", "test@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
 
         _userRepository.Update(Guid.NewGuid(), user);
     }

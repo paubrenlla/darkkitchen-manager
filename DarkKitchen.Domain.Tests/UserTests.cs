@@ -25,7 +25,7 @@ public class UserTests
     [TestMethod]
     public void CreateUser_WithValidData_CreatesSuccessfully()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword,_passwordHasher);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
 
         Assert.IsNotNull(user);
         Assert.AreEqual(ValidName, user.Name);
@@ -37,7 +37,7 @@ public class UserTests
     public void CreateUser_WithEmptyName_ThrowsArgumentException()
     {
         var name = string.Empty;
-        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword,_passwordHasher);
+        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -45,7 +45,7 @@ public class UserTests
     public void CreateUser_WithNullName_ThrowsArgumentException()
     {
         string name = null!;
-        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword,_passwordHasher);
+        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -53,7 +53,7 @@ public class UserTests
     public void CreateUser_WithShortSurname_ThrowsArgumentException()
     {
         var shortSurname = "Al";
-        new User("Juan", shortSurname, ValidEmail, ValidPhone, ValidPassword,_passwordHasher);
+        new User("Juan", shortSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public class UserTests
     public void CreateUser_WithLongSurname_ThrowsArgumentException()
     {
         var longSurname = new string('a', 26);
-        new User(ValidName, longSurname, ValidEmail, ValidPhone, ValidPassword,_passwordHasher);
+        new User(ValidName, longSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -69,7 +69,7 @@ public class UserTests
     public void CreateUser_WithEmptyEmail_ThrowsArgumentException()
     {
         var email = string.Empty;
-        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword,_passwordHasher);
+        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
