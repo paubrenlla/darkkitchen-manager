@@ -11,7 +11,7 @@ public class ExpressShippingStrategy : IShippingStrategy
 
     public bool CanHandle(DeliveryType deliveryType)
     {
-        return true;
+        return deliveryType == DeliveryType.Express;
     }
 
     public decimal Calculate()
