@@ -37,7 +37,6 @@ public class PromotionsControllerTests
                 EndDate = new DateTime(2025, 12, 31),
                 Products = ["BURG02"]
             }
-
         ];
 
         _controller = new PromotionsController(_mockService.Object);
@@ -126,5 +125,34 @@ public class PromotionsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_ValidRequest_ShouldReturnOkWithResponse()
+    {
+        var id = Guid.NewGuid();
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Actualizada",
+            DiscountPercentage = 25,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["BURG01"]
+        };
+        var expected = new PromotionCreateResponse
+        {
+            Name = "Promo Actualizada",
+            DiscountPercentage = 25,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            Products = ["BURG01"]
+        };
+        _mockService.Setup(s => s.UpdatePromotion(id, request)).Returns(expected);
+
+        var result = _controller.UpdatePromotion(id, request) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+        Assert.AreEqual(expected, result.Value);
     }
 }
