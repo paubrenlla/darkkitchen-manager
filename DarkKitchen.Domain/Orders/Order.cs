@@ -2,7 +2,6 @@ namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
-    private static IShippingCostCalculator? _shippingCostCalculator;
     private readonly List<OrderItem> _items;
 
     public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items, decimal shippingCost)
@@ -52,11 +51,6 @@ public class Order
         }
 
         OrderNumber = orderNumber;
-    }
-
-    public static void SetShippingCostCalculator(IShippingCostCalculator? calculator)
-    {
-        _shippingCostCalculator = calculator;
     }
 
     public void SetCreatedAt(DateTime date)
