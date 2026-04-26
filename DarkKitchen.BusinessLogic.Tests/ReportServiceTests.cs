@@ -11,6 +11,7 @@ namespace DarkKitchen.BusinessLogic.Tests;
 public class ReportServiceTests
 {
     private Mock<IOrderRepository> _orderRepositoryMock = null!;
+    private Mock<IPasswordHasher> _passwordHasherMock = null!;
     private Guid _product1Id;
     private Guid _product2Id;
     private Guid _product3Id;
@@ -25,6 +26,10 @@ public class ReportServiceTests
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _productRepositoryMock = new Mock<IProductRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+
         _reportService = new ReportService(
             _orderRepositoryMock.Object,
             _productRepositoryMock.Object,
