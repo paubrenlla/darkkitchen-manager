@@ -19,7 +19,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         try
         {
-            Guid clientId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var clientId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             OrderCreateResponse response = _orderService.CreateOrder(clientId, request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
@@ -104,7 +104,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         [FromQuery] string? city)
     {
         var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        Guid callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         if(callerRole == "Preparador")
         {
