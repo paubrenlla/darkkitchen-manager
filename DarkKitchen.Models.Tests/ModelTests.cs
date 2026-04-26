@@ -5,6 +5,7 @@ using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
+using Moq;
 
 namespace DarkKitchen.Models.Tests;
 
@@ -15,7 +16,9 @@ public class ModelTests
     public void Converter_ToUserCreateResponse_MapsCorrectData()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var hasher = new Mock<IPasswordHasher>();
+        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
 
         var result = Converter.ToUserCreateResponse(user);
 
@@ -82,7 +85,9 @@ public class ModelTests
     public void ToLoginResponse_ShouldMapCorrectly()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var hasher = new Mock<IPasswordHasher>();
+        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
 
         var result = Converter.ToLoginResponse("my.jwt.token", user);
 
@@ -113,7 +118,9 @@ public class ModelTests
     public void ToUserCreateResponse_ShouldMapCorrectly()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var hasher = new Mock<IPasswordHasher>();
+        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,hasher.Object);
 
         var result = Converter.ToUserCreateResponse(user);
 

@@ -36,10 +36,10 @@ public class AuthServiceTests
     [TestMethod]
     public void LoginWithValidCredentials_ReturnsLoginResponse()
     {
-        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(expectedUser);
-        _passwordHasherMock.Setup(h => h.VerifyPassword(ValidPassword, expectedUser.Password)).Returns(true);
+        _passwordHasherMock.Setup(h => h.VerifyPassword(ValidPassword, expectedUser.HashedPassword)).Returns(true);
         _tokenServiceMock.Setup(t => t.GenerateToken(expectedUser)).Returns("mocked.token");
 
         var result = _authService.Login(ValidEmail, ValidPassword);
@@ -52,10 +52,10 @@ public class AuthServiceTests
     [ExpectedException(typeof(UnauthorizedAccessException))]
     public void LoginWithInvalidPassword_ThrowsUnauthorized()
     {
-        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente);
+        var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(existingUser);
-        _passwordHasherMock.Setup(h => h.VerifyPassword("WrongPassword", existingUser.Password)).Returns(false);
+        _passwordHasherMock.Setup(h => h.VerifyPassword("WrongPassword", existingUser.HashedPassword)).Returns(false);
 
         _authService.Login(ValidEmail, "WrongPassword");
     }

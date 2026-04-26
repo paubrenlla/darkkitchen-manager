@@ -104,7 +104,7 @@ public class UserServiceTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente)];
+        List<User> users = [new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente,_passwordHasherMock.Object)];
 
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
 
@@ -122,7 +122,7 @@ public class UserServiceTests
 
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador);
+        var existingUser = new User("Old", "Name", "old@test.com", phone, "Valid1Password!@", Role.Preparador,_passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
 

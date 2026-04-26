@@ -16,7 +16,7 @@ public class AuthService(IUserRepository userRepository, ITokenService tokenServ
     {
         User? user = _userRepository.GetUserByEmail(email);
 
-        if(user == null || !_passwordHasher.VerifyPassword(password, user.Password))
+        if(user == null || !_passwordHasher.VerifyPassword(password, user.HashedPassword))
         {
             throw new UnauthorizedAccessException("Credenciales inválidas.");
         }
