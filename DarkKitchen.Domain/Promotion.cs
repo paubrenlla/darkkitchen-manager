@@ -63,4 +63,9 @@ public class Promotion
             throw new ArgumentException("Discount percentage must be greater than zero.");
         }
     }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
 }
