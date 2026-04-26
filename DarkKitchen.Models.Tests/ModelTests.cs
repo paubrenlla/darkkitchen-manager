@@ -234,7 +234,10 @@ public class ModelTests
     {
         var request = new PromotionCreateRequest
         {
-            Name = null!, DiscountPercentage = 10, StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(7)
+            Name = null!,
+            DiscountPercentage = 10,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7)
         };
 
         var validationResults = new List<ValidationResult>();

@@ -55,7 +55,7 @@ public class OrderServiceTests
             500m,
             validImages);
 
-        _productRepositoryMock.Setup(r => r.GetAll()).Returns(new List<Product> { product });
+        _productRepositoryMock.Setup(r => r.GetAll()).Returns([product]);
 
         _promotionServiceMock.Setup(p => p.GetBestPromotionForProduct(product.Id, It.IsAny<DateTime>()))
             .Returns(("Promo Test", 10m));
@@ -67,9 +67,12 @@ public class OrderServiceTests
             DeliveryType = "Express",
             Address = new OrderAddressDto
             {
-                Street = "Av. Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay"
+                Street = "Av. Rivera",
+                Number = "1234",
+                City = "Montevideo",
+                Country = "Uruguay"
             },
-            Items = new List<OrderItemDto> { new() { ProductId = product.Id, Quantity = 2 } }
+            Items = [new OrderItemDto { ProductId = product.Id, Quantity = 2 }]
         };
 
         OrderCreateResponse result = _orderService.CreateOrder(_clientId, request);
@@ -214,16 +217,19 @@ public class OrderServiceTests
 
         product.Deactivate();
 
-        _productRepositoryMock.Setup(r => r.GetAll()).Returns(new List<Product> { product });
+        _productRepositoryMock.Setup(r => r.GetAll()).Returns([product]);
 
         var request = new OrderCreateRequest
         {
             DeliveryType = "Express",
             Address = new OrderAddressDto
             {
-                Street = "Calle Falsa", Number = "123", City = "Montevideo", Country = "Uruguay"
+                Street = "Calle Falsa",
+                Number = "123",
+                City = "Montevideo",
+                Country = "Uruguay"
             },
-            Items = new List<OrderItemDto> { new() { ProductId = product.Id, Quantity = 1 } }
+            Items = [new OrderItemDto { ProductId = product.Id, Quantity = 1 }]
         };
 
         _orderService.CreateOrder(_clientId, request);
