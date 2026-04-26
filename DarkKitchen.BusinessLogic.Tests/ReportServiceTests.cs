@@ -221,6 +221,24 @@ public class ReportServiceTests
         Assert.AreEqual(2, result.Periods[1].Month);
     }
 
+    [TestMethod]
+    public void GetSalesReport_ShouldExcludeCancelledOrders()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var clientId = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+
+        var validOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
+        var cancelledOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 9999m);
+        cancelledOrder.TransitionTo(OrderState.Cancelled);
+
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([validOrder, cancelledOrder]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(1, result.Periods.Count);
+    }
+
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
         var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
