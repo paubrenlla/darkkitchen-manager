@@ -100,4 +100,14 @@ public class OrderItemTests
         Assert.ThrowsException<ArgumentException>(() =>
             new OrderItem(Guid.NewGuid(), 1, 100m, 101m));
     }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithDiscount_ShouldApplyDiscountCorrectly()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 2, 100m, 10m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(180m, total);
+    }
 }
