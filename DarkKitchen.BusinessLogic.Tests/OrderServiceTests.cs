@@ -266,4 +266,49 @@ public class OrderServiceTests
         Assert.AreEqual(900m, result.Subtotal);
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CreateOrder_WhenProductIsInactive_ShouldThrowException()
+    {
+        var validImages = new List<ProductImage> { new("https://darkkitchen.com/foto.jpg", 50 * 1024) };
+
+        var product = new Product(
+            "PRODINACT",
+            "Producto Inactivo de Prueba",
+            "Descripción lo suficientemente larga para que no falle el dominio",
+            new ProductLine("Línea"),
+            new ProductCategory("Categoría"),
+            100m,
+            validImages);
+
+        product.Deactivate();
+
+        _productRepositoryMock.Setup(r => r.GetAll()).Returns([product]);
+
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = "Express",
+            Address = new OrderAddressDto { Street = "S", Number = "1", City = "C", Country = "C" },
+            Items = [new OrderItemDto { ProductId = product.Id, Quantity = 1 }]
+        };
+
+        _orderService.CreateOrder(_clientId, request);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void CreateOrder_WhenProductDoesNotExists_ShouldThrowException()
+    {
+        _productRepositoryMock.Setup(r => r.GetAll()).Returns([]);
+
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = "Express",
+            Address = new OrderAddressDto { Street = "S", Number = "1", City = "C", Country = "C" },
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }]
+        };
+
+        _orderService.CreateOrder(_clientId, request);
+    }
 }
