@@ -55,6 +55,11 @@ public class PromotionService(
             .Where(p => request.ProductCodes.Contains(p.Code))
             .ToList();
 
+        if(selectedProducts.Count != request.ProductCodes.Count)
+        {
+            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
+        }
+
         existingPromo.Update(
             request.Name,
             request.DiscountPercentage,
