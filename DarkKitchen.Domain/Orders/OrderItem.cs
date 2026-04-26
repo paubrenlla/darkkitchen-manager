@@ -15,7 +15,7 @@ public class OrderItem
             throw new ArgumentException("El precio no puede ser negativo.");
         }
 
-        if(discountPercentage < 0)
+        if(discountPercentage is < 0 or > 100)
         {
             throw new ArgumentException("El descuento no es válido.");
         }
