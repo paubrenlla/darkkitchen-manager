@@ -1,4 +1,5 @@
-﻿using DarkKitchen.IBusinessLogic;
+﻿using System.Security.Claims;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     private readonly IOrderService _orderService = orderService;
 
     [HttpPost]
-    public IActionResult CreateOrder([FromBody] OrderCreateRequest request, [FromHeader(Name = "X-Client-Id")] Guid clientId)
+    [Authorize(Roles = "Cliente")]
+    public IActionResult CreateOrder([FromBody] OrderCreateRequest request)
     {
         try
         {
-            var response = _orderService.CreateOrder(clientId, request);
+            var clientId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            OrderCreateResponse response = _orderService.CreateOrder(clientId, request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
         catch(ArgumentException ex)
@@ -31,28 +34,56 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         try
         {
+            var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             switch(request.Status.ToLower())
             {
-                case "cancelado":
-                    _orderService.Cancel(id);
-                    break;
-                case "entregado":
-                    _orderService.Deliver(id);
-                    break;
                 case "preparado":
+                    if(callerRole != "Preparador" && callerRole != "Administrativo")
+                    {
+                        return Forbid();
+                    }
+
                     _orderService.Prepare(id);
                     break;
+
+                case "cancelado":
+                    if(callerRole != "Administrativo")
+                    {
+                        return Forbid();
+                    }
+
+                    _orderService.Cancel(id);
+                    break;
+
                 case "encamino":
-                    _orderService.Ship(id);
-                    break;
+                case "entregado":
                 case "noentregado":
-                    _orderService.NotDelivered(id);
+                    if(callerRole != "Preparador")
+                    {
+                        return Forbid();
+                    }
+
+                    if(request.Status.ToLower() == "encamino")
+                    {
+                        _orderService.Ship(id);
+                    }
+                    else if(request.Status.ToLower() == "entregado")
+                    {
+                        _orderService.Deliver(id);
+                    }
+                    else
+                    {
+                        _orderService.NotDelivered(id);
+                    }
+
                     break;
+
                 default:
                     return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
             }
 
-            var response = _orderService.GetOrderById(id);
+            OrderDetailResponse response = _orderService.GetOrderById(id);
             return Ok(response);
         }
         catch(KeyNotFoundException ex)
@@ -65,28 +96,28 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetOrderDetail(Guid id)
-    {
-        try
-        {
-            var response = _orderService.GetOrderById(id);
-            return Ok(response);
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-    }
-
     [HttpGet]
     public IActionResult GetOrders(
-        [FromHeader(Name = "X-Client-Id")] Guid clientId,
         [FromQuery] DateTime? fromDate,
         [FromQuery] DateTime? toDate,
-        [FromQuery] string? status)
+        [FromQuery] string? status,
+        [FromQuery] string? city)
     {
-        var orders = _orderService.GetOrdersByClient(clientId, fromDate, toDate, status);
-        return Ok(orders);
+        var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        if(callerRole == "Preparador")
+        {
+            if(fromDate == null || toDate == null)
+            {
+                return BadRequest(new { error = "El rango de fechas es obligatorio para el preparador." });
+            }
+
+            IEnumerable<OrderListResponse> preparadorOrders = _orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, city);
+            return Ok(preparadorOrders);
+        }
+
+        IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
+        return Ok(clientOrders);
     }
 }
