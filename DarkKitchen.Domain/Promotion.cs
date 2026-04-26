@@ -71,6 +71,6 @@ public class Promotion
 
     public bool IsVigente(DateTime date)
     {
-        return true;
+        return date >= StartDate;
     }
 }
