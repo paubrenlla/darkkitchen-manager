@@ -42,7 +42,11 @@ public class PromotionsController(IPromotionService promotionService) : Controll
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdatePromotion(Guid id, [FromBody] PromotionCreateRequest request)
     {
-        PromotionCreateResponse response = _promotionService.UpdatePromotion(id, request);
-        return Ok(response);
+        try
+        {
+            PromotionCreateResponse response = _promotionService.UpdatePromotion(id, request);
+            return Ok(response);
+        }
+        catch(KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
     }
 }
