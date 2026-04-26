@@ -33,6 +33,12 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        var existingUser = _userRepository.GetUserByEmail(request.Email);
+        if(existingUser != null)
+        {
+            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
+        }
+
         var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
