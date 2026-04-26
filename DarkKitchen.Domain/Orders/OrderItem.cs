@@ -37,6 +37,7 @@ public class OrderItem
     public decimal CalculateItemTotal()
     {
         var rawTotal = Price * Quantity;
-        return rawTotal;
+        var discountAmount = rawTotal * (DiscountPercentage / 100m);
+        return rawTotal - discountAmount;
     }
 }
