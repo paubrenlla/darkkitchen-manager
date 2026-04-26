@@ -7,6 +7,7 @@ public class ProductImage
 
     public string Url { get; private set; }
     public long SizeInBytes { get; private set; }
+    public Guid Id { get; private set; }
 
     public ProductImage(string url, long sizeInBytes)
     {
@@ -15,6 +16,7 @@ public class ProductImage
 
         Url = url;
         SizeInBytes = sizeInBytes;
+        Id = Guid.NewGuid();
     }
 
     private static void ValidateUrl(string url)

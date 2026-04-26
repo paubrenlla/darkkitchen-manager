@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
-    private readonly List<OrderItem> _items;
+    private List<OrderItem> _items;
 
     public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items, decimal shippingCost)
     {
