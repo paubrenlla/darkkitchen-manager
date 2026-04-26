@@ -9,7 +9,7 @@ public class DarkKitchenContextFactory : IDesignTimeDbContextFactory<DarkKitchen
     {
         var optionsBuilder = new DbContextOptionsBuilder<DarkKitchenContext>();
         optionsBuilder.UseSqlServer(
-            "Server=localhost,1433;Database=DarkKitchenDB;User Id=sa;Password=Contraseña123;TrustServerCertificate=true");
+            "Server=localhost,1433;Database=DarkKitchenDB;User Id=sa;Password=DarkKitchen2026!;TrustServerCertificate=true");
         return new DarkKitchenContext(optionsBuilder.Options);
     }
 }
