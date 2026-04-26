@@ -17,9 +17,9 @@ public static class DependencyResolution
     {
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
         services.AddSingleton<IUserRepository, InMemoryUserRepository>();
         services.AddSingleton<IProductRepository, InMemoryProductRepository>();
-        services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IReportService, ReportService>();
@@ -27,6 +27,8 @@ public static class DependencyResolution
         services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
         services.AddScoped<IUserService, UserService>();
+        services.AddSingleton<IPromotionRepository, InMemoryPromotionRepository>();
+        services.AddScoped<IPromotionService, PromotionService>();
 
         return services;
     }

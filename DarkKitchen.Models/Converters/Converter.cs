@@ -1,3 +1,4 @@
+using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
@@ -9,11 +10,7 @@ public static class Converter
 {
     public static LoginResponse ToLoginResponse(string token, User user)
     {
-        return new LoginResponse
-        {
-            Token = token,
-            Role = user.Role.ToString(),
-        };
+        return new LoginResponse { Token = token, Role = user.Role.ToString() };
     }
 
     public static ProductResponse ToProductResponse(Product product)
@@ -40,7 +37,7 @@ public static class Converter
             Surname = user.Surname,
             Email = user.Email,
             Phone = $"{user.Phone.CountryPrefix}{user.Phone.Number}",
-            Role = user.Role.ToString(),
+            Role = user.Role.ToString()
         };
     }
 
@@ -52,7 +49,7 @@ public static class Converter
             OrderNumber = order.OrderNumber ?? 0,
             Subtotal = order.Subtotal,
             ShippingCost = order.ShippingCost,
-            Total = order.Total,
+            Total = order.Total
         };
     }
 
@@ -61,7 +58,7 @@ public static class Converter
         return new OrderStatusResponse
         {
             Status = order.State.ToString(),
-            LastTransitionDate = order.LastTransitionDate,
+            LastTransitionDate = order.LastTransitionDate
         };
     }
 
@@ -79,8 +76,8 @@ public static class Converter
                 ProductId = i.ProductId,
                 Quantity = i.Quantity,
                 Price = i.Price,
-                ItemTotal = i.CalculateItemTotal(),
-            }).ToList(),
+                ItemTotal = i.CalculateItemTotal()
+            }).ToList()
         };
     }
 
@@ -93,7 +90,19 @@ public static class Converter
             CreatedAt = order.CreatedAt,
             Status = order.State.ToString(),
             Total = order.Total,
-            ProductCount = order.Items.Sum(i => i.Quantity),
+            ProductCount = order.Items.Sum(i => i.Quantity)
+        };
+    }
+
+    public static PromotionCreateResponse ToPromotionCreateResponse(Promotion promotion)
+    {
+        return new PromotionCreateResponse
+        {
+            Name = promotion.Name,
+            DiscountPercentage = promotion.DiscountPercentage,
+            StartDate = promotion.StartDate,
+            EndDate = promotion.EndDate,
+            Products = promotion.Products.Select(p => p.Code).ToList()
         };
     }
 

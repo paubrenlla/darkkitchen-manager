@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
@@ -36,7 +37,7 @@ public class ModelTests
             Email = "juan@test.com",
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
-            Password = "Pass123!",
+            Password = "Pass123!"
         };
 
         var validationResults = new List<ValidationResult>();
@@ -71,7 +72,7 @@ public class ModelTests
             CountryPrefix = "+598",
             PhoneNumber = "094111222",
             Password = "Pass123!",
-            Role = "Administrativo",
+            Role = "Administrativo"
         };
 
         Assert.AreEqual("Administrativo", request.Role);
@@ -94,8 +95,10 @@ public class ModelTests
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        List<ProductImage> images = [new ProductImage("photo.jpg", 100000)];
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
+
+        List<ProductImage> images = [new("photo.jpg", 100000)];
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m, images);
         var result = Converter.ToProductResponse(product);
 
         Assert.AreEqual("BURG01", result.Code);
@@ -178,11 +181,7 @@ public class ModelTests
     public void ToOrderListResponse_ShouldMapCorrectly()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem>
-        {
-            new(Guid.NewGuid(), 2, 100m),
-            new(Guid.NewGuid(), 3, 50m),
-        };
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m), new(Guid.NewGuid(), 3, 50m) };
         var clientId = Guid.NewGuid();
         var order = new Order(clientId, address, DeliveryType.Express, items);
         order.AssignOrderNumber(5);
@@ -194,5 +193,109 @@ public class ModelTests
         Assert.AreEqual("Pending", result.Status);
         Assert.AreEqual(order.Total, result.Total);
         Assert.AreEqual(5, result.ProductCount);
+    }
+
+    [TestMethod]
+    public void ToPromotionCreateResponse_ShouldMapCorrectly()
+    {
+        var start = new DateTime(2025, 1, 1);
+        var end = new DateTime(2025, 1, 31);
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var products = new List<Product>
+        {
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m,
+                [new ProductImage("img1.jpg", 100000)]),
+            new("BURG02", "Hamburguesa Doble", "Hamburguesa doble con queso cheddar y bacon", line, category, 200m,
+                [new ProductImage("img2.jpg", 150000)])
+        };
+        var promotion = new Promotion("Promo Verano", 20, start, end, products);
+
+        var result = Converter.ToPromotionCreateResponse(promotion);
+
+        Assert.AreEqual("Promo Verano", result.Name);
+        Assert.AreEqual(20, result.DiscountPercentage);
+        Assert.AreEqual(start, result.StartDate);
+        Assert.AreEqual(end, result.EndDate);
+        Assert.AreEqual(2, result.Products.Count);
+        Assert.IsTrue(result.Products.Contains("BURG01"));
+        Assert.IsTrue(result.Products.Contains("BURG02"));
+    }
+
+    [TestMethod]
+    public void PromotionCreateRequest_MissingName_ReturnsValidationError()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = null!,
+            DiscountPercentage = 10,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7)
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsFalse(isValid);
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El nombre es obligatorio."));
+    }
+
+    [TestMethod]
+    public void PromotionCreateRequest_DiscountBelowRange_ReturnsValidationError()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 0,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7)
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsFalse(isValid);
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe ser un número entre 1 y 100."));
+    }
+
+    [TestMethod]
+    public void PromotionCreateRequest_DiscountAboveRange_ReturnsValidationError()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 101,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7)
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsFalse(isValid);
+        Assert.IsTrue(validationResults.Any(v => v.ErrorMessage == "El descuento debe ser un número entre 1 y 100."));
+    }
+
+    [TestMethod]
+    public void PromotionCreateRequest_ValidData_PassesValidation()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7),
+            ProductCodes = ["BURG01", "BURG02"]
+        };
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(request, null, null);
+        var isValid = Validator.TryValidateObject(request, context, validationResults, true);
+
+        Assert.IsTrue(isValid);
+        Assert.AreEqual(0, validationResults.Count);
     }
 }
