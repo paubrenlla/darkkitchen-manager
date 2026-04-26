@@ -28,4 +28,11 @@ public class TwentyFourHoursShippingStrategyTests
 
         Assert.AreEqual(80m, strategy.Calculate());
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Constructor_WithNegativeCost_ShouldThrow()
+    {
+        new TwentyFourHoursShippingStrategy(-1m);
+    }
 }
