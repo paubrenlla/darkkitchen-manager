@@ -78,6 +78,11 @@ public class PromotionService(
             .Where(p => p.Products.Any(prod => prod.Id == productId))
             .ToList();
 
+        if(!activePromos.Any())
+        {
+            return 0;
+        }
+
         return activePromos.Max(p => p.DiscountPercentage);
     }
 
