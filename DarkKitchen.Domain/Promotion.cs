@@ -30,6 +30,7 @@ public class Promotion
     public void Update(string name, int discount, DateTime start, DateTime end, List<Product> products)
     {
         ValidateName(name);
+        ValidateDiscountPercentage(discount);
 
         Name = name;
         DiscountPercentage = discount;
