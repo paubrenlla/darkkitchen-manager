@@ -57,7 +57,8 @@ public static class Converter
     {
         return new OrderStatusResponse
         {
-            Status = order.State.ToString(), LastTransitionDate = order.LastTransitionDate
+            Status = order.State.ToString(),
+            LastTransitionDate = order.LastTransitionDate
         };
     }
 
