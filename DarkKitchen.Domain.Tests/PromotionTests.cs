@@ -168,4 +168,12 @@ public class PromotionTests
 
         Assert.IsTrue(promotion.IsVigente(DateTime.Today.AddDays(2)));
     }
+
+    [TestMethod]
+    public void IsVigente_DateBeforeStart_ReturnsFalse()
+    {
+        var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(-1)));
+    }
 }
