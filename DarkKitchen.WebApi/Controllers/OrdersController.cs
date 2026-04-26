@@ -68,18 +68,29 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetOrderDetail(Guid id)
+    [HttpGet]
+    public IActionResult GetOrders(
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
+        [FromQuery] string? status,
+        [FromQuery] string? city)
     {
-        try
+        string? callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        Guid callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        if(callerRole == "Preparador")
         {
-            var response = _orderService.GetOrderById(id);
-            return Ok(response);
+            if(fromDate == null || toDate == null)
+            {
+                return BadRequest(new { error = "El rango de fechas es obligatorio para el preparador." });
+            }
+
+            IEnumerable<OrderListResponse> preparadorOrders = _orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, city);
+            return Ok(preparadorOrders);
         }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
+
+        IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
+        return Ok(clientOrders);
     }
 
     [HttpGet]

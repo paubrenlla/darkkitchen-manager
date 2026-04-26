@@ -278,60 +278,89 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
-    public void GetOrderDetail_Exists_ReturnsOk()
+public void GetOrders_AsCliente_ReturnsClientOrders()
+{
+    var clientId = Guid.NewGuid();
+    SetCallerContext(clientId, "Cliente");
+
+    var orders = new List<OrderListResponse>
     {
-        var orderId = Guid.NewGuid();
-        var detailResponse = new OrderDetailResponse
+        new OrderListResponse
         {
             OrderNumber = 1,
-            ClientId = _clientId,
+            ClientId = clientId,
             CreatedAt = DateTime.Now,
             Status = "Pending",
-            Items = [],
             Total = 100m,
-        };
+            ProductCount = 2,
+        },
+    };
 
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+    _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns(orders);
 
-        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+    var result = _controller.GetOrders(null, null, null, null) as OkObjectResult;
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-    }
+    Assert.IsNotNull(result);
+    Assert.AreEqual(200, result.StatusCode);
+    _mockOrderService.Verify(s => s.GetOrdersByClient(clientId, null, null, null), Times.Once);
+}
 
-    [TestMethod]
-    public void GetOrderDetail_NotFound_ReturnsNotFound()
+[TestMethod]
+public void GetOrders_AsPreparador_WithDates_ReturnsAllOrders()
+{
+    var preparadorId = Guid.NewGuid();
+    SetCallerContext(preparadorId, "Preparador");
+
+    var from = DateTime.Now.AddDays(-7);
+    var to = DateTime.Now;
+
+    var orders = new List<OrderListResponse>
     {
-        _mockOrderService.Setup(s => s.GetOrderById(It.IsAny<Guid>()))
-            .Throws(new KeyNotFoundException("Pedido no encontrado."));
+        new OrderListResponse
+        {
+            OrderNumber = 1,
+            ClientId = Guid.NewGuid(),
+            CreatedAt = DateTime.Now,
+            Status = "Pending",
+            Total = 100m,
+            ProductCount = 2,
+        },
+    };
 
-        var result = _controller.GetOrderDetail(Guid.NewGuid()) as NotFoundObjectResult;
+    _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns(orders);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
-    }
+    var result = _controller.GetOrders(from, to, null, null) as OkObjectResult;
 
-    [TestMethod]
-    public void GetOrders_ReturnsOkWithList()
-    {
-        var orders = new List<OrderListResponse>
-       {
-           new OrderListResponse
-           {
-               OrderNumber = 1,
-               ClientId = _clientId,
-               CreatedAt = DateTime.Now,
-               Status = "Pending",
-               Total = 100m,
-               ProductCount = 2,
-           },
-       };
+    Assert.IsNotNull(result);
+    Assert.AreEqual(200, result.StatusCode);
+    _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, null, null), Times.Once);
+}
 
-        _mockOrderService.Setup(s => s.GetOrdersByClient(_clientId, null, null, null)).Returns(orders);
+[TestMethod]
+public void GetOrders_AsPreparador_WithoutDates_ReturnsBadRequest()
+{
+    SetCallerContext(Guid.NewGuid(), "Preparador");
 
-        var result = _controller.GetOrders(_clientId, null, null, null) as OkObjectResult;
+    var result = _controller.GetOrders(null, null, null, null) as BadRequestObjectResult;
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-    }
+    Assert.IsNotNull(result);
+    Assert.AreEqual(400, result.StatusCode);
+}
+
+[TestMethod]
+public void GetOrders_AsPreparador_WithFilters_PassesFiltersToService()
+{
+    SetCallerContext(Guid.NewGuid(), "Preparador");
+
+    var from = DateTime.Now.AddDays(-7);
+    var to = DateTime.Now;
+
+    _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, "Pending", "Montevideo"))
+        .Returns(new List<OrderListResponse>());
+
+    var result = _controller.GetOrders(from, to, "Pending", "Montevideo") as OkObjectResult;
+
+    Assert.IsNotNull(result);
+    _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, "Pending", "Montevideo"), Times.Once);
+}
 }
