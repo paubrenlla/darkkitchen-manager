@@ -31,6 +31,7 @@ public class Promotion
     {
         ValidateName(name);
         ValidateDiscountPercentage(discount);
+        ValidateDates(start, end);
 
         Name = name;
         DiscountPercentage = discount;
