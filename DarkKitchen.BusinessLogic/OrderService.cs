@@ -10,11 +10,13 @@ namespace DarkKitchen.BusinessLogic;
 public class OrderService(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
-    IPromotionService promotionService) : IOrderService
+    IPromotionService promotionService,
+    IShippingCostCalculator shippingCalculator) : IOrderService // Inyectamos el calculador
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IPromotionService _promotionService = promotionService;
+    private readonly IShippingCostCalculator _shippingCalculator = shippingCalculator;
 
     public OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request)
     {
@@ -53,7 +55,10 @@ public class OrderService(
                 promoName));
         }
 
-        var order = new Order(clientId, address, deliveryType, orderItems);
+        var shippingCost = _shippingCalculator.CalculateShippingCost(deliveryType);
+
+        var order = new Order(clientId, address, deliveryType, orderItems, shippingCost);
+
         _orderRepository.Add(order);
 
         return Converter.ToOrderCreateResponse(order);
@@ -61,8 +66,7 @@ public class OrderService(
 
     public OrderDetailResponse GetOrderById(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        return Converter.ToOrderDetailResponse(order);
+        return Converter.ToOrderDetailResponse(GetOrderOrThrow(orderId));
     }
 
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
@@ -77,42 +81,41 @@ public class OrderService(
 
     public void Prepare(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Prepare(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Prepare(o);
+        _orderRepository.Update(o);
     }
 
     public void Cancel(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Cancel(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Cancel(o);
+        _orderRepository.Update(o);
     }
 
     public void Ship(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Ship(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Ship(o);
+        _orderRepository.Update(o);
     }
 
     public void Deliver(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Deliver(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Deliver(o);
+        _orderRepository.Update(o);
     }
 
     public void NotDelivered(Guid orderId)
     {
-        Order order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).NotDelivered(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).NotDelivered(o);
+        _orderRepository.Update(o);
     }
 
     private Order GetOrderOrThrow(Guid orderId)
     {
-        return _orderRepository.GetById(orderId)
-               ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
+        return _orderRepository.GetById(orderId) ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
     }
 }
