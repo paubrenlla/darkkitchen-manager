@@ -35,4 +35,12 @@ public class ExpressShippingStrategyTests
     {
         new ExpressShippingStrategy(-1m);
     }
+
+    [TestMethod]
+    public void Constructor_WithZeroCost_ShouldBeValid()
+    {
+        var strategy = new ExpressShippingStrategy(0m);
+
+        Assert.AreEqual(0m, strategy.Calculate());
+    }
 }
