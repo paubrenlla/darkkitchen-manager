@@ -1,4 +1,4 @@
-﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +19,11 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromQuery] string? category)
     {
         var products = _productService.GetProducts(name, line, category);
+        if(!products.Any())
+        {
+            return NoContent();
+        }
+
         return Ok(products);
     }
 
