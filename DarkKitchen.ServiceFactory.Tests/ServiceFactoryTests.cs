@@ -1,6 +1,7 @@
 using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
@@ -82,5 +83,17 @@ public class ServiceFactoryTests
         var result = _services.AddProjectServices();
 
         Assert.AreSame(_services, result);
+    }
+
+    [TestMethod]
+    public void AddProjectServices_RegistersIPasswordHasher()
+    {
+        _services.AddProjectServices();
+
+        var provider = _services.BuildServiceProvider();
+        var hasher = provider.GetService<IPasswordHasher>();
+
+        Assert.IsNotNull(hasher);
+        Assert.IsInstanceOfType(hasher, typeof(BCryptHasher));
     }
 }

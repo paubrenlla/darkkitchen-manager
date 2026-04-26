@@ -12,13 +12,19 @@ public class UserServiceTests
     private Mock<IUserRepository> _userRepositoryMock = null!;
     private Mock<IPhoneStrategyFactory> _strategyFactoryMock = null!;
     private UserService _userService = null!;
+    private Mock<IPasswordHasher> _passwordHasherMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _strategyFactoryMock = new Mock<IPhoneStrategyFactory>();
-        _userService = new UserService(_userRepositoryMock.Object, _strategyFactoryMock.Object);
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed_password");
+        _userService = new UserService(
+            _userRepositoryMock.Object,
+            _strategyFactoryMock.Object,
+            _passwordHasherMock.Object);
     }
 
     [TestMethod]

@@ -10,7 +10,7 @@ public class UserRepositoryTests
     [TestInitialize]
     public void Setup()
     {
-        _userRepository = new InMemoryUserRepository();
+        _userRepository = new InMemoryUserRepository(new BCryptHasher());
     }
 
     [TestMethod]

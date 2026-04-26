@@ -7,33 +7,21 @@ public class InMemoryUserRepository : IUserRepository
 {
     private readonly List<User> _users;
 
-    public InMemoryUserRepository()
+    public InMemoryUserRepository(IPasswordHasher passwordHasher)
     {
         var uruguayStrategy = new UruguayPhoneValidationStrategy();
-        var mockPassword = "ValidP@ssw0rd!8X";
-        _users =
-        [
-            new User(
-                "Admin",
-                "Jefe",
-                "admin@bmb.com",
-                PhoneNumber.Create("+598", "094222333", uruguayStrategy),
-                mockPassword,
-                Role.Administrativo),
-            new User(
-                "Pepe",
-                "Ruiz",
-                "preparador@bmb.com",
-                PhoneNumber.Create("+598", "094333444", uruguayStrategy),
-                mockPassword,
-                Role.Preparador),
-            new User(
-                "Juan",
-                "Sosa",
-                "cliente@bmb.com",
-                PhoneNumber.Create("+598", "094444555", uruguayStrategy),
-                mockPassword)
-        ];
+        var rawPassword = "ValidP@ssw0rd!8X";
+
+        var admin = new User("Admin", "Jefe", "admin@bmb.com", PhoneNumber.Create("+598", "094222333", uruguayStrategy), rawPassword, Role.Administrativo);
+        admin.HashPassword(passwordHasher);
+
+        var preparador = new User("Pepe", "Ruiz", "preparador@bmb.com", PhoneNumber.Create("+598", "094333444", uruguayStrategy), rawPassword, Role.Preparador);
+        preparador.HashPassword(passwordHasher);
+
+        var cliente = new User("Juan", "Sosa", "cliente@bmb.com", PhoneNumber.Create("+598", "094444555", uruguayStrategy), rawPassword);
+        cliente.HashPassword(passwordHasher);
+
+        _users = [admin, preparador, cliente];
     }
 
     public User? GetUserByEmail(string email)
