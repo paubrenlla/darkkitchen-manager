@@ -265,4 +265,15 @@ public class PromotionServiceTests
 
         Assert.AreEqual(10m, result);
     }
+
+    [TestMethod]
+    public void GetBestDiscountForProduct_NoActivePromos_ReturnsZero()
+    {
+        Guid productId = _testProducts[0].Id;
+        var date = new DateTime(2030, 1, 1);
+
+        var result = _promotionService.GetBestDiscountForProduct(productId, date);
+
+        Assert.AreEqual(0m, result);
+    }
 }
