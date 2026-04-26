@@ -17,6 +17,15 @@ public class Product
     public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
     private List<ProductImage> _images;
+    protected Product()
+    {
+        Code = null!;
+        Name = null!;
+        Description = null!;
+        Line = null!;
+        Category = null!;
+        _images = [];
+    }
 
     public Product(string code, string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
     {
