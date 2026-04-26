@@ -53,8 +53,9 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
     }
 
     public SalesReportResponse GetSalesReport()
-    {
-        var validOrders = _orderRepository.GetAll();
+{
+    var validOrders = _orderRepository.GetAll()
+        .Where(o => o.State != OrderState.Cancelled);
 
     var periods = validOrders
         .GroupBy(o => new { o.CreatedAt.Year, o.CreatedAt.Month })
