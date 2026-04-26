@@ -27,6 +27,25 @@ public class Promotion
     public DateTime EndDate { get; private set; }
     public List<Product> Products { get; private set; } = [];
 
+    public void Update(string name, int discount, DateTime start, DateTime end, List<Product> products)
+    {
+        ValidateName(name);
+
+        Name = name;
+        DiscountPercentage = discount;
+        StartDate = start;
+        EndDate = end;
+        Products = products;
+    }
+
+    private static void ValidateName(string name)
+    {
+        if(string.IsNullOrWhiteSpace(name) || name.Length < 3 || name.Length > 50)
+        {
+            throw new ArgumentException("Name must be between 3 and 50 characters.");
+        }
+    }
+
     private static void ValidateDates(DateTime startDate, DateTime endDate)
     {
         if(startDate > endDate)
@@ -41,22 +60,5 @@ public class Promotion
         {
             throw new ArgumentException("Discount percentage must be greater than zero.");
         }
-    }
-
-    private static void ValidateName(string name)
-    {
-        if(string.IsNullOrWhiteSpace(name) || name.Length < 3 || name.Length > 50)
-        {
-            throw new ArgumentException("Name must be between 3 and 50 characters.");
-        }
-    }
-
-    public void Update(string name, int discount, DateTime start, DateTime end, List<Product> products)
-    {
-        Name = name;
-        DiscountPercentage = discount;
-        StartDate = start;
-        EndDate = end;
-        Products = products;
     }
 }
