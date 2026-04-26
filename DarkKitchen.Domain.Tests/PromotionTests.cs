@@ -136,4 +136,18 @@ public class PromotionTests
         var promotion = new Promotion("Nombre Valido", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
         promotion.Update("Nombre Valido", 10, DateTime.Today.AddDays(5), DateTime.Today, []);
     }
+
+    [TestMethod]
+    public void UpdatePromotion_WithEmptyProducts_ShouldDesassociateAll()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m);
+        var promotion = new Promotion("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), [product]);
+
+        promotion.Update("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        Assert.AreEqual(0, promotion.Products.Count);
+    }
 }
