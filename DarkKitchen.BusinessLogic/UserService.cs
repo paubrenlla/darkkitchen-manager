@@ -68,6 +68,11 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
             request.Email,
             validPhone,
             role);
+        User userWithEmail = _userRepository.GetUserByEmail(request.Email);
+        if(userWithEmail != null && userWithEmail.Id != userId)
+        {
+            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
+        }
 
         _userRepository.Update(userId, existingUser);
         return Converter.ToUserCreateResponse(existingUser);
