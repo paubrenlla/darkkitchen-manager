@@ -203,4 +203,20 @@ public class PromotionServiceTests
         Assert.AreEqual(30, result.DiscountPercentage);
         Assert.IsTrue(result.Products.Contains("BURG02"));
     }
+
+    [TestMethod]
+    public void UpdatePromotion_NonExistentId_ThrowsKeyNotFoundException()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo X",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+
+        Assert.ThrowsException<KeyNotFoundException>(() =>
+            _promotionService.UpdatePromotion(Guid.NewGuid(), request));
+    }
 }
