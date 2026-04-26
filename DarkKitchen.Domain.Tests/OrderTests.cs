@@ -181,4 +181,13 @@ public class OrderTests
 
         Assert.AreEqual(210m, order.Subtotal);
     }
+
+    [TestMethod]
+    public void Subtotal_WithDiscountedItems_ShouldReflectDiscounts()
+    {
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m, 10m), new(Guid.NewGuid(), 1, 50m) };
+        var order = new Order(_clientId, _address, DeliveryType.Express, items);
+
+        Assert.AreEqual(230m, order.Subtotal);
+    }
 }
