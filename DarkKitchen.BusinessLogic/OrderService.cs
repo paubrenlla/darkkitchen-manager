@@ -11,7 +11,7 @@ public class OrderService(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IPromotionService promotionService,
-    IShippingCostCalculator shippingCalculator) : IOrderService // Inyectamos el calculador
+    IShippingCostCalculator shippingCalculator) : IOrderService
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IProductRepository _productRepository = productRepository;
