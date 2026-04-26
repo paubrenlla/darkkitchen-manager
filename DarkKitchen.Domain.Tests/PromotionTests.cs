@@ -94,4 +94,22 @@ public class PromotionTests
 
         Assert.IsNotNull(promotion);
     }
+
+    [TestMethod]
+    public void UpdatePromotion_WithValidData_ShouldUpdateProperties()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var products = new List<Product>
+        {
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m)
+        };
+        var promotion = new Promotion("Nombre Viejo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        promotion.Update("Nombre Nuevo", 25, DateTime.Today, DateTime.Today.AddDays(10), products);
+
+        Assert.AreEqual("Nombre Nuevo", promotion.Name);
+        Assert.AreEqual(25, promotion.DiscountPercentage);
+        Assert.AreEqual(1, promotion.Products.Count);
+    }
 }
