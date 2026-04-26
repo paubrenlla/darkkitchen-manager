@@ -219,4 +219,21 @@ public class PromotionServiceTests
         Assert.ThrowsException<KeyNotFoundException>(() =>
             _promotionService.UpdatePromotion(Guid.NewGuid(), request));
     }
+
+    [TestMethod]
+    public void UpdatePromotion_InvalidProductCode_ThrowsArgumentException()
+    {
+        Guid promoId = _testPromotions[0].Id;
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Valida",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = ["INVALIDO99"]
+        };
+
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.UpdatePromotion(promoId, request));
+    }
 }
