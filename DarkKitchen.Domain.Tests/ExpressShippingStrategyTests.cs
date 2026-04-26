@@ -12,4 +12,12 @@ public class ExpressShippingStrategyTests
 
         Assert.IsTrue(strategy.CanHandle(DeliveryType.Express));
     }
+
+    [TestMethod]
+    public void CanHandle_TwentyFourHoursDeliveryType_ReturnsFalse()
+    {
+        var strategy = new ExpressShippingStrategy(100m);
+
+        Assert.IsFalse(strategy.CanHandle(DeliveryType.TwentyFourHours));
+    }
 }
