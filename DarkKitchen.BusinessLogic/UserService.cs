@@ -11,24 +11,68 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 {
     private readonly IPhoneStrategyFactory _strategyFactory = strategyFactory;
     private readonly IUserRepository _userRepository = userRepository;
+    private static readonly IReadOnlyList<string> AllowedAdminRoles = ["Administrativo", "Preparador"];
 
     public UserCreateResponse CreateUser(UserCreateRequest request)
     {
+        Role role;
+
+        if(request.Role == null)
+        {
+            role = Role.Cliente;
+        }
+        else if(!AllowedAdminRoles.Contains(request.Role))
+        {
+            throw new ArgumentException($"Rol inválido. Los roles permitidos son: {string.Join(", ", AllowedAdminRoles)}.");
+        }
+        else
+        {
+            role = Enum.Parse<Role>(request.Role);
+        }
+
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role);
+        _userRepository.Add(user);
+        return Converter.ToUserCreateResponse(user);
+    }
 
-        var role = request.Role != null ? Enum.Parse<Role>(request.Role) : Role.Cliente;
+    public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
+    {
+        return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
+    }
 
-        var user = new User(
+    public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
+        }
+
+        User existingUser = _userRepository.GetById(userId);
+
+        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
+        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        Role role = Enum.Parse<Role>(request.Role);
+
+        existingUser.UpdateDetails(
             request.Name,
             request.Surname,
             request.Email,
             validPhone,
-            request.Password,
             role);
 
-        _userRepository.Add(user);
-        return Converter.ToUserCreateResponse(user);
+        _userRepository.Update(userId, existingUser);
+        return Converter.ToUserCreateResponse(existingUser);
+    }
+
+    public void DeleteUser(Guid adminId, Guid userId)
+    {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
+        }
+
+        _userRepository.Delete(userId);
     }
 }

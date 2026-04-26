@@ -110,4 +110,17 @@ public class User
 
         return false;
     }
+
+    public void UpdateDetails(string name, string surname, string email, PhoneNumber phone, Role role)
+    {
+        ValidateName(name);
+        ValidateSurname(surname);
+        ValidateEmail(email);
+
+        Name = name;
+        Surname = surname;
+        Email = email;
+        Phone = phone;
+        Role = role;
+    }
 }

@@ -7,6 +7,10 @@ public class InMemoryOrderRepository : IOrderRepository
 {
     private readonly List<Order> _orders = [];
     private int _nextOrderNumber = 1;
+    public IEnumerable<Order> GetAll()
+    {
+        return _orders;
+    }
 
     public void Add(Order order)
     {

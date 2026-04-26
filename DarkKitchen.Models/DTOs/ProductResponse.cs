@@ -8,4 +8,6 @@ public class ProductResponse
     public decimal Price { get; set; }
     public required string Line { get; set; }
     public required string Category { get; set; }
+    public required List<string> Images { get; set; }
+    public bool IsActive { get; set; }
 }

@@ -1,4 +1,4 @@
-using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 
 namespace DarkKitchen.DataAccess;
@@ -16,14 +16,36 @@ public class InMemoryProductRepository : IProductRepository
 
         _products =
         [
-            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m),
-            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m),
-            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m),
+            new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", lineCombo, categoryParrilla, 150m, [new ProductImage("default.jpg", 50000)]),
+            new Product("BURG02", "Hamburguesa Doble Grande", "Hamburguesa doble con queso y bacon", lineCombo, categoryParrilla, 200m, [new ProductImage("default.jpg", 50000)]),
+            new Product("DESA01", "Desayuno Completo Grande", "Desayuno con cafe tostadas y jugo", lineDesayunos, categoryBebidas, 120m, [new ProductImage("default.jpg", 50000)]),
         ];
     }
 
     public IEnumerable<Product> GetAll()
     {
         return _products;
+    }
+
+    public Product? GetById(Guid id)
+    {
+        return _products.FirstOrDefault(p => p.Id == id);
+    }
+
+    public void Add(Product product)
+    {
+        _products.Add(product);
+    }
+
+    public void Update(Guid id, Product product)
+    {
+        var index = _products.FindIndex(p => p.Id == id);
+
+        if(index < 0)
+        {
+            throw new KeyNotFoundException($"Producto {id} no encontrado.");
+        }
+
+        _products[index] = product;
     }
 }
