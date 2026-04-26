@@ -84,7 +84,7 @@ public class PromotionService(
         return Converter.ToPromotionCreateResponse(existingPromo);
     }
 
-    public decimal GetBestDiscountForProduct(Guid productId, DateTime date)
+    public (string? PromotionName, decimal Discount) GetBestPromotionForProduct(Guid productId, DateTime date)
     {
         var activePromos = _promotionRepository.GetAll()
             .Where(p => p.IsVigente(date) && p.Products.Any(prod => prod.Id == productId))
@@ -92,9 +92,11 @@ public class PromotionService(
 
         if(!activePromos.Any())
         {
-            return 0;
+            return (null, 0m);
         }
 
-        return activePromos.Max(p => p.DiscountPercentage);
+        Promotion bestPromo = activePromos.OrderByDescending(p => p.DiscountPercentage).First();
+
+        return (bestPromo.Name, bestPromo.DiscountPercentage);
     }
 }

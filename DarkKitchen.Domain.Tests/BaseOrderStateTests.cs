@@ -12,7 +12,7 @@ public class OrderStateTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items);
+        _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items, 0m);
     }
 
     [TestMethod]
