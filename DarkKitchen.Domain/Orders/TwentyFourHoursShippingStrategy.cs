@@ -16,6 +16,6 @@ public class TwentyFourHoursShippingStrategy : IShippingStrategy
 
     public decimal Calculate()
     {
-        return new decimal(null);
+        return _cost;
     }
 }
