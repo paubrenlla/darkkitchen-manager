@@ -348,4 +348,22 @@ public class PromotionServiceTests
 
         Assert.AreEqual(0, result.Count);
     }
+
+    [TestMethod]
+    public void GetPromotions_InactivePromotion_IsExcluded()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m);
+
+        var promo = new Promotion("Promo Inactiva", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
+        promo.Deactivate();
+
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([promo]);
+
+        var result = _promotionService.GetPromotions(null, null, null).ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
 }
