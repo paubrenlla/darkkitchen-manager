@@ -184,4 +184,13 @@ public class PromotionTests
 
         Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(10)));
     }
+
+    [TestMethod]
+    public void IsVigente_WhenInactive_ReturnsFalse()
+    {
+        var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+        promotion.Deactivate();
+
+        Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(2)));
+    }
 }
