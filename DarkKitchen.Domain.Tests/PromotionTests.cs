@@ -193,4 +193,20 @@ public class PromotionTests
 
         Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(2)));
     }
+
+    [TestMethod]
+    public void IsVigente_OnStartDate_ReturnsTrue()
+    {
+        var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        Assert.IsTrue(promotion.IsVigente(DateTime.Today));
+    }
+
+    [TestMethod]
+    public void IsVigente_OnEndDate_ReturnsTrue()
+    {
+        var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        Assert.IsTrue(promotion.IsVigente(DateTime.Today.AddDays(5)));
+    }
 }
