@@ -34,28 +34,56 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         try
         {
+            var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             switch(request.Status.ToLower())
             {
-                case "cancelado":
-                    _orderService.Cancel(id);
-                    break;
-                case "entregado":
-                    _orderService.Deliver(id);
-                    break;
                 case "preparado":
+                    if(callerRole != "Preparador" && callerRole != "Administrativo")
+                    {
+                        return Forbid();
+                    }
+
                     _orderService.Prepare(id);
                     break;
+
+                case "cancelado":
+                    if(callerRole != "Administrativo")
+                    {
+                        return Forbid();
+                    }
+
+                    _orderService.Cancel(id);
+                    break;
+
                 case "encamino":
-                    _orderService.Ship(id);
-                    break;
+                case "entregado":
                 case "noentregado":
-                    _orderService.NotDelivered(id);
+                    if(callerRole != "Preparador")
+                    {
+                        return Forbid();
+                    }
+
+                    if(request.Status.ToLower() == "encamino")
+                    {
+                        _orderService.Ship(id);
+                    }
+                    else if(request.Status.ToLower() == "entregado")
+                    {
+                        _orderService.Deliver(id);
+                    }
+                    else
+                    {
+                        _orderService.NotDelivered(id);
+                    }
+
                     break;
+
                 default:
                     return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
             }
 
-            var response = _orderService.GetOrderById(id);
+            OrderDetailResponse response = _orderService.GetOrderById(id);
             return Ok(response);
         }
         catch(KeyNotFoundException ex)
@@ -75,7 +103,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         [FromQuery] string? status,
         [FromQuery] string? city)
     {
-        string? callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
         Guid callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         if(callerRole == "Preparador")
@@ -91,16 +119,5 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
         IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
         return Ok(clientOrders);
-    }
-
-    [HttpGet]
-    public IActionResult GetOrders(
-        [FromHeader(Name = "X-Client-Id")] Guid clientId,
-        [FromQuery] DateTime? fromDate,
-        [FromQuery] DateTime? toDate,
-        [FromQuery] string? status)
-    {
-        var orders = _orderService.GetOrdersByClient(clientId, fromDate, toDate, status);
-        return Ok(orders);
     }
 }
