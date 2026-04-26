@@ -50,4 +50,13 @@ public class Promotion
             throw new ArgumentException("Name must be between 3 and 50 characters.");
         }
     }
+
+    public void Update(string name, int discount, DateTime start, DateTime end, List<Product> products)
+    {
+        Name = name;
+        DiscountPercentage = discount;
+        StartDate = start;
+        EndDate = end;
+        Products = products;
+    }
 }
