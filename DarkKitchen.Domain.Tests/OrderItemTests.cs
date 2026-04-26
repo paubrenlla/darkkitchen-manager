@@ -77,4 +77,13 @@ public class OrderItemTests
 
         Assert.AreEqual(0m, total);
     }
+
+    [TestMethod]
+    public void CreateItem_WithDiscount_ShouldSetDiscountPercentage()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 2, 100m, 10m, "Black Friday");
+
+        Assert.AreEqual(10m, item.DiscountPercentage);
+        Assert.AreEqual("Black Friday", item.AppliedPromotionName);
+    }
 }
