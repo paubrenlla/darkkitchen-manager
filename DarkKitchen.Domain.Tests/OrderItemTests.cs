@@ -93,4 +93,11 @@ public class OrderItemTests
         Assert.ThrowsException<ArgumentException>(() =>
             new OrderItem(Guid.NewGuid(), 1, 100m, -5m));
     }
+
+    [TestMethod]
+    public void CreateItem_WithDiscountOverHundred_ShouldThrowArgumentException()
+    {
+        Assert.ThrowsException<ArgumentException>(() =>
+            new OrderItem(Guid.NewGuid(), 1, 100m, 101m));
+    }
 }
