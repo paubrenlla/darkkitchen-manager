@@ -46,8 +46,7 @@ public class PromotionServiceTests
 
         _promotionService = new PromotionService(
             _mockPromotionRepository.Object,
-            _mockProductRepository.Object
-        );
+            _mockProductRepository.Object);
     }
 
     [TestMethod]

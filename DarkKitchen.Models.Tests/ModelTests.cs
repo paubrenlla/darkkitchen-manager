@@ -204,14 +204,14 @@ public class ModelTests
         var category = new ProductCategory("Parrilla");
         var products = new List<Product>
         {
-            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, [new ProductImage("img1.jpg", 100000)]),
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m,
+                [new ProductImage("img1.jpg", 100000)]),
             new("BURG02", "Hamburguesa Doble", "Hamburguesa doble con queso cheddar y bacon", line, category, 200m,
                 [new ProductImage("img2.jpg", 150000)])
         };
         var promotion = new Promotion("Promo Verano", 20, start, end, products);
 
-        var
-            result = Converter.ToPromotionCreateResponse(promotion);
+        var result = Converter.ToPromotionCreateResponse(promotion);
 
         Assert.AreEqual("Promo Verano", result.Name);
         Assert.AreEqual(20, result.DiscountPercentage);
