@@ -68,4 +68,9 @@ public class Promotion
     {
         IsActive = false;
     }
+
+    public bool IsVigente(DateTime date)
+    {
+        return true;
+    }
 }
