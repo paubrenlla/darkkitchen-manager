@@ -6,6 +6,11 @@ public class ExpressShippingStrategy : IShippingStrategy
 
     public ExpressShippingStrategy(decimal cost)
     {
+        if (cost < 0)
+        {
+            throw new ArgumentException("Express shipping cost cannot be negative.");
+        }
+
         _cost = cost;
     }
 
