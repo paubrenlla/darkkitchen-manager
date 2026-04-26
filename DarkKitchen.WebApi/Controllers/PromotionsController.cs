@@ -48,5 +48,6 @@ public class PromotionsController(IPromotionService promotionService) : Controll
             return Ok(response);
         }
         catch(KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
+        catch(ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
     }
 }
