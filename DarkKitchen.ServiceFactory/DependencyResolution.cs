@@ -8,14 +8,19 @@ using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkKitchen.ServiceFactory;
 
 public static class DependencyResolution
 {
-    public static IServiceCollection AddProjectServices(this IServiceCollection services)
+    public static IServiceCollection AddProjectServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddDbContext<DarkKitchenContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DarkKitchenDB")));
+
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();

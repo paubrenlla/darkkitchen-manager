@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddProjectServices();
+builder.Services.AddProjectServices(builder.Configuration);
 
 var jwtSecret = builder.Configuration.GetSection("JwtConfig:Secret").Value!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
