@@ -1,17 +1,10 @@
 namespace DarkKitchen.Domain.Orders;
 
-public class ShippingCostCalculator : IShippingCostCalculator
+public class ShippingCostCalculator(IEnumerable<IShippingStrategy> strategies) : IShippingCostCalculator
 {
-    private readonly IEnumerable<IShippingStrategy> _strategies;
-
-    public ShippingCostCalculator(IEnumerable<IShippingStrategy> strategies)
-    {
-        _strategies = strategies;
-    }
-
     public decimal CalculateShippingCost(DeliveryType deliveryType)
     {
-        IShippingStrategy? strategy = _strategies.FirstOrDefault(s => s.CanHandle(deliveryType));
+        IShippingStrategy? strategy = strategies.FirstOrDefault(s => s.CanHandle(deliveryType));
 
         if(strategy == null)
         {
