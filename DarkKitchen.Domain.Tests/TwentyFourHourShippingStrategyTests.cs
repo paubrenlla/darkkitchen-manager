@@ -35,4 +35,12 @@ public class TwentyFourHoursShippingStrategyTests
     {
         new TwentyFourHoursShippingStrategy(-1m);
     }
+
+    [TestMethod]
+    public void Constructor_WithZeroCost_ShouldBeValid()
+    {
+        var strategy = new TwentyFourHoursShippingStrategy(0m);
+
+        Assert.AreEqual(0m, strategy.Calculate());
+    }
 }
