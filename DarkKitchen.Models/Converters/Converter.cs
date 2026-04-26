@@ -17,6 +17,7 @@ public static class Converter
     {
         return new ProductResponse
         {
+            Id = product.Id,
             Code = product.Code,
             Name = product.Name,
             Description = product.Description,
@@ -98,6 +99,7 @@ public static class Converter
     {
         return new PromotionCreateResponse
         {
+            Id = promotion.Id,
             Name = promotion.Name,
             DiscountPercentage = promotion.DiscountPercentage,
             StartDate = promotion.StartDate,
