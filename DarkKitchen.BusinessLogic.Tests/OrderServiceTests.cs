@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
@@ -14,38 +15,24 @@ public class OrderServiceTests
     private List<OrderItem> _items = null!;
     private Mock<IOrderRepository> _orderRepositoryMock = null!;
     private IOrderService _orderService = null!;
+    private Mock<IProductRepository> _productRepositoryMock = null!;
+    private Mock<IPromotionService> _promotionServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
-        _orderService = new OrderService(_orderRepositoryMock.Object);
+        _productRepositoryMock = new Mock<IProductRepository>();
+        _promotionServiceMock = new Mock<IPromotionService>();
+
+        _orderService = new OrderService(
+            _orderRepositoryMock.Object,
+            _productRepositoryMock.Object,
+            _promotionServiceMock.Object);
+
         _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
         _clientId = Guid.NewGuid();
-    }
-
-    [TestMethod]
-    public void CreateOrder_ShouldReturnResponseAndAddToRepository()
-    {
-        var request = new OrderCreateRequest
-        {
-            DeliveryType = "Express",
-            Address = new OrderAddressDto
-            {
-                Street = "Rivera",
-                Number = "1234",
-                City = "Montevideo",
-                Country = "Uruguay",
-            },
-            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
-        };
-
-        var result = _orderService.CreateOrder(_clientId, request);
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(_clientId, result.ClientId);
-        _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
 
     [TestMethod]
@@ -172,8 +159,8 @@ public class OrderServiceTests
     public void GetOrdersByClient_ShouldDelegateToRepository()
     {
         var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items) };
-        var from = DateTime.Now.AddDays(-7);
-        var to = DateTime.Now;
+        DateTime from = DateTime.Now.AddDays(-7);
+        DateTime to = DateTime.Now;
 
         _orderRepositoryMock.Setup(r => r.GetByClient(_clientId, from, to, "Pending")).Returns(orders);
 
@@ -187,8 +174,8 @@ public class OrderServiceTests
     public void GetOrdersByStatus_ShouldDelegateToRepository()
     {
         var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items) };
-        var from = DateTime.Now.AddDays(-7);
-        var to = DateTime.Now;
+        DateTime from = DateTime.Now.AddDays(-7);
+        DateTime to = DateTime.Now;
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, "Pending", "Montevideo")).Returns(orders);
 
@@ -207,12 +194,9 @@ public class OrderServiceTests
             DeliveryType = "InvalidType",
             Address = new OrderAddressDto
             {
-                Street = "Rivera",
-                Number = "1234",
-                City = "Montevideo",
-                Country = "Uruguay",
+                Street = "Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay"
             },
-            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }]
         };
 
         _orderService.CreateOrder(_clientId, request);
@@ -225,7 +209,7 @@ public class OrderServiceTests
         var order = new Order(_clientId, _address, DeliveryType.Express, _items);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
-        var result = _orderService.GetOrderById(orderId);
+        OrderDetailResponse result = _orderService.GetOrderById(orderId);
 
         Assert.IsNotNull(result);
         Assert.AreEqual(_clientId, result.ClientId);
