@@ -236,4 +236,22 @@ public class PromotionServiceTests
         Assert.ThrowsException<ArgumentException>(() =>
             _promotionService.UpdatePromotion(promoId, request));
     }
+
+    [TestMethod]
+    public void UpdatePromotion_RemovingProduct_DesassociatesItCorrectly()
+    {
+        Guid promoId = _testPromotions[0].Id;
+        var request = new PromotionCreateRequest
+        {
+            Name = "Black Friday",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+
+        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
+
+        Assert.AreEqual(0, result.Products.Count);
+    }
 }
