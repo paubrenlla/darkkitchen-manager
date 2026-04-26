@@ -290,6 +290,25 @@ public class ReportServiceTests
         Assert.AreEqual(order1.Total + order2.Total, result.Periods[0].Clients[0].Total);
     }
 
+    [TestMethod]
+    public void GetSalesReport_ShouldCalculatePeriodTotal()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var clientId1 = Guid.NewGuid();
+        var clientId2 = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
+
+        var order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
+        var order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
+
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(order1.Total + order2.Total, result.Periods[0].PeriodTotal);
+    }
+
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
         var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
