@@ -25,4 +25,11 @@ public class ReportsController(IReportService reportService) : ControllerBase
         IEnumerable<TopProductResponse> topProducts = _reportService.GetTopProducts(fromDate, toDate);
         return Ok(topProducts);
     }
+
+    [HttpGet("sales")]
+    public IActionResult GetSalesReport()
+    {
+        var report = _reportService.GetSalesReport();
+        return Ok(report);
+    }
 }

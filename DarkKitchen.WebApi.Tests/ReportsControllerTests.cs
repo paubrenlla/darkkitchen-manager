@@ -80,4 +80,43 @@ public class ReportsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
     }
+
+    [TestMethod]
+    public void GetSalesReport_ReturnsOk()
+    {
+        var report = new SalesReportResponse
+        {
+            Periods =
+            [
+                new SalesPeriodResponse
+                {
+                    Year = 2026,
+                    Month = 1,
+                    Clients = [new SalesClientResponse { ClientName = "Juan Perez", Total = 5000m }],
+                    PeriodTotal = 5000m,
+                },
+            ],
+            GrandTotal = 5000m,
+        };
+
+        _mockReportService.Setup(s => s.GetSalesReport()).Returns(report);
+
+        var result = _controller.GetSalesReport() as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void GetSalesReport_EmptyReport_ReturnsOk()
+    {
+        var emptyReport = new SalesReportResponse { Periods = [], GrandTotal = 0 };
+
+        _mockReportService.Setup(s => s.GetSalesReport()).Returns(emptyReport);
+
+        var result = _controller.GetSalesReport() as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
 }
