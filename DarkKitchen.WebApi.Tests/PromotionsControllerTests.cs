@@ -156,4 +156,25 @@ public class PromotionsControllerTests
         Assert.AreEqual(200, result.StatusCode);
         Assert.AreEqual(expected, result.Value);
     }
+
+    [TestMethod]
+    public void UpdatePromotion_NonExistentId_ShouldReturnNotFound()
+    {
+        var id = Guid.NewGuid();
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo X",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+        _mockService.Setup(s => s.UpdatePromotion(id, request))
+            .Throws(new KeyNotFoundException("La promoción no existe."));
+
+        var result = _controller.UpdatePromotion(id, request) as NotFoundObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(404, result.StatusCode);
+    }
 }
