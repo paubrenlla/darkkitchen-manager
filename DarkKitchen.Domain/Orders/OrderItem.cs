@@ -2,11 +2,8 @@ namespace DarkKitchen.Domain.Orders;
 
 public class OrderItem
 {
-    protected OrderItem()
-    {
-    }
-
-    public OrderItem(Guid productId, int quantity, decimal price)
+    public OrderItem(Guid productId, int quantity, decimal price, decimal discountPercentage = 0,
+        string? appliedPromotionName = null)
     {
         if(quantity <= 0)
         {
@@ -21,14 +18,20 @@ public class OrderItem
         ProductId = productId;
         Quantity = quantity;
         Price = price;
+        DiscountPercentage = discountPercentage;
+        AppliedPromotionName = appliedPromotionName;
     }
 
     public Guid ProductId { get; private set; }
     public int Quantity { get; }
     public decimal Price { get; }
 
+    public decimal DiscountPercentage { get; }
+    public string? AppliedPromotionName { get; private set; }
+
     public decimal CalculateItemTotal()
     {
-        return Price * Quantity;
+        var rawTotal = Price * Quantity;
+        return rawTotal;
     }
 }
