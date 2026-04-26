@@ -96,7 +96,7 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
         return new SalesClientResponse
         {
             ClientName = clientName,
-            Total = 0,
+            Total = orders.Sum(o => o.Total),
         };
     }
 }
