@@ -1,4 +1,5 @@
-﻿using DarkKitchen.IBusinessLogic;
+﻿using System.Security.Claims;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Http;
@@ -12,19 +13,51 @@ public class OrdersControllerTests
 {
     private Mock<IOrderService> _mockOrderService = null!;
     private OrdersController _controller = null!;
-    private Guid _clientId;
 
     [TestInitialize]
     public void Setup()
     {
         _mockOrderService = new Mock<IOrderService>();
         _controller = new OrdersController(_mockOrderService.Object);
-        _clientId = Guid.NewGuid();
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+    }
+
+    private void SetCallerContext(Guid callerId, string role)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, callerId.ToString()),
+            new Claim(ClaimTypes.Role, role),
+        };
+
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal },
+        };
+    }
+
+    private static OrderDetailResponse BuildDetailResponse()
+    {
+        return new OrderDetailResponse
+        {
+            OrderNumber = 1,
+            ClientId = Guid.NewGuid(),
+            CreatedAt = DateTime.Now,
+            Status = "Pending",
+            Items = [],
+            Total = 100m,
+        };
     }
 
     [TestMethod]
     public void CreateOrder_ValidRequest_Returns201()
     {
+        var clientId = Guid.NewGuid();
+        SetCallerContext(clientId, "Cliente");
+
         var request = new OrderCreateRequest
         {
             DeliveryType = "Express",
@@ -40,16 +73,16 @@ public class OrdersControllerTests
 
         var response = new OrderCreateResponse
         {
-            ClientId = _clientId,
+            ClientId = clientId,
             OrderNumber = 1,
             Subtotal = 100m,
             ShippingCost = 50m,
             Total = 183m,
         };
 
-        _mockOrderService.Setup(s => s.CreateOrder(_clientId, request)).Returns(response);
+        _mockOrderService.Setup(s => s.CreateOrder(clientId, request)).Returns(response);
 
-        var result = _controller.CreateOrder(request, _clientId) as ObjectResult;
+        var result = _controller.CreateOrder(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
@@ -58,6 +91,9 @@ public class OrdersControllerTests
     [TestMethod]
     public void CreateOrder_ServiceThrowsArgumentException_ReturnsBadRequest()
     {
+        var clientId = Guid.NewGuid();
+        SetCallerContext(clientId, "Cliente");
+
         var request = new OrderCreateRequest
         {
             DeliveryType = "InvalidType",
@@ -71,10 +107,10 @@ public class OrdersControllerTests
             Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
         };
 
-        _mockOrderService.Setup(s => s.CreateOrder(_clientId, request))
+        _mockOrderService.Setup(s => s.CreateOrder(clientId, request))
             .Throws(new ArgumentException("Tipo de entrega inválido."));
 
-        var result = _controller.CreateOrder(request, _clientId) as BadRequestObjectResult;
+        var result = _controller.CreateOrder(request) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);

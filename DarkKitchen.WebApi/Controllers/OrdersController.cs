@@ -1,4 +1,5 @@
-﻿using DarkKitchen.IBusinessLogic;
+﻿using System.Security.Claims;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     private readonly IOrderService _orderService = orderService;
 
     [HttpPost]
-    public IActionResult CreateOrder([FromBody] OrderCreateRequest request, [FromHeader(Name = "X-Client-Id")] Guid clientId)
+    [Authorize(Roles = "Cliente")]
+    public IActionResult CreateOrder([FromBody] OrderCreateRequest request)
     {
         try
         {
-            var response = _orderService.CreateOrder(clientId, request);
+            Guid clientId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            OrderCreateResponse response = _orderService.CreateOrder(clientId, request);
             return StatusCode(StatusCodes.Status201Created, response);
         }
         catch(ArgumentException ex)
