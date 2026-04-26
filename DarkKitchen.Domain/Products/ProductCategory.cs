@@ -1,11 +1,11 @@
-namespace DarkKitchen.Domain;
+﻿namespace DarkKitchen.Domain.Products;
 
-public class ProductLine
+public class ProductCategory
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; }
 
-    public ProductLine(string name)
+    public ProductCategory(string name)
     {
         ValidateName(name);
         Id = Guid.NewGuid();
@@ -16,7 +16,7 @@ public class ProductLine
     {
         if(string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Product line name is required.");
+            throw new ArgumentException("Product category name is required.");
         }
     }
 }

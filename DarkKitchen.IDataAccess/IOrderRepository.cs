@@ -4,6 +4,7 @@ namespace DarkKitchen.IDataAccess;
 
 public interface IOrderRepository
 {
+    IEnumerable<Order> GetAll();
     void Add(Order order);
     void Update(Order order);
     Order? GetById(Guid id);

@@ -55,4 +55,9 @@ public class Order
 
         OrderNumber = orderNumber;
     }
+
+    public void SetCreatedAt(DateTime date)
+    {
+        CreatedAt = date;
+    }
 }

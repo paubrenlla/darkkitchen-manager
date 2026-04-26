@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
@@ -97,6 +97,8 @@ public class ModelTests
         var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
             category, 150m);
 
+        List<ProductImage> images = [new ProductImage("photo.jpg", 100000)];
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, images);
         var result = Converter.ToProductResponse(product);
 
         Assert.AreEqual("BURG01", result.Code);
