@@ -28,4 +28,11 @@ public class ExpressShippingStrategyTests
 
         Assert.AreEqual(150m, strategy.Calculate());
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Constructor_WithNegativeCost_ShouldThrow()
+    {
+        new ExpressShippingStrategy(-1m);
+    }
 }
