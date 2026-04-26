@@ -6,6 +6,11 @@ public class TwentyFourHoursShippingStrategy : IShippingStrategy
 
     public TwentyFourHoursShippingStrategy(decimal cost)
     {
+        if(cost < 0)
+        {
+            throw new ArgumentException("24-hours shipping cost cannot be negative.");
+        }
+
         _cost = cost;
     }
 
