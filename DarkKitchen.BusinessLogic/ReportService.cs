@@ -9,6 +9,7 @@ namespace DarkKitchen.BusinessLogic;
 public class ReportService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository) : IReportService
 {
     private const int TopProductsLimit = 5;
+    private const string UnknownClientFallback = "Cliente desconocido";
 
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IProductRepository _productRepository = productRepository;
@@ -53,27 +54,49 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
     }
 
     public SalesReportResponse GetSalesReport()
-{
-    var validOrders = _orderRepository.GetAll()
-        .Where(o => o.State != OrderState.Cancelled);
-
-    var periods = validOrders
-        .GroupBy(o => new { o.CreatedAt.Year, o.CreatedAt.Month })
-        .OrderBy(g => g.Key.Year)
-        .ThenBy(g => g.Key.Month)
-        .Select(g => new SalesPeriodResponse
-        {
-            Year = g.Key.Year,
-            Month = g.Key.Month,
-            Clients = [],
-            PeriodTotal = 0,
-        })
-        .ToList();
-
-    return new SalesReportResponse
     {
-        Periods = periods,
-        GrandTotal = 0,
-    };
-}
+        var validOrders = _orderRepository.GetAll()
+            .Where(o => o.State != OrderState.Cancelled);
+
+        var periods = validOrders
+            .GroupBy(o => new { o.CreatedAt.Year, o.CreatedAt.Month })
+            .OrderBy(g => g.Key.Year)
+            .ThenBy(g => g.Key.Month)
+            .Select(g => BuildPeriodResponse(g.Key.Year, g.Key.Month, g))
+            .ToList();
+
+        return new SalesReportResponse
+        {
+            Periods = periods,
+            GrandTotal = 0,
+        };
+    }
+
+    private SalesPeriodResponse BuildPeriodResponse(int year, int month, IEnumerable<Order> orders)
+    {
+        var clients = orders
+            .GroupBy(o => o.ClientId)
+            .Select(g => BuildClientResponse(g.Key, g))
+            .ToList();
+
+        return new SalesPeriodResponse
+        {
+            Year = year,
+            Month = month,
+            Clients = clients,
+            PeriodTotal = 0,
+        };
+    }
+
+    private SalesClientResponse BuildClientResponse(Guid clientId, IEnumerable<Order> orders)
+    {
+        var user = _userRepository.GetById(clientId);
+        var clientName = user != null ? $"{user.Name} {user.Surname}" : UnknownClientFallback;
+
+        return new SalesClientResponse
+        {
+            ClientName = clientName,
+            Total = 0,
+        };
+    }
 }
