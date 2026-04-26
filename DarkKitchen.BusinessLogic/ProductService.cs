@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
@@ -34,6 +34,11 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public ProductResponse CreateProduct(ProductCreateRequest request)
     {
+        if(_productRepository.GetAll().Any(p => p.Code == request.Code))
+        {
+            throw new ArgumentException($"Product with code {request.Code} already exists.");
+        }
+
         var product = Converter.ToProduct(request);
         _productRepository.Add(product);
         return Converter.ToProductResponse(product);
