@@ -30,8 +30,8 @@ public class PromotionServiceTests
                 200m)
         ];
 
-        var start = new DateTime(2025, 1, 1);
-        var end = new DateTime(2025, 12, 31);
+        DateTime start = DateTime.Now.AddDays(-1);
+        DateTime end = DateTime.Now.AddDays(30);
 
         _testPromotions =
         [
@@ -129,7 +129,7 @@ public class PromotionServiceTests
     [TestMethod]
     public void GetPromotions_FilterByDate_ReturnsMatchingPromotions()
     {
-        var result = _promotionService.GetPromotions(new DateTime(2025, 6, 1), null, null).ToList();
+        var result = _promotionService.GetPromotions(DateTime.Now, null, null).ToList();
 
         Assert.AreEqual(2, result.Count);
     }
@@ -178,7 +178,8 @@ public class PromotionServiceTests
     [TestMethod]
     public void GetPromotions_CombinedFilters_ReturnsMatchingPromotion()
     {
-        var result = _promotionService.GetPromotions(new DateTime(2025, 6, 1), "Combo burgers", "BURG01").ToList();
+        var result = _promotionService.GetPromotions(DateTime.Now, "Combo burgers", "BURG01")
+            .ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(result[0].Products.Contains("BURG01"));
@@ -259,7 +260,7 @@ public class PromotionServiceTests
     public void GetBestDiscountForProduct_WithActivePromo_ReturnsBestDiscount()
     {
         Guid productId = _testProducts[0].Id;
-        var date = new DateTime(2025, 6, 1);
+        DateTime date = DateTime.Now;
 
         var result = _promotionService.GetBestDiscountForProduct(productId, date);
 
@@ -270,7 +271,7 @@ public class PromotionServiceTests
     public void GetBestDiscountForProduct_NoActivePromos_ReturnsZero()
     {
         Guid productId = _testProducts[0].Id;
-        var date = new DateTime(2030, 1, 1);
+        DateTime date = DateTime.Now.AddDays(60);
 
         var result = _promotionService.GetBestDiscountForProduct(productId, date);
 
@@ -329,5 +330,22 @@ public class PromotionServiceTests
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("Vigente", result[0].Name);
+    }
+
+    [TestMethod]
+    public void GetPromotions_NoDateProvided_ExcludesFuturePromotions()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m);
+
+        var futurePromo = new Promotion("Futura", 15, DateTime.Now.AddDays(5), DateTime.Now.AddDays(15), [product]);
+
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([futurePromo]);
+
+        var result = _promotionService.GetPromotions(null, null, null).ToList();
+
+        Assert.AreEqual(0, result.Count);
     }
 }
