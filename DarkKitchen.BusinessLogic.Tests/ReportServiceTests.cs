@@ -239,6 +239,40 @@ public class ReportServiceTests
         Assert.AreEqual(1, result.Periods.Count);
     }
 
+    [TestMethod]
+    public void GetSalesReport_ShouldGroupClientsByPeriod()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var clientId1 = Guid.NewGuid();
+        var clientId2 = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
+
+        var order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
+        var order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
+
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(2, result.Periods[0].Clients.Count);
+    }
+
+    [TestMethod]
+    public void GetSalesReport_UnknownClient_ShouldUseFallbackName()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var unknownClientId = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(unknownClientId)).Returns((User?)null);
+
+        var order = CreateOrderWithDate(unknownClientId, address, new DateTime(2026, 1, 10), 100m);
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual("Cliente desconocido", result.Periods[0].Clients[0].ClientName);
+    }
+
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
         var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
