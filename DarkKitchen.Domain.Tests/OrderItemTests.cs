@@ -110,4 +110,33 @@ public class OrderItemTests
 
         Assert.AreEqual(180m, total);
     }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithFullDiscount_ShouldReturnZero()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 3, 50m, 100m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(0m, total);
+    }
+
+    [TestMethod]
+    public void CalculateItemTotal_WithNoDiscount_ShouldReturnFullPrice()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 2, 100m);
+
+        var total = item.CalculateItemTotal();
+
+        Assert.AreEqual(200m, total);
+    }
+
+    [TestMethod]
+    public void CreateItem_WithNoDiscountArguments_ShouldDefaultToZeroAndNullPromotion()
+    {
+        var item = new OrderItem(Guid.NewGuid(), 1, 100m);
+
+        Assert.AreEqual(0m, item.DiscountPercentage);
+        Assert.IsNull(item.AppliedPromotionName);
+    }
 }
