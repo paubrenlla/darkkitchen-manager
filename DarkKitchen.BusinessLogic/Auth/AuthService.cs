@@ -6,10 +6,11 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic.Auth;
 
-public class AuthService(IUserRepository userRepository, ITokenService tokenService) : IAuthService
+public class AuthService(IUserRepository userRepository, ITokenService tokenService, IPasswordHasher passwordHasher) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenService _tokenService = tokenService;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
     public LoginResponse Login(string email, string password)
     {

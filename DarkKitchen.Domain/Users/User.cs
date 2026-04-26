@@ -123,4 +123,9 @@ public class User
         Phone = phone;
         Role = role;
     }
+
+    public void HashPassword(IPasswordHasher hasher)
+    {
+        Password = hasher.HashPassword(Password);
+    }
 }

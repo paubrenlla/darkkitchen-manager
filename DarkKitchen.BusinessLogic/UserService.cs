@@ -7,10 +7,11 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory) : IUserService
+public class UserService(IUserRepository userRepository, IPhoneStrategyFactory strategyFactory,IPasswordHasher passwordHasher) : IUserService
 {
     private readonly IPhoneStrategyFactory _strategyFactory = strategyFactory;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private static readonly IReadOnlyList<string> AllowedAdminRoles = ["Administrativo", "Preparador"];
 
     public UserCreateResponse CreateUser(UserCreateRequest request)
@@ -33,6 +34,7 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
         var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role);
+        user.HashPassword(_passwordHasher);
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
     }
