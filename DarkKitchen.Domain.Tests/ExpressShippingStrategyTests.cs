@@ -20,4 +20,12 @@ public class ExpressShippingStrategyTests
 
         Assert.IsFalse(strategy.CanHandle(DeliveryType.TwentyFourHours));
     }
+
+    [TestMethod]
+    public void Calculate_ShouldReturnConfiguredCost()
+    {
+        var strategy = new ExpressShippingStrategy(150m);
+
+        Assert.AreEqual(150m, strategy.Calculate());
+    }
 }
