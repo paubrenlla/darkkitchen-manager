@@ -150,4 +150,14 @@ public class PromotionTests
 
         Assert.AreEqual(0, promotion.Products.Count);
     }
+
+    [TestMethod]
+    public void Deactivate_ShouldSetIsActiveToFalse()
+    {
+        var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        promotion.Deactivate();
+
+        Assert.IsFalse(promotion.IsActive);
+    }
 }
