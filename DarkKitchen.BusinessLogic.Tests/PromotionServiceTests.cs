@@ -258,62 +258,6 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void GetBestDiscountForProduct_WithActivePromo_ReturnsBestDiscount()
-    {
-        Guid productId = _testProducts[0].Id;
-        DateTime date = DateTime.Now;
-
-        var result = _promotionService.GetBestDiscountForProduct(productId, date);
-
-        Assert.AreEqual(10m, result);
-    }
-
-    [TestMethod]
-    public void GetBestDiscountForProduct_NoActivePromos_ReturnsZero()
-    {
-        Guid productId = _testProducts[0].Id;
-        DateTime date = DateTime.Now.AddDays(60);
-
-        var result = _promotionService.GetBestDiscountForProduct(productId, date);
-
-        Assert.AreEqual(0m, result);
-    }
-
-    [TestMethod]
-    public void GetBestDiscountForProduct_MultiplePromos_ReturnsHighestDiscount()
-    {
-        var line = new ProductLine("Combo burgers");
-        var category = new ProductCategory("Parrilla");
-        var sharedProduct = new Product("SHARED01", "Producto Compartido", "Descripcion larga del producto compartido",
-            line, category, 100m, [new ProductImage("shared.jpg", 120000)]);
-
-        var start = new DateTime(2025, 1, 1);
-        var end = new DateTime(2025, 12, 31);
-        var promoLow = new Promotion("Promo 10%", 10, start, end, [sharedProduct]);
-        var promoHigh = new Promotion("Promo 40%", 40, start, end, [sharedProduct]);
-
-        _mockPromotionRepository.Setup(r => r.GetAll())
-            .Returns([promoLow, promoHigh]);
-
-        var result = _promotionService.GetBestDiscountForProduct(sharedProduct.Id, new DateTime(2025, 6, 1));
-
-        Assert.AreEqual(40m, result);
-    }
-
-    [TestMethod]
-    public void GetBestDiscountForProduct_ProductNotInAnyPromo_ReturnsZero()
-    {
-        var line = new ProductLine("Desayunos");
-        var category = new ProductCategory("Fritos");
-        var unrelatedProduct = new Product("DESAY01", "Medialunas de manteca",
-            "Medialunas clasicas de manteca artesanal", line, category, 80m, [new ProductImage("medialunas.jpg", 95000)]);
-
-        var result = _promotionService.GetBestDiscountForProduct(unrelatedProduct.Id, new DateTime(2025, 6, 1));
-
-        Assert.AreEqual(0m, result);
-    }
-
-    [TestMethod]
     public void GetPromotions_NoDateProvided_ReturnsOnlyCurrentlyActivePromotions()
     {
         var line = new ProductLine("Combo burgers");
@@ -366,5 +310,48 @@ public class PromotionServiceTests
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_WithActivePromo_ReturnsNameAndDiscount()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now);
+
+        Assert.AreEqual("Black Friday", name);
+        Assert.AreEqual(10m, discount);
+    }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_NoActivePromo_ReturnsNullAndZero()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now.AddDays(60));
+
+        Assert.IsNull(name);
+        Assert.AreEqual(0m, discount);
+    }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_MultiplePromos_ReturnsHighestOne()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("SHARED01", "Producto Compartido", "Descripcion larga del producto compartido",
+            line, category, 100m, [new ProductImage("shared.jpg", 120000)]);
+
+        DateTime start = DateTime.Now.AddDays(-1);
+        DateTime end = DateTime.Now.AddDays(30);
+        var promoLow = new Promotion("Promo Baja", 10, start, end, [product]);
+        var promoHigh = new Promotion("Promo Alta", 40, start, end, [product]);
+
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([promoLow, promoHigh]);
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
+
+        Assert.AreEqual("Promo Alta", name);
+        Assert.AreEqual(40m, discount);
     }
 }

@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
@@ -6,13 +7,20 @@ using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class OrderService(IOrderRepository orderRepository) : IOrderService
+public class OrderService(
+    IOrderRepository orderRepository,
+    IProductRepository productRepository,
+    IPromotionService promotionService,
+    IShippingCostCalculator shippingCalculator) : IOrderService
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
+    private readonly IProductRepository _productRepository = productRepository;
+    private readonly IPromotionService _promotionService = promotionService;
+    private readonly IShippingCostCalculator _shippingCalculator = shippingCalculator;
 
     public OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request)
     {
-        if(!Enum.TryParse<DeliveryType>(request.DeliveryType, true, out var deliveryType))
+        if(!Enum.TryParse(request.DeliveryType, true, out DeliveryType deliveryType))
         {
             throw new ArgumentException("Tipo de entrega inválido.");
         }
@@ -24,10 +32,33 @@ public class OrderService(IOrderRepository orderRepository) : IOrderService
             request.Address.City,
             request.Address.Country);
 
-        var items = request.Items.Select(i =>
-            new OrderItem(i.ProductId, i.Quantity, 0m)).ToList();
+        var orderItems = new List<OrderItem>();
 
-        var order = new Order(clientId, address, deliveryType, items);
+        foreach(OrderItemDto itemReq in request.Items)
+        {
+            Product product = _productRepository.GetAll().FirstOrDefault(p => p.Id == itemReq.ProductId)
+                              ?? throw new KeyNotFoundException($"El producto {itemReq.ProductId} no existe.");
+
+            if(!product.IsActive)
+            {
+                throw new InvalidOperationException(
+                    $"No es posible realizar el pedido porque el producto '{product.Name}' está inactivo.");
+            }
+
+            var (promoName, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
+
+            orderItems.Add(new OrderItem(
+                product.Id,
+                itemReq.Quantity,
+                product.Price,
+                discount,
+                promoName));
+        }
+
+        var shippingCost = _shippingCalculator.CalculateShippingCost(deliveryType);
+
+        var order = new Order(clientId, address, deliveryType, orderItems, shippingCost);
+
         _orderRepository.Add(order);
 
         return Converter.ToOrderCreateResponse(order);
@@ -35,8 +66,7 @@ public class OrderService(IOrderRepository orderRepository) : IOrderService
 
     public OrderDetailResponse GetOrderById(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        return Converter.ToOrderDetailResponse(order);
+        return Converter.ToOrderDetailResponse(GetOrderOrThrow(orderId));
     }
 
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
@@ -51,42 +81,41 @@ public class OrderService(IOrderRepository orderRepository) : IOrderService
 
     public void Prepare(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Prepare(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Prepare(o);
+        _orderRepository.Update(o);
     }
 
     public void Cancel(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Cancel(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Cancel(o);
+        _orderRepository.Update(o);
     }
 
     public void Ship(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Ship(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Ship(o);
+        _orderRepository.Update(o);
     }
 
     public void Deliver(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).Deliver(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Deliver(o);
+        _orderRepository.Update(o);
     }
 
     public void NotDelivered(Guid orderId)
     {
-        var order = GetOrderOrThrow(orderId);
-        OrderStateFactory.Create(order.State).NotDelivered(order);
-        _orderRepository.Update(order);
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).NotDelivered(o);
+        _orderRepository.Update(o);
     }
 
     private Order GetOrderOrThrow(Guid orderId)
     {
-        return _orderRepository.GetById(orderId)
-               ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
+        return _orderRepository.GetById(orderId) ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
     }
 }

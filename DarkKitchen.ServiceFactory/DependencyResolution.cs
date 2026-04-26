@@ -2,6 +2,7 @@ using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
@@ -29,6 +30,9 @@ public static class DependencyResolution
         services.AddScoped<IUserService, UserService>();
         services.AddSingleton<IPromotionRepository, InMemoryPromotionRepository>();
         services.AddScoped<IPromotionService, PromotionService>();
+        services.AddScoped<IShippingStrategy>(sp => new ExpressShippingStrategy(150m));
+        services.AddScoped<IShippingStrategy>(sp => new TwentyFourHoursShippingStrategy(50m));
+        services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
 
         return services;
     }
