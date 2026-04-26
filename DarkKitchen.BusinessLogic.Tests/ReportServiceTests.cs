@@ -273,6 +273,23 @@ public class ReportServiceTests
         Assert.AreEqual("Cliente desconocido", result.Periods[0].Clients[0].ClientName);
     }
 
+    [TestMethod]
+    public void GetSalesReport_ShouldCalculateClientTotal()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var clientId = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+
+        var order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 5), 100m);
+        var order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 200m);
+
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(order1.Total + order2.Total, result.Periods[0].Clients[0].Total);
+    }
+
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
         var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
