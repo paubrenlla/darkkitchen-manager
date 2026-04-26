@@ -322,4 +322,36 @@ public class PromotionServiceTests
         Assert.AreEqual("Black Friday", name);
         Assert.AreEqual(10m, discount);
     }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_NoActivePromo_ReturnsNullAndZero()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now.AddDays(60));
+
+        Assert.IsNull(name);
+        Assert.AreEqual(0m, discount);
+    }
+
+    [TestMethod]
+    public void GetBestPromotionForProduct_MultiplePromos_ReturnsHighestOne()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("SHARED01", "Producto Compartido", "Descripcion larga del producto compartido",
+            line, category, 100m, [new ProductImage("shared.jpg", 120000)]);
+
+        DateTime start = DateTime.Now.AddDays(-1);
+        DateTime end = DateTime.Now.AddDays(30);
+        var promoLow = new Promotion("Promo Baja", 10, start, end, [product]);
+        var promoHigh = new Promotion("Promo Alta", 40, start, end, [product]);
+
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([promoLow, promoHigh]);
+
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
+
+        Assert.AreEqual("Promo Alta", name);
+        Assert.AreEqual(40m, discount);
+    }
 }
