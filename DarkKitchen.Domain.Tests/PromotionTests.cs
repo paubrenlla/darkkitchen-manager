@@ -120,4 +120,12 @@ public class PromotionTests
         var promotion = new Promotion("Nombre Valido", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
         promotion.Update("Ab", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void UpdatePromotion_WithInvalidDiscount_ShouldThrow()
+    {
+        var promotion = new Promotion("Nombre Valido", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+        promotion.Update("Nombre Valido", 0, DateTime.Today, DateTime.Today.AddDays(5), []);
+    }
 }
