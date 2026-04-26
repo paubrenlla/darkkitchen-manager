@@ -4,8 +4,7 @@ namespace DarkKitchen.Domain.Users;
 
 public class User
 {
-    public User(string name, string surname, string email, PhoneNumber phone, string password,
-        Role role)
+    public User(string name, string surname, string email, PhoneNumber phone, string password, Role role, IPasswordHasher passwordHasher)
     {
         ValidateName(name);
         ValidateSurname(surname);
@@ -17,12 +16,12 @@ public class User
         Surname = surname;
         Email = email;
         Phone = phone;
-        Password = password;
+        HashedPassword = passwordHasher.HashPassword(password);
         Role = role;
     }
 
-    public User(string name, string surname, string email, PhoneNumber phoneNumber, string password)
-        : this(name, surname, email, phoneNumber, password, Role.Cliente)
+    public User(string name, string surname, string email, PhoneNumber phone, string password, IPasswordHasher passwordHasher)
+        : this(name, surname, email, phone, password, Role.Cliente, passwordHasher)
     {
     }
 
@@ -31,7 +30,7 @@ public class User
     public string Surname { get; private set; }
     public string Email { get; private set; }
     public PhoneNumber Phone { get; private set; }
-    public string Password { get; private set; }
+    public string HashedPassword { get; private set; }
     public Role Role { get; private set; }
 
     private static void ValidateName(string name)
