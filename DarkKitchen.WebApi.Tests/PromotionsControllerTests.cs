@@ -37,6 +37,7 @@ public class PromotionsControllerTests
                 EndDate = new DateTime(2025, 12, 31),
                 Products = ["BURG02"]
             }
+
         ];
 
         _controller = new PromotionsController(_mockService.Object);

@@ -37,4 +37,12 @@ public class PromotionsController(IPromotionService promotionService) : Controll
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrativo")]
+    public IActionResult UpdatePromotion(Guid id, [FromBody] PromotionCreateRequest request)
+    {
+        PromotionCreateResponse response = _promotionService.UpdatePromotion(id, request);
+        return Ok(response);
+    }
 }
