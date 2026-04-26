@@ -1,5 +1,6 @@
 ﻿using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Users;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
 using Moq;
@@ -197,5 +198,41 @@ public class ReportServiceTests
 
         Assert.AreEqual(0, result.Periods.Count);
         Assert.AreEqual(0, result.GrandTotal);
+    }
+
+    [TestMethod]
+    public void GetSalesReport_ShouldGroupByYearAndMonth()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var clientId = Guid.NewGuid();
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+
+        var order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
+        var order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
+
+        _orderRepositoryMock.Setup(r => r.GetAll()).Returns([order1, order2]);
+
+        var result = _reportService.GetSalesReport();
+
+        Assert.AreEqual(2, result.Periods.Count);
+        Assert.AreEqual(2026, result.Periods[0].Year);
+        Assert.AreEqual(1, result.Periods[0].Month);
+        Assert.AreEqual(2026, result.Periods[1].Year);
+        Assert.AreEqual(2, result.Periods[1].Month);
+    }
+
+    private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
+    {
+        var items = new List<OrderItem> { new OrderItem(Guid.NewGuid(), 1, itemPrice) };
+        var order = new Order(clientId, address, DeliveryType.Express, items);
+        order.SetCreatedAt(date);
+        return order;
+    }
+
+    private static User CreateUser(string name, string surname)
+    {
+        var strategy = new UruguayPhoneValidationStrategy();
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        return new User(name, surname, $"{name}@test.com", phone, "Valid1Password!@", Role.Cliente);
     }
 }
