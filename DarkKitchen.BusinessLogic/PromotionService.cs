@@ -49,7 +49,19 @@ public class PromotionService(
 
     public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request)
     {
-        throw new NotImplementedException();
+        Promotion existingPromo = _promotionRepository.GetAll().FirstOrDefault(p => p.Id == id);
+        var selectedProducts = _productRepository.GetAll()
+            .Where(p => request.ProductCodes.Contains(p.Code))
+            .ToList();
+
+        existingPromo.Update(
+            request.Name,
+            request.DiscountPercentage,
+            request.StartDate,
+            request.EndDate,
+            selectedProducts);
+
+        return Converter.ToPromotionCreateResponse(existingPromo);
     }
 
     public decimal GetBestDiscountForProduct(Guid productId, DateTime date)
