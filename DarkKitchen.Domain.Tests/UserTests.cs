@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Users;
+using Moq;
 
 namespace DarkKitchen.Domain.Tests;
 
@@ -11,11 +12,20 @@ public class UserTests
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
     private static readonly PhoneNumber ValidPhone = PhoneNumber.Create("+598", "094123456", UruguayStrategy);
+    private IPasswordHasher _passwordHasher = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        var mock = new Mock<IPasswordHasher>();
+        mock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        _passwordHasher = mock.Object;
+    }
 
     [TestMethod]
     public void CreateUser_WithValidData_CreatesSuccessfully()
     {
-        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword);
+        var user = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
 
         Assert.IsNotNull(user);
         Assert.AreEqual(ValidName, user.Name);
@@ -27,7 +37,7 @@ public class UserTests
     public void CreateUser_WithEmptyName_ThrowsArgumentException()
     {
         var name = string.Empty;
-        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword);
+        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -35,7 +45,7 @@ public class UserTests
     public void CreateUser_WithNullName_ThrowsArgumentException()
     {
         string name = null!;
-        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword);
+        new User(name, ValidSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -43,7 +53,7 @@ public class UserTests
     public void CreateUser_WithShortSurname_ThrowsArgumentException()
     {
         var shortSurname = "Al";
-        new User("Juan", shortSurname, ValidEmail, ValidPhone, ValidPassword);
+        new User("Juan", shortSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -51,7 +61,7 @@ public class UserTests
     public void CreateUser_WithLongSurname_ThrowsArgumentException()
     {
         var longSurname = new string('a', 26);
-        new User(ValidName, longSurname, ValidEmail, ValidPhone, ValidPassword);
+        new User(ValidName, longSurname, ValidEmail, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -59,7 +69,7 @@ public class UserTests
     public void CreateUser_WithEmptyEmail_ThrowsArgumentException()
     {
         var email = string.Empty;
-        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword);
+        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -67,7 +77,7 @@ public class UserTests
     public void CreateUser_WithInvalidEmailFormat_ThrowsArgumentException()
     {
         var email = "invalid.email.com";
-        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword);
+        new User(ValidName, ValidSurname, email, ValidPhone, ValidPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -75,7 +85,7 @@ public class UserTests
     public void CreateUser_WithShortPassword_ThrowsArgumentException()
     {
         var shortPassword = "Short1!pass";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, shortPassword);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, shortPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -83,7 +93,7 @@ public class UserTests
     public void CreateUser_WithLongPassword_ThrowsArgumentException()
     {
         var longPassword = "Valid1Password!@1234567890ABC";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, longPassword);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, longPassword, _passwordHasher);
     }
 
     [TestMethod]
@@ -91,7 +101,7 @@ public class UserTests
     public void CreateUser_PasswordWithoutUppercase_ThrowsArgumentException()
     {
         var noUpper = "valid1password!@";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noUpper);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noUpper, _passwordHasher);
     }
 
     [TestMethod]
@@ -99,7 +109,7 @@ public class UserTests
     public void CreateUser_PasswordWithoutLowercase_ThrowsArgumentException()
     {
         var noLower = "VALID1PASSWORD!@";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noLower);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noLower, _passwordHasher);
     }
 
     [TestMethod]
@@ -107,7 +117,7 @@ public class UserTests
     public void CreateUser_PasswordWithoutNumber_ThrowsArgumentException()
     {
         var noNumber = "ValidPassword!@#";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noNumber);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noNumber, _passwordHasher);
     }
 
     [TestMethod]
@@ -115,7 +125,7 @@ public class UserTests
     public void CreateUser_PasswordWithoutSymbol_ThrowsArgumentException()
     {
         var noSymbol = "Valid1PasswordAA";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noSymbol);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, noSymbol, _passwordHasher);
     }
 
     [TestMethod]
@@ -123,7 +133,7 @@ public class UserTests
     public void CreateUser_PasswordWithSequence_ThrowsArgumentException()
     {
         var withSequence = "Valid1Password!@123";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withSequence, _passwordHasher);
     }
 
     [TestMethod]
@@ -131,7 +141,7 @@ public class UserTests
     public void CreateUser_PasswordWithDescendingSequence_ThrowsArgumentException()
     {
         var withDescendingSequence = "Valid1Password!@321";
-        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withDescendingSequence);
+        new User(ValidName, ValidSurname, ValidEmail, ValidPhone, withDescendingSequence, _passwordHasher);
     }
 
     [TestMethod]
@@ -139,7 +149,7 @@ public class UserTests
     {
         IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
         var phone = PhoneNumber.Create("+598", "094123456", strategy);
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente);
+        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasher);
         Guid originalId = user.Id;
 
         var newPhone = PhoneNumber.Create("+598", "094999888", strategy);

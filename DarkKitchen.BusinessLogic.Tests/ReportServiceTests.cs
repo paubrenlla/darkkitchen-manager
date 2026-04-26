@@ -11,7 +11,6 @@ namespace DarkKitchen.BusinessLogic.Tests;
 public class ReportServiceTests
 {
     private Mock<IOrderRepository> _orderRepositoryMock = null!;
-    private Mock<IPasswordHasher> _passwordHasherMock = null!;
     private Guid _product1Id;
     private Guid _product2Id;
     private Guid _product3Id;
@@ -34,6 +33,8 @@ public class ReportServiceTests
             _orderRepositoryMock.Object,
             _productRepositoryMock.Object,
             _userRepositoryMock.Object);
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
 
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
@@ -221,7 +222,7 @@ public class ReportServiceTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
 
         Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
         Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
@@ -242,7 +243,7 @@ public class ReportServiceTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
 
         Order validOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
         Order cancelledOrder = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 9999m);
@@ -261,8 +262,8 @@ public class ReportServiceTests
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId1 = Guid.NewGuid();
         var clientId2 = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
-        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
+        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin", _passwordHasherMock.Object));
 
         Order order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
         Order order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
@@ -294,7 +295,7 @@ public class ReportServiceTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
 
         Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 5), 100m);
         Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 20), 200m);
@@ -312,8 +313,8 @@ public class ReportServiceTests
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId1 = Guid.NewGuid();
         var clientId2 = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez"));
-        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId1)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
+        _userRepositoryMock.Setup(r => r.GetById(clientId2)).Returns(CreateUser("Yuri", "Gagarin", _passwordHasherMock.Object));
 
         Order order1 = CreateOrderWithDate(clientId1, address, new DateTime(2026, 1, 15), 100m);
         Order order2 = CreateOrderWithDate(clientId2, address, new DateTime(2026, 1, 20), 200m);
@@ -330,7 +331,7 @@ public class ReportServiceTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var clientId = Guid.NewGuid();
-        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez"));
+        _userRepositoryMock.Setup(r => r.GetById(clientId)).Returns(CreateUser("Juan", "Perez", _passwordHasherMock.Object));
 
         Order order1 = CreateOrderWithDate(clientId, address, new DateTime(2026, 1, 15), 100m);
         Order order2 = CreateOrderWithDate(clientId, address, new DateTime(2026, 2, 10), 200m);
@@ -350,10 +351,10 @@ public class ReportServiceTests
         return order;
     }
 
-    private static User CreateUser(string name, string surname)
+    private static User CreateUser(string name, string surname, IPasswordHasher hasher)
     {
         var strategy = new UruguayPhoneValidationStrategy();
         var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
-        return new User(name, surname, $"{name}@test.com", phone, "Valid1Password!@", Role.Cliente);
+        return new User(name, surname, $"{name}@test.com", phone, "Valid1Password!@", Role.Cliente, hasher);
     }
 }
