@@ -310,4 +310,24 @@ public class PromotionServiceTests
 
         Assert.AreEqual(0m, result);
     }
+
+    [TestMethod]
+    public void GetPromotions_NoDateProvided_ReturnsOnlyCurrentlyActivePromotions()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m);
+
+        var activePromo = new Promotion("Vigente", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
+        var expiredPromo =
+            new Promotion("Vencida", 20, new DateTime(2020, 1, 1), new DateTime(2020, 12, 31), [product]);
+
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([activePromo, expiredPromo]);
+
+        var result = _promotionService.GetPromotions(null, null, null).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Vigente", result[0].Name);
+    }
 }
