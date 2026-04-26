@@ -15,9 +15,15 @@ public class PromotionService(
 
     public IEnumerable<PromotionCreateResponse> GetPromotions(DateTime? date, string? line, string? productCode)
     {
-        IEnumerable<Promotion>? promotions = _promotionRepository.GetAll();
+        IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
 
-        promotions = FilterByDate(promotions, date);
+        DateTime dateToFilter = date ?? DateTime.Now;
+
+        promotions = promotions.Where(p =>
+            dateToFilter >= p.StartDate &&
+            dateToFilter <= p.EndDate &&
+            p.IsActive);
+
         promotions = FilterByLine(promotions, line);
         promotions = FilterByProductCode(promotions, productCode);
 
