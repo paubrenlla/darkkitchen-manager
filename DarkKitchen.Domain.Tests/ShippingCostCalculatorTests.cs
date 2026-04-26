@@ -5,46 +5,47 @@ namespace DarkKitchen.Domain.Tests;
 [TestClass]
 public class ShippingCostCalculatorTests
 {
-    [TestMethod]
-    public void CalculateShippingCost_Express_ShouldReturnExpressPrice()
+    private ShippingCostCalculator _calculator = null!;
+
+    [TestInitialize]
+    public void Setup()
     {
-        var calculator = new ShippingCostCalculator(250m, 100m);
-
-        var cost = calculator.CalculateShippingCost(DeliveryType.Express);
-
-        Assert.AreEqual(250m, cost);
+        var strategies = new List<IShippingStrategy>
+        {
+            new ExpressShippingStrategy(150m), new TwentyFourHoursShippingStrategy(50m)
+        };
+        _calculator = new ShippingCostCalculator(strategies);
     }
 
     [TestMethod]
-    public void CalculateShippingCost_TwentyFourHours_ShouldReturnStandardPrice()
+    public void CalculateShippingCost_Express_ShouldReturnExpressCost()
     {
-        var calculator = new ShippingCostCalculator(200m, 80m);
+        var result = _calculator.CalculateShippingCost(DeliveryType.Express);
 
-        var cost = calculator.CalculateShippingCost(DeliveryType.TwentyFourHours);
-
-        Assert.AreEqual(80m, cost);
+        Assert.AreEqual(150m, result);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void Constructor_WithNegativeExpressPrice_ShouldThrowException()
+    public void CalculateShippingCost_TwentyFourHours_ShouldReturnTwentyFourHoursCost()
     {
-        new ShippingCostCalculator(-50m, 100m);
-    }
+        var result = _calculator.CalculateShippingCost(DeliveryType.TwentyFourHours);
 
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void Constructor_WithNegative24hsPrice_ShouldThrowException()
-    {
-        new ShippingCostCalculator(200m, -50m);
+        Assert.AreEqual(50m, result);
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public void CalculateShippingCost_WithInvalidDeliveryType_ShouldThrowException()
+    public void CalculateShippingCost_UnsupportedDeliveryType_ShouldThrow()
     {
-        var calculator = new ShippingCostCalculator(200m, 100m);
+        var emptyCalculator = new ShippingCostCalculator([]);
 
-        calculator.CalculateShippingCost((DeliveryType)999);
+        emptyCalculator.CalculateShippingCost(DeliveryType.Express);
+    }
+
+    [TestMethod]
+    public void CalculateShippingCost_WhenMultipleStrategiesRegistered_UsesCorrectOne()
+    {
+        Assert.AreEqual(150m, _calculator.CalculateShippingCost(DeliveryType.Express));
+        Assert.AreEqual(50m, _calculator.CalculateShippingCost(DeliveryType.TwentyFourHours));
     }
 }
