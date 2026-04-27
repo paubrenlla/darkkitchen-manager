@@ -78,13 +78,17 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         return Converter.ToUserCreateResponse(existingUser);
     }
 
-    public void DeleteUser(Guid adminId, Guid userId)
+    public UserCreateResponse DeleteUser(Guid adminId, Guid userId)
     {
         if(adminId == userId)
         {
             throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
         }
 
+        User user = _userRepository.GetById(userId)
+                    ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+
         _userRepository.Delete(userId);
+        return Converter.ToUserCreateResponse(user);
     }
 }

@@ -22,6 +22,7 @@ public class UserController(IUserService userService) : ControllerBase
             if(request.Role != null)
             {
                 var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
                 if(callerRole != "Administrativo")
                 {
                     return Forbid();
@@ -35,18 +36,30 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult GetUsers(
         [FromQuery] string? name,
         [FromQuery] string? surname)
     {
-        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname);
+        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname).ToList();
+
+        if(!users.Any())
+        {
+            return NoContent();
+        }
+
         return Ok(users);
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request)
     {
         try
@@ -66,13 +79,14 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult DeleteUser(Guid id)
     {
         try
         {
             var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            _userService.DeleteUser(callerId, id);
-            return NoContent();
+            UserCreateResponse response = _userService.DeleteUser(callerId, id);
+            return Ok(response);
         }
         catch(InvalidOperationException ex)
         {

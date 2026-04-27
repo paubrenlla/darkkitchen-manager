@@ -168,13 +168,21 @@ public class UserServiceTests
     }
 
     [TestMethod]
-    public void DeleteUser_ValidRequest_ShouldCallRepositoryDelete()
+    public void DeleteUser_ValidRequest_ShouldReturnDeletedUserAndCallRepository()
     {
         var adminId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        _userService.DeleteUser(adminId, userId);
+        IPhoneValidationStrategy strategy = new UruguayPhoneValidationStrategy();
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094123456", strategy);
+        var existingUser = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, _passwordHasherMock.Object);
 
+        _userRepositoryMock.Setup(r => r.GetById(userId)).Returns(existingUser);
+
+        UserCreateResponse result = _userService.DeleteUser(adminId, userId);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Juan", result.Name);
         _userRepositoryMock.Verify(r => r.Delete(userId), Times.Once);
     }
 
