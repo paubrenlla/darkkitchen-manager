@@ -46,7 +46,12 @@ public class UserController(IUserService userService) : ControllerBase
         [FromQuery] string? name,
         [FromQuery] string? surname)
     {
-        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname);
+        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname).ToList();
+        if(!users.Any())
+        {
+            return NoContent();
+        }
+
         return Ok(users);
     }
 
