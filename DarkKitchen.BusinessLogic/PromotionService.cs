@@ -62,7 +62,7 @@ public class PromotionService(
 
     public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request)
     {
-        Promotion existingPromo = _promotionRepository.GetAll().FirstOrDefault(p => p.Id == id)
+        Promotion existingPromo = _promotionRepository.GetById(id)
                                   ?? throw new KeyNotFoundException("La promoción no existe.");
 
         var selectedProducts = _productRepository.GetAll()
@@ -81,6 +81,7 @@ public class PromotionService(
             request.EndDate,
             selectedProducts);
 
+        _promotionRepository.Update(existingPromo);
         return Converter.ToPromotionCreateResponse(existingPromo);
     }
 

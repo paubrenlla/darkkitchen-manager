@@ -43,7 +43,9 @@ public class PromotionServiceTests
 
         _mockProductRepository.Setup(r => r.GetAll()).Returns(_testProducts);
         _mockPromotionRepository.Setup(r => r.GetAll()).Returns(_testPromotions);
-
+        _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[0].Id)).Returns(_testPromotions[0]);
+        _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[1].Id)).Returns(_testPromotions[1]);
+        _mockPromotionRepository.Setup(r => r.GetById(It.Is<Guid>(id => id != _testPromotions[0].Id && id != _testPromotions[1].Id))).Returns((Promotion?)null);
         _promotionService = new PromotionService(
             _mockPromotionRepository.Object,
             _mockProductRepository.Object);

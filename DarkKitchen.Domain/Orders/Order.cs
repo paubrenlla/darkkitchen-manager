@@ -3,6 +3,11 @@ namespace DarkKitchen.Domain.Orders;
 public class Order
 {
     private readonly List<OrderItem> _items;
+    protected Order()
+    {
+        _items = [];
+        DeliveryAddress = null!;
+    }
 
     public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items, decimal shippingCost)
     {

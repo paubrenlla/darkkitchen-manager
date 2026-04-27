@@ -25,11 +25,13 @@ public class OrderItem
         Price = price;
         DiscountPercentage = discountPercentage;
         AppliedPromotionName = appliedPromotionName;
+        Id = Guid.NewGuid();
     }
 
     public Guid ProductId { get; private set; }
     public int Quantity { get; }
     public decimal Price { get; }
+    public Guid Id { get; private set; }
 
     public decimal DiscountPercentage { get; }
     public string? AppliedPromotionName { get; private set; }

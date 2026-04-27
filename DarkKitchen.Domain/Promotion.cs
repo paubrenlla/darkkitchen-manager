@@ -4,6 +4,12 @@ namespace DarkKitchen.Domain;
 
 public class Promotion
 {
+    protected Promotion()
+    {
+        Name = null!;
+        Products = [];
+    }
+
     public Promotion(string name, int discountPercentage, DateTime startDate, DateTime endDate,
         List<Product> products)
     {
