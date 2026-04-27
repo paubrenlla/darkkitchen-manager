@@ -146,6 +146,18 @@ public class UserControllerTests
     }
 
     [TestMethod]
+    public void GetUsers_NoResults_ReturnsNoContent()
+    {
+        _userServiceMock.Setup(s => s.GetUsers(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns([]);
+
+        var result = _userController.GetUsers("Inexistente", null) as NoContentResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(204, result.StatusCode);
+    }
+
+    [TestMethod]
     public void UpdateUser_ValidRequest_ReturnsOk()
     {
         var userId = Guid.NewGuid();
