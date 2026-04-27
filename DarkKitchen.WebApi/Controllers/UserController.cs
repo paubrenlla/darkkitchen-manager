@@ -75,8 +75,8 @@ public class UserController(IUserService userService) : ControllerBase
         try
         {
             var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            _userService.DeleteUser(callerId, id);
-            return NoContent();
+            UserCreateResponse response = _userService.DeleteUser(callerId, id);
+            return Ok(response);
         }
         catch(InvalidOperationException ex)
         {
