@@ -100,6 +100,28 @@ public class UserControllerTests
     }
 
     [TestMethod]
+    public void CreateUser_DuplicateEmail_ReturnsBadRequest()
+    {
+        var request = new UserCreateRequest
+        {
+            Name = "Lucia",
+            Surname = "Gomez",
+            Email = "duplicado@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094111222",
+            Password = "Valid1Password!@",
+        };
+
+        _userServiceMock.Setup(s => s.CreateUser(request))
+            .Throws(new InvalidOperationException("El email duplicado@test.com ya está en uso."));
+
+        var result = _userController.CreateUser(request) as BadRequestObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
+    }
+
+    [TestMethod]
     public void GetUsers_ReturnsOkWithList()
     {
         List<UserCreateResponse> users =
