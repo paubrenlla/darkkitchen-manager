@@ -4,6 +4,15 @@ namespace DarkKitchen.Domain.Users;
 
 public class User
 {
+    protected User()
+    {
+        Name = null!;
+        Surname = null!;
+        Email = null!;
+        Phone = null!;
+        HashedPassword = null!;
+    }
+
     public User(string name, string surname, string email, PhoneNumber phone, string password, Role role, IPasswordHasher passwordHasher)
     {
         ValidateName(name);
