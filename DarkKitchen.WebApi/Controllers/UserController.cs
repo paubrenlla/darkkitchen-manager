@@ -22,6 +22,7 @@ public class UserController(IUserService userService) : ControllerBase
             if(request.Role != null)
             {
                 var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
                 if(callerRole != "Administrativo")
                 {
                     return Forbid();
@@ -42,11 +43,13 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult GetUsers(
         [FromQuery] string? name,
         [FromQuery] string? surname)
     {
         IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname).ToList();
+
         if(!users.Any())
         {
             return NoContent();
@@ -56,6 +59,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request)
     {
         try
@@ -75,6 +79,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrativo")]
     public IActionResult DeleteUser(Guid id)
     {
         try
