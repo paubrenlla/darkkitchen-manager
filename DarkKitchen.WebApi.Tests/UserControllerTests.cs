@@ -1,7 +1,9 @@
+using System.Reflection;
 using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -291,6 +293,60 @@ public class UserControllerTests
     public void CreateUser_PreparadorCreatesWithRole_ReturnsForbid()
     {
         SetCallerContext(_callerId, "Preparador");
+
+        var request = new UserCreateRequest
+        {
+            Name = "Carlos",
+            Surname = "Lopez",
+            Email = "carlos@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094111333",
+            Password = "Valid1Password!@",
+            Role = "Preparador",
+        };
+
+        var result = _userController.CreateUser(request) as ForbidResult;
+
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void GetUsers_ShouldHaveAuthorizeAttributeWithAdministrativoRole()
+    {
+        var method = typeof(UserController).GetMethod(nameof(UserController.GetUsers));
+        var attribute = method?.GetCustomAttributes(typeof(AuthorizeAttribute), true)
+            .FirstOrDefault() as AuthorizeAttribute;
+
+        Assert.IsNotNull(attribute);
+        Assert.AreEqual("Administrativo", attribute.Roles);
+    }
+
+    [TestMethod]
+    public void UpdateUser_ShouldHaveAuthorizeAttributeWithAdministrativoRole()
+    {
+        var method = typeof(UserController).GetMethod(nameof(UserController.UpdateUser), [typeof(Guid), typeof(UserUpdateRequest)]);
+        var attribute = method?.GetCustomAttributes(typeof(AuthorizeAttribute), true)
+            .FirstOrDefault() as AuthorizeAttribute;
+
+        Assert.IsNotNull(attribute);
+        Assert.AreEqual("Administrativo", attribute.Roles);
+    }
+
+    [TestMethod]
+    public void DeleteUser_ShouldHaveAuthorizeAttributeWithAdministrativoRole()
+    {
+        var method = typeof(UserController).GetMethod(nameof(UserController.DeleteUser));
+        var attribute = method?.GetCustomAttributes(typeof(AuthorizeAttribute), true)
+            .FirstOrDefault() as AuthorizeAttribute;
+
+        Assert.IsNotNull(attribute);
+        Assert.AreEqual("Administrativo", attribute.Roles);
+    }
+
+    [TestMethod]
+    public void CreateUser_ClienteCreatesWithRole_ReturnsForbid()
+    {
+        SetCallerContext(_callerId, "Cliente");
 
         var request = new UserCreateRequest
         {
