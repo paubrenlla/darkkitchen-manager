@@ -32,7 +32,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey("ProductId")
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Metadata.FindNavigation(nameof(Product.Images))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(p => p.Images)
+            .HasField("_images")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
