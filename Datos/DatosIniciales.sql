@@ -1,4 +1,4 @@
-﻿-- =============================================
+-- =============================================
 -- DarkKitchen - Script de datos de prueba
 -- Contraseña para todos los usuarios: ValidP@ssw0rd!8X
 -- =============================================
@@ -56,7 +56,7 @@ VALUES
         'Admin',
         'Jefe',
         'admin@bmb.com',
-        '$2a$11$5WJSaVVhBHDJnF1H/N2e2.Xr0F7JpC5vJKoB8oB0oVOJ7l1G5PNiy',
+        '$2a$12$aZGd1nXfOuqRCZd4fV4p4Op4R6bPZvKQAwbD2ODT.7wXQJQIqXPn2',
         'Administrativo',
         '+598',
         '094222333'
@@ -66,7 +66,7 @@ VALUES
         'Pepe',
         'Ruiz',
         'preparador@bmb.com',
-        '$2a$11$5WJSaVVhBHDJnF1H/N2e2.Xr0F7JpC5vJKoB8oB0oVOJ7l1G5PNiy',
+        '$2a$12$aZGd1nXfOuqRCZd4fV4p4Op4R6bPZvKQAwbD2ODT.7wXQJQIqXPn2',
         'Preparador',
         '+598',
         '094333444'
@@ -76,7 +76,7 @@ VALUES
         'Juan',
         'Sosa',
         'cliente@bmb.com',
-        '$2a$11$5WJSaVVhBHDJnF1H/N2e2.Xr0F7JpC5vJKoB8oB0oVOJ7l1G5PNiy',
+        '$2a$12$aZGd1nXfOuqRCZd4fV4p4Op4R6bPZvKQAwbD2ODT.7wXQJQIqXPn2',
         'Cliente',
         '+598',
         '094444555'
