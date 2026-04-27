@@ -225,16 +225,28 @@ public class UserControllerTests
     }
 
     [TestMethod]
-    public void DeleteUser_ValidRequest_ReturnsNoContent()
+    public void DeleteUser_ValidRequest_ReturnsOkWithUser()
     {
         var userId = Guid.NewGuid();
+        var response = new UserCreateResponse
+        {
+            Id = userId,
+            Name = "Lucia",
+            Surname = "Gomez",
+            Email = "lucia@test.com",
+            Phone = "+598094111222",
+            Role = "Cliente",
+        };
 
-        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId));
+        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId)).Returns(response);
 
-        var result = _userController.DeleteUser(userId) as NoContentResult;
+        var result = _userController.DeleteUser(userId) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
+        var body = result.Value as UserCreateResponse;
+        Assert.IsNotNull(body);
+        Assert.AreEqual("Lucia", body.Name);
     }
 
     [TestMethod]
