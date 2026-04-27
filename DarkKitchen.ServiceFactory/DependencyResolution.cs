@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.BusinessLogic.PhoneNumber;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkKitchen.ServiceFactory;
-
+[ExcludeFromCodeCoverage]
 public static class DependencyResolution
 {
     public static IServiceCollection AddProjectServices(this IServiceCollection services, IConfiguration configuration)

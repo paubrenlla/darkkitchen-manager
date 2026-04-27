@@ -166,4 +166,73 @@ public class SqlOrderRepositoryTests
 
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public void GetByClient_WithFromDate_ShouldFilterByFromDate()
+    {
+        var order = CreateOrder();
+        _repository.Add(order);
+
+        var from = DateTime.Now.AddHours(-1);
+        var result = _repository.GetByClient(_clientId, from: from).ToList();
+
+        Assert.AreEqual(1, result.Count);
+    }
+
+    [TestMethod]
+    public void GetByClient_WithToDate_ShouldFilterByToDate()
+    {
+        var order = CreateOrder();
+        _repository.Add(order);
+
+        var to = DateTime.Now.AddHours(1);
+        var result = _repository.GetByClient(_clientId, to: to).ToList();
+
+        Assert.AreEqual(1, result.Count);
+    }
+
+    [TestMethod]
+    public void GetByClient_WithFromDateAfterOrder_ShouldReturnEmpty()
+    {
+        var order = CreateOrder();
+        _repository.Add(order);
+
+        var from = DateTime.Now.AddHours(1);
+        var result = _repository.GetByClient(_clientId, from: from).ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetByClient_WithToDateBeforeOrder_ShouldReturnEmpty()
+    {
+        var order = CreateOrder();
+        _repository.Add(order);
+
+        var to = DateTime.Now.AddHours(-1);
+        var result = _repository.GetByClient(_clientId, to: to).ToList();
+
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetByStatus_WithStateFilter_ShouldFilterByState()
+    {
+        var order1 = CreateOrder();
+        var order2 = CreateOrder();
+        _repository.Add(order1);
+        _repository.Add(order2);
+
+        order2.TransitionTo(OrderState.Prepared);
+        _repository.Update(order2);
+        _context.ChangeTracker.Clear();
+
+        var from = DateTime.Now.AddHours(-1);
+        var to = DateTime.Now.AddHours(1);
+
+        var result = _repository.GetByStatus(from, to, state: "Prepared").ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(OrderState.Prepared, result[0].State);
+    }
 }

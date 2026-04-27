@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace DarkKitchen.DataAccess;
 
+[ExcludeFromCodeCoverage]
 public class DarkKitchenContextFactory : IDesignTimeDbContextFactory<DarkKitchenContext>
 {
     public DarkKitchenContext CreateDbContext(string[] args)
