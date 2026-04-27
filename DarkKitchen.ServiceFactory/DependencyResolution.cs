@@ -23,7 +23,7 @@ public static class DependencyResolution
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
-        services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
+        services.AddScoped<IOrderRepository, SqlOrderRepository>();
         services.AddSingleton<IUserRepository, SqlUserRepository>();
         services.AddSingleton<IProductRepository, SqlProductRepository>();
         services.AddScoped<ITokenService, TokenService>();
@@ -33,7 +33,7 @@ public static class DependencyResolution
         services.AddSingleton<IPhoneValidationStrategy, UruguayPhoneValidationStrategy>();
         services.AddScoped<IPhoneStrategyFactory, PhoneStrategyFactory>();
         services.AddScoped<IUserService, UserService>();
-        services.AddSingleton<IPromotionRepository, InMemoryPromotionRepository>();
+        services.AddScoped<IPromotionRepository, SqlPromotionRepository>();
         services.AddScoped<IPromotionService, PromotionService>();
         services.AddScoped<IShippingStrategy>(sp => new ExpressShippingStrategy(150m));
         services.AddScoped<IShippingStrategy>(sp => new TwentyFourHoursShippingStrategy(50m));

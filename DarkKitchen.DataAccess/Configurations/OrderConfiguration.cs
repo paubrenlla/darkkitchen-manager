@@ -36,7 +36,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasForeignKey("OrderId")
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Metadata.FindNavigation(nameof(Order.Items))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(o => o.Items)
+            .HasField("_items")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

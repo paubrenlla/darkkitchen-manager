@@ -1,6 +1,5 @@
 ﻿using DarkKitchen.Domain.Users;
 using DarkKitchen.IDataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace DarkKitchen.DataAccess;
 

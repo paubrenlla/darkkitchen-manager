@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DarkKitchen.DataAccess;
 
-public class DarkKitchenContext : DbContext
+public class DarkKitchenContext(DbContextOptions<DarkKitchenContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Product> Products { get; set; }
@@ -14,11 +14,6 @@ public class DarkKitchenContext : DbContext
     public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Promotion> Promotions { get; set; }
-
-    public DarkKitchenContext(DbContextOptions<DarkKitchenContext> options)
-        : base(options)
-    {
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

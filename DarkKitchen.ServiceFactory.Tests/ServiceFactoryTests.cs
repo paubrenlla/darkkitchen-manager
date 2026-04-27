@@ -42,7 +42,7 @@ public class ServiceFactoryTests
         var repository = _provider.GetService<IUserRepository>();
 
         Assert.IsNotNull(repository);
-        Assert.IsInstanceOfType(repository, typeof(InMemoryUserRepository));
+        Assert.IsInstanceOfType(repository, typeof(SqlUserRepository));
     }
 
     [TestMethod]

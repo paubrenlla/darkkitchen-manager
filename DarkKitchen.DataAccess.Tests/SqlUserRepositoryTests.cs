@@ -1,5 +1,4 @@
-﻿using DarkKitchen.DataAccess;
-using DarkKitchen.Domain.Users;
+﻿using DarkKitchen.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 

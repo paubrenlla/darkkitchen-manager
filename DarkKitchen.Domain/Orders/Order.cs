@@ -2,7 +2,7 @@ namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
-    private List<OrderItem> _items;
+    private readonly List<OrderItem> _items;
     protected Order()
     {
         _items = [];

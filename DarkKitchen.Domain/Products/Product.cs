@@ -16,7 +16,7 @@ public class Product
     public bool IsActive { get; private set; }
     public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
-    private List<ProductImage> _images;
+    private readonly List<ProductImage> _images;
     protected Product()
     {
         Code = null!;
@@ -120,20 +120,20 @@ public class Product
     }
 
     public void UpdateDetails(string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
-{
-    ValidateName(name);
-    ValidateDescription(description);
-    ValidateLine(line);
-    ValidateCategory(category);
-    ValidatePrice(price);
-    ValidateImages(images);
+    {
+        ValidateName(name);
+        ValidateDescription(description);
+        ValidateLine(line);
+        ValidateCategory(category);
+        ValidatePrice(price);
+        ValidateImages(images);
 
-    Name = name;
-    Description = description;
-    Line = line;
-    Category = category;
-    Price = price;
-    _images.Clear();
-    _images.AddRange(images);
-}
+        Name = name;
+        Description = description;
+        Line = line;
+        Category = category;
+        Price = price;
+        _images.Clear();
+        _images.AddRange(images);
+    }
 }

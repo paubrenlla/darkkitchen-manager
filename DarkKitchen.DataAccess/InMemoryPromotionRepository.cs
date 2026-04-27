@@ -16,4 +16,13 @@ public class InMemoryPromotionRepository : IPromotionRepository
     {
         return _promotions;
     }
+
+    public Promotion? GetById(Guid id)
+    {
+        return _promotions.FirstOrDefault(p => p.Id == id);
+    }
+
+    public void Update(Promotion promotion)
+    {
+    }
 }
