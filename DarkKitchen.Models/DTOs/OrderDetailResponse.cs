@@ -1,7 +1,8 @@
-﻿namespace DarkKitchen.Models.DTOs;
+namespace DarkKitchen.Models.DTOs;
 
 public class OrderDetailResponse
 {
+    public Guid Id { get; set; }
     public int? OrderNumber { get; set; }
     public Guid ClientId { get; set; }
     public DateTime CreatedAt { get; set; }

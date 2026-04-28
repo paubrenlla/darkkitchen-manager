@@ -46,6 +46,7 @@ public static class Converter
     {
         return new OrderCreateResponse
         {
+            Id = order.Id,
             ClientId = order.ClientId,
             OrderNumber = order.OrderNumber ?? 0,
             Subtotal = order.Subtotal,
@@ -67,6 +68,7 @@ public static class Converter
     {
         return new OrderDetailResponse
         {
+            Id = order.Id,
             OrderNumber = order.OrderNumber,
             ClientId = order.ClientId,
             CreatedAt = order.CreatedAt,
@@ -86,6 +88,7 @@ public static class Converter
     {
         return new OrderListResponse
         {
+            Id = order.Id,
             OrderNumber = order.OrderNumber,
             ClientId = order.ClientId,
             CreatedAt = order.CreatedAt,
