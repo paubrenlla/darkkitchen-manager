@@ -107,14 +107,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     [Authorize(Roles = "Preparador,Administrativo")]
     public IActionResult GetOrderDetail(Guid id)
     {
-        try
-        {
-            var response = _orderService.GetOrderById(id);
-            return Ok(response);
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
+        OrderDetailResponse response = _orderService.GetOrderById(id);
+        return Ok(response);
     }
 }
