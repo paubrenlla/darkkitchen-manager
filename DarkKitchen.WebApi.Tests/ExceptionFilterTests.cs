@@ -22,7 +22,7 @@ public class ExceptionFilterTests
             RouteData = new RouteData(),
             ActionDescriptor = new ControllerActionDescriptor()
         };
-        return new ExceptionContext(actionContext, new List<IFilterMetadata>()) { Exception = ex! };
+        return new ExceptionContext(actionContext, []) { Exception = ex! };
     }
 
     private static string GetErrorMessage(ObjectResult result)
