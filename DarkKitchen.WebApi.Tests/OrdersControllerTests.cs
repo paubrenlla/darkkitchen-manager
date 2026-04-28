@@ -63,7 +63,10 @@ public class OrdersControllerTests
             DeliveryType = "Express",
             Address = new OrderAddressDto
             {
-                Street = "Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay"
+                Street = "Rivera",
+                Number = "1234",
+                City = "Montevideo",
+                Country = "Uruguay"
             },
             Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 2 }]
         };
