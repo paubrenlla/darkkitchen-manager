@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -43,6 +43,7 @@ public class OrdersControllerTests
     {
         return new OrderDetailResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = Guid.NewGuid(),
             CreatedAt = DateTime.Now,
@@ -73,6 +74,7 @@ public class OrdersControllerTests
 
         var response = new OrderCreateResponse
         {
+            Id = Guid.NewGuid(),
             ClientId = clientId,
             OrderNumber = 1,
             Subtotal = 100m,
@@ -296,6 +298,7 @@ public class OrdersControllerTests
     {
         new OrderListResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = clientId,
             CreatedAt = DateTime.Now,
@@ -327,6 +330,7 @@ public class OrdersControllerTests
     {
         new OrderListResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = Guid.NewGuid(),
             CreatedAt = DateTime.Now,

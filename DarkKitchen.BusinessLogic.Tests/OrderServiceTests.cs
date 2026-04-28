@@ -76,7 +76,7 @@ public class OrderServiceTests
         };
 
         OrderCreateResponse result = _orderService.CreateOrder(_clientId, request);
-
+        Assert.AreNotEqual(Guid.Empty, result.Id);
         Assert.AreEqual(900m, result.Subtotal);
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
@@ -190,13 +190,13 @@ public class OrderServiceTests
     [TestMethod]
     public void GetOrderById_WhenExists_ShouldReturnDetailResponse()
     {
-        var orderId = Guid.NewGuid();
         var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var orderId = order.Id;
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
         OrderDetailResponse result = _orderService.GetOrderById(orderId);
-
         Assert.IsNotNull(result);
+        Assert.AreEqual(orderId, result.Id);
         Assert.AreEqual("Pending", result.Status);
     }
 
