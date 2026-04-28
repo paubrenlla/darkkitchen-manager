@@ -11,12 +11,14 @@ public class OrderService(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IPromotionService promotionService,
-    IShippingCostCalculator shippingCalculator) : IOrderService
+    IShippingCostCalculator shippingCalculator,
+    IOrderEnricher orderEnricher) : IOrderService
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IPromotionService _promotionService = promotionService;
     private readonly IShippingCostCalculator _shippingCalculator = shippingCalculator;
+    private readonly IOrderEnricher _orderEnricher = orderEnricher;
 
     public OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request)
     {
@@ -56,11 +58,9 @@ public class OrderService(
         }
 
         var shippingCost = _shippingCalculator.CalculateShippingCost(deliveryType);
-
         var order = new Order(clientId, address, deliveryType, orderItems, shippingCost);
 
         _orderRepository.Add(order);
-
         return Converter.ToOrderCreateResponse(order);
     }
 
@@ -71,12 +71,14 @@ public class OrderService(
 
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
     {
-        return _orderRepository.GetByClient(clientId, from, to, state).Select(Converter.ToOrderListResponse);
+        return _orderRepository.GetByClient(clientId, from, to, state)
+            .Select(_orderEnricher.EnrichForClient);
     }
 
     public IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city)
     {
-        return _orderRepository.GetByStatus(from, to, state, city).Select(Converter.ToOrderListResponse);
+        return _orderRepository.GetByStatus(from, to, state, city)
+            .Select(_orderEnricher.EnrichForPreparador);
     }
 
     public void Prepare(Guid orderId)
@@ -116,6 +118,7 @@ public class OrderService(
 
     private Order GetOrderOrThrow(Guid orderId)
     {
-        return _orderRepository.GetById(orderId) ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
+        return _orderRepository.GetById(orderId)
+            ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
     }
 }
