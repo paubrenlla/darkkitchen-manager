@@ -1,5 +1,4 @@
 ﻿using DarkKitchen.IBusinessLogic;
-using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,14 +21,12 @@ public class ReportsController(IReportService reportService) : ControllerBase
             return BadRequest(new { error = "La fecha de inicio no puede ser posterior a la fecha de fin." });
         }
 
-        IEnumerable<TopProductResponse> topProducts = _reportService.GetTopProducts(fromDate, toDate);
-        return Ok(topProducts);
+        return Ok(_reportService.GetTopProducts(fromDate, toDate));
     }
 
     [HttpGet("sales")]
     public IActionResult GetSalesReport()
     {
-        var report = _reportService.GetSalesReport();
-        return Ok(report);
+        return Ok(_reportService.GetSalesReport());
     }
 }

@@ -19,41 +19,20 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
-        IEnumerable<PromotionCreateResponse> result = _promotionService.GetPromotions(date, line, productCode);
-        return Ok(result);
+        return Ok(_promotionService.GetPromotions(date, line, productCode));
     }
 
     [HttpPost]
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreatePromotion([FromBody] PromotionCreateRequest request)
     {
-        try
-        {
-            PromotionCreateResponse response = _promotionService.CreatePromotion(request);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return StatusCode(StatusCodes.Status201Created, _promotionService.CreatePromotion(request));
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdatePromotion(Guid id, [FromBody] PromotionCreateRequest request)
     {
-        try
-        {
-            PromotionCreateResponse response = _promotionService.UpdatePromotion(id, request);
-            return Ok(response);
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return Ok(_promotionService.UpdatePromotion(id, request));
     }
 }

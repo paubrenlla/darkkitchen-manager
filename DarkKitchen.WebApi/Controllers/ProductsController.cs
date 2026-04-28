@@ -1,4 +1,4 @@
-using DarkKitchen.IBusinessLogic;
+﻿using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,46 +18,21 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromQuery] string? line,
         [FromQuery] string? category)
     {
-        var products = _productService.GetProducts(name, line, category);
-        if(!products.Any())
-        {
-            return NoContent();
-        }
-
-        return Ok(products);
+        IEnumerable<ProductResponse> products = _productService.GetProducts(name, line, category);
+        return products.Any() ? Ok(products) : NoContent();
     }
 
     [HttpPost]
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
     {
-        try
-        {
-            ProductResponse response = _productService.CreateProduct(request);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return StatusCode(StatusCodes.Status201Created, _productService.CreateProduct(request));
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
     {
-        try
-        {
-            ProductResponse response = _productService.UpdateProduct(id, request);
-            return Ok(response);
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return Ok(_productService.UpdateProduct(id, request));
     }
 }

@@ -17,29 +17,16 @@ public class UserController(IUserService userService) : ControllerBase
     [AllowAnonymous]
     public IActionResult CreateUser([FromBody] UserCreateRequest request)
     {
-        try
+        if(request.Role != null)
         {
-            if(request.Role != null)
+            var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            if(callerRole != "Administrativo")
             {
-                var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-                if(callerRole != "Administrativo")
-                {
-                    return Forbid();
-                }
+                return Forbid();
             }
+        }
 
-            UserCreateResponse response = _userService.CreateUser(request);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch(InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return StatusCode(StatusCodes.Status201Created, _userService.CreateUser(request));
     }
 
     [HttpGet]
@@ -48,53 +35,23 @@ public class UserController(IUserService userService) : ControllerBase
         [FromQuery] string? name,
         [FromQuery] string? surname)
     {
-        IEnumerable<UserCreateResponse> users = _userService.GetUsers(name, surname).ToList();
-
-        if(!users.Any())
-        {
-            return NoContent();
-        }
-
-        return Ok(users);
+        var users = _userService.GetUsers(name, surname).ToList();
+        return users.Any() ? Ok(users) : NoContent();
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request)
     {
-        try
-        {
-            var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            UserCreateResponse response = _userService.UpdateUser(callerId, id, request);
-            return Ok(response);
-        }
-        catch(InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        return Ok(_userService.UpdateUser(callerId, id, request));
     }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult DeleteUser(Guid id)
     {
-        try
-        {
-            var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            UserCreateResponse response = _userService.DeleteUser(callerId, id);
-            return Ok(response);
-        }
-        catch(InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
+        var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        return Ok(_userService.DeleteUser(callerId, id));
     }
 }
