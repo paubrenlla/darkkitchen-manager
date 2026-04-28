@@ -120,4 +120,19 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
         return Ok(clientOrders);
     }
+
+    [HttpGet("{id}")]
+    [Authorize(Roles = "Preparador,Administrativo")]
+    public IActionResult GetOrderDetail(Guid id)
+    {
+        try
+        {
+            var response = _orderService.GetOrderById(id);
+            return Ok(response);
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+    }
 }

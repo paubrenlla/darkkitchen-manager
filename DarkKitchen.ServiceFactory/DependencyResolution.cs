@@ -24,6 +24,7 @@ public static class DependencyResolution
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderEnricher, OrderEnricher>();
         services.AddScoped<IOrderRepository, SqlOrderRepository>();
         services.AddScoped<IUserRepository, SqlUserRepository>();
         services.AddScoped<IProductRepository, SqlProductRepository>();

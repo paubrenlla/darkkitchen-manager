@@ -18,6 +18,7 @@ public class OrderServiceTests
     private Mock<IProductRepository> _productRepositoryMock = null!;
     private Mock<IPromotionService> _promotionServiceMock = null!;
     private Mock<IShippingCostCalculator> _shippingCalculatorMock = null!;
+    private Mock<IOrderEnricher> _orderEnricherMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -26,12 +27,14 @@ public class OrderServiceTests
         _productRepositoryMock = new Mock<IProductRepository>();
         _promotionServiceMock = new Mock<IPromotionService>();
         _shippingCalculatorMock = new Mock<IShippingCostCalculator>();
+        _orderEnricherMock = new Mock<IOrderEnricher>();
 
         _orderService = new OrderService(
             _orderRepositoryMock.Object,
             _productRepositoryMock.Object,
             _promotionServiceMock.Object,
-            _shippingCalculatorMock.Object);
+            _shippingCalculatorMock.Object,
+            _orderEnricherMock.Object);
 
         _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
@@ -76,7 +79,7 @@ public class OrderServiceTests
         };
 
         OrderCreateResponse result = _orderService.CreateOrder(_clientId, request);
-
+        Assert.AreNotEqual(Guid.Empty, result.Id);
         Assert.AreEqual(900m, result.Subtotal);
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
     }
@@ -163,13 +166,18 @@ public class OrderServiceTests
     public void GetOrdersByClient_ShouldDelegateToRepository()
     {
         var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items, 0m) };
+        var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+
         _orderRepositoryMock
             .Setup(r => r.GetByClient(_clientId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<string?>()))
             .Returns(orders);
+        _orderEnricherMock.Setup(e => e.EnrichForClient(It.IsAny<Order>())).Returns(expectedResponse);
 
         var result = _orderService.GetOrdersByClient(_clientId, null, null, null).ToList();
 
         Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Juan Sosa", result[0].ClientName);
+        _orderEnricherMock.Verify(e => e.EnrichForClient(It.IsAny<Order>()), Times.Once);
     }
 
     [TestMethod]
@@ -190,13 +198,13 @@ public class OrderServiceTests
     [TestMethod]
     public void GetOrderById_WhenExists_ShouldReturnDetailResponse()
     {
-        var orderId = Guid.NewGuid();
         var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var orderId = order.Id;
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
         OrderDetailResponse result = _orderService.GetOrderById(orderId);
-
         Assert.IsNotNull(result);
+        Assert.AreEqual(orderId, result.Id);
         Assert.AreEqual("Pending", result.Status);
     }
 
@@ -233,5 +241,22 @@ public class OrderServiceTests
         };
 
         _orderService.CreateOrder(_clientId, request);
+    }
+
+    [TestMethod]
+    public void GetOrdersByStatus_ShouldDelegateToEnricher()
+    {
+        var from = DateTime.Now.AddDays(-1);
+        var to = DateTime.Now.AddDays(1);
+        var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items, 0m) };
+        var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+
+        _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
+        _orderEnricherMock.Setup(e => e.EnrichForPreparador(It.IsAny<Order>())).Returns(expectedResponse);
+
+        var result = _orderService.GetOrdersByStatus(from, to, null, null).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        _orderEnricherMock.Verify(e => e.EnrichForPreparador(It.IsAny<Order>()), Times.Once);
     }
 }

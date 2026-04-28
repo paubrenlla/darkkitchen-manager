@@ -46,6 +46,7 @@ public static class Converter
     {
         return new OrderCreateResponse
         {
+            Id = order.Id,
             ClientId = order.ClientId,
             OrderNumber = order.OrderNumber ?? 0,
             Subtotal = order.Subtotal,
@@ -67,6 +68,7 @@ public static class Converter
     {
         return new OrderDetailResponse
         {
+            Id = order.Id,
             OrderNumber = order.OrderNumber,
             ClientId = order.ClientId,
             CreatedAt = order.CreatedAt,
@@ -77,21 +79,28 @@ public static class Converter
                 ProductId = i.ProductId,
                 Quantity = i.Quantity,
                 Price = i.Price,
-                ItemTotal = i.CalculateItemTotal()
-            }).ToList()
+                AppliedPromotion = i.AppliedPromotionName,
+                ItemTotal = i.CalculateItemTotal(),
+            }).ToList(),
         };
     }
 
-    public static OrderListResponse ToOrderListResponse(Order order)
+    public static OrderListResponse ToOrderListResponse(
+        Order order,
+        string clientName = "",
+        List<OrderItemSummaryDto>? items = null)
     {
         return new OrderListResponse
         {
+            Id = order.Id,
             OrderNumber = order.OrderNumber,
             ClientId = order.ClientId,
+            ClientName = clientName,
             CreatedAt = order.CreatedAt,
             Status = order.State.ToString(),
             Total = order.Total,
-            ProductCount = order.Items.Sum(i => i.Quantity)
+            ProductCount = order.Items.Sum(i => i.Quantity),
+            Items = items ?? [],
         };
     }
 

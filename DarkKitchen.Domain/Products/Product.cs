@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace DarkKitchen.Domain.Products;
 
@@ -17,6 +18,7 @@ public class Product
     public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
     private readonly List<ProductImage> _images;
+    [ExcludeFromCodeCoverage]
     protected Product()
     {
         Code = null!;

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -43,6 +43,7 @@ public class OrdersControllerTests
     {
         return new OrderDetailResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = Guid.NewGuid(),
             CreatedAt = DateTime.Now,
@@ -73,6 +74,7 @@ public class OrdersControllerTests
 
         var response = new OrderCreateResponse
         {
+            Id = Guid.NewGuid(),
             ClientId = clientId,
             OrderNumber = 1,
             Subtotal = 100m,
@@ -296,6 +298,7 @@ public class OrdersControllerTests
     {
         new OrderListResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = clientId,
             CreatedAt = DateTime.Now,
@@ -327,6 +330,7 @@ public class OrdersControllerTests
     {
         new OrderListResponse
         {
+            Id = Guid.NewGuid(),
             OrderNumber = 1,
             ClientId = Guid.NewGuid(),
             CreatedAt = DateTime.Now,
@@ -371,5 +375,49 @@ public class OrdersControllerTests
 
         Assert.IsNotNull(result);
         _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, "Pending", "Montevideo"), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetOrderDetail_AsPreparador_Exists_ReturnsOk()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var orderId = Guid.NewGuid();
+        var detailResponse = BuildDetailResponse();
+
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+
+        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void GetOrderDetail_AsAdministrativo_Exists_ReturnsOk()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+        var orderId = Guid.NewGuid();
+        var detailResponse = BuildDetailResponse();
+
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+
+        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+    }
+
+    [TestMethod]
+    public void GetOrderDetail_NotFound_ReturnsNotFound()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+
+        _mockOrderService.Setup(s => s.GetOrderById(It.IsAny<Guid>()))
+            .Throws(new KeyNotFoundException("Pedido no encontrado."));
+
+        var result = _controller.GetOrderDetail(Guid.NewGuid()) as NotFoundObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(404, result.StatusCode);
     }
 }

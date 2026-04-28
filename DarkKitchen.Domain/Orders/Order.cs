@@ -1,8 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace DarkKitchen.Domain.Orders;
 
 public class Order
 {
     private readonly List<OrderItem> _items;
+    [ExcludeFromCodeCoverage]
     protected Order()
     {
         _items = [];
