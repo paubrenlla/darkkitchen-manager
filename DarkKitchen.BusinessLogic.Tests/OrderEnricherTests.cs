@@ -2,7 +2,6 @@
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.DTOs;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;

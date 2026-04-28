@@ -1,6 +1,4 @@
 ﻿using DarkKitchen.Domain.Orders;
-using DarkKitchen.Domain.Products;
-using DarkKitchen.Domain.Users;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
