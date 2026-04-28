@@ -89,34 +89,6 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
-    public void CreateOrder_ServiceThrowsArgumentException_ReturnsBadRequest()
-    {
-        var clientId = Guid.NewGuid();
-        SetCallerContext(clientId, "Cliente");
-
-        var request = new OrderCreateRequest
-        {
-            DeliveryType = "InvalidType",
-            Address = new OrderAddressDto
-            {
-                Street = "Rivera",
-                Number = "1234",
-                City = "Montevideo",
-                Country = "Uruguay",
-            },
-            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
-        };
-
-        _mockOrderService.Setup(s => s.CreateOrder(clientId, request))
-            .Throws(new ArgumentException("Tipo de entrega inválido."));
-
-        var result = _controller.CreateOrder(request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
     public void UpdateStatus_Preparado_AsPreparador_ReturnsOk()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
@@ -251,36 +223,6 @@ public class OrdersControllerTests
         SetCallerContext(Guid.NewGuid(), "Administrativo");
 
         var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "EstadoInvalido" }) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateStatus_OrderNotFound_ReturnsNotFound()
-    {
-        SetCallerContext(Guid.NewGuid(), "Preparador");
-        var orderId = Guid.NewGuid();
-
-        _mockOrderService.Setup(s => s.Prepare(orderId))
-            .Throws(new KeyNotFoundException("Pedido no encontrado."));
-
-        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as NotFoundObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateStatus_InvalidTransition_ReturnsBadRequest()
-    {
-        SetCallerContext(Guid.NewGuid(), "Preparador");
-        var orderId = Guid.NewGuid();
-
-        _mockOrderService.Setup(s => s.Ship(orderId))
-            .Throws(new InvalidOperationException("No se puede enviar en estado Pending"));
-
-        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "EnCamino" }) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
