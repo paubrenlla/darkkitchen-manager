@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace DarkKitchen.Domain.Users;
 
 public class User
 {
+    [ExcludeFromCodeCoverage]
     protected User()
     {
         Name = null!;
