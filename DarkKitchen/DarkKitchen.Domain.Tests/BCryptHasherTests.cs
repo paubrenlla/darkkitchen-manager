@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
 
 namespace DarkKitchen.Domain.Tests;
 

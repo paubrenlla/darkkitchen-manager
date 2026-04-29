@@ -1,5 +1,7 @@
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
+using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
 using Moq;

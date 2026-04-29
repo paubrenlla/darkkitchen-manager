@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using DarkKitchen.Domain.Users.Encryptor;
 
 namespace DarkKitchen.Domain.Users;
 

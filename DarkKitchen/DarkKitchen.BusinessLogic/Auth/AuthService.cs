@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;

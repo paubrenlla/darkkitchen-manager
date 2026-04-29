@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace DarkKitchen.Domain.Users;
+namespace DarkKitchen.Domain.Users.PhoneValidations;
 
 public class UruguayPhoneValidationStrategy : IPhoneValidationStrategy
 {

@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Orders.Delivery;
 
 namespace DarkKitchen.Domain.Tests;
 

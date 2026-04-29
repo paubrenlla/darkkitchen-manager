@@ -1,5 +1,6 @@
 ﻿using DarkKitchen.Domain;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DarkKitchen.DataAccess.Tests;

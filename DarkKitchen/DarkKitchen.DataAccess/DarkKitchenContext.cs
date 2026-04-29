@@ -1,6 +1,7 @@
 ﻿using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 

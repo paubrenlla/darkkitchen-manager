@@ -1,6 +1,6 @@
 using BCrypt.Net;
 
-namespace DarkKitchen.Domain.Users;
+namespace DarkKitchen.Domain.Users.Encryptor;
 
 public class BCryptHasher : IPasswordHasher
 {

@@ -1,4 +1,6 @@
 using DarkKitchen.Domain;
+using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 
 namespace DarkKitchen.IDataAccess;
 

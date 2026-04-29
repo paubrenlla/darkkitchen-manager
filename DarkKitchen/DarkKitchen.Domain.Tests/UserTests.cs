@@ -1,4 +1,6 @@
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
+using DarkKitchen.Domain.Users.PhoneValidations;
 using Moq;
 
 namespace DarkKitchen.Domain.Tests;

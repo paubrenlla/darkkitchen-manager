@@ -2,6 +2,7 @@ using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
 using DarkKitchen.DataAccess;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;

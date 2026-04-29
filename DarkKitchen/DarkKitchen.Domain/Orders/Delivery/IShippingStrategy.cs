@@ -1,4 +1,4 @@
-namespace DarkKitchen.Domain.Orders;
+namespace DarkKitchen.Domain.Orders.Delivery;
 
 public interface IShippingStrategy
 {
