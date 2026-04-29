@@ -85,7 +85,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         [FromQuery] DateTime? fromDate,
         [FromQuery] DateTime? toDate,
         [FromQuery] string? status,
-        [FromQuery] string? city)
+        [FromQuery] string? address)
     {
         var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -97,10 +97,12 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 return BadRequest(new { error = "El rango de fechas es obligatorio para el preparador." });
             }
 
-            return Ok(_orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, city));
+            IEnumerable<OrderListResponse> preparadorOrders = _orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, address);
+            return Ok(preparadorOrders);
         }
 
-        return Ok(_orderService.GetOrdersByClient(callerId, fromDate, toDate, status));
+        IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
+        return Ok(clientOrders);
     }
 
     [HttpGet("{id}")]

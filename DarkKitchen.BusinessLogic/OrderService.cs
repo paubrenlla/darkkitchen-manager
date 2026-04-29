@@ -75,9 +75,9 @@ public class OrderService(
             .Select(_orderEnricher.EnrichForClient);
     }
 
-    public IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? city)
+    public IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? address)
     {
-        return _orderRepository.GetByStatus(from, to, state, city)
+        return _orderRepository.GetByStatus(from, to, state, address)
             .Select(_orderEnricher.EnrichForPreparador);
     }
 

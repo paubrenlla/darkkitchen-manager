@@ -57,7 +57,7 @@ public class SqlOrderRepository(DarkKitchenContext context) : IOrderRepository
         return query.ToList();
     }
 
-    public IEnumerable<Order> GetByStatus(DateTime from, DateTime to, string? state = null, string? city = null)
+    public IEnumerable<Order> GetByStatus(DateTime from, DateTime to, string? state = null, string? address = null)
     {
         var query = _context.Orders
             .AsNoTracking()
@@ -69,9 +69,9 @@ public class SqlOrderRepository(DarkKitchenContext context) : IOrderRepository
             query = query.Where(o => o.State == parsedState);
         }
 
-        if(!string.IsNullOrWhiteSpace(city))
+        if(!string.IsNullOrWhiteSpace(address))
         {
-            query = query.Where(o => o.DeliveryAddress.City.Contains(city));
+            query = query.Where(o => o.DeliveryAddress.Street.Contains(address));
         }
 
         return query.ToList();
