@@ -41,5 +41,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.ApplyMigrations();
+app.Services.ApplyMigrations();
 app.Run();
