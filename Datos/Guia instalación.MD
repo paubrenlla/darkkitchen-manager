@@ -21,7 +21,9 @@ Esto levanta un contenedor con la base de datos
 
 ## Paso 2 — Ejecutar la aplicación
 
-Entrá a la carpeta `Aplicación` y ejecutá el ejecutable
+Entrá a la carpeta `Aplicación` y ejecutá el dll con el comando:
+
+dotnet DarkKitchen.WebApi.dll
 
 
 ---
