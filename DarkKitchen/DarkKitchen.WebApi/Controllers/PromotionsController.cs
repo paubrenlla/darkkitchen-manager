@@ -20,7 +20,7 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? productCode)
     {
         var promotions = _promotionService.GetPromotions(date, line, productCode);
-        if (!promotions.Any())
+        if(!promotions.Any())
         {
             return NoContent();
         }
