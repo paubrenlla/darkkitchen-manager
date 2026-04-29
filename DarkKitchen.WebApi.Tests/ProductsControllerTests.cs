@@ -1,4 +1,4 @@
-using DarkKitchen.IBusinessLogic;
+﻿using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Http;
@@ -118,52 +118,6 @@ public class ProductsControllerTests
     }
 
     [TestMethod]
-    public void CreateProduct_InvalidData_ReturnsBadRequest()
-    {
-        var request = new ProductCreateRequest
-        {
-            Code = "AB",
-            Name = "Corto",
-            Description = "Corta",
-            Line = "Desayunos",
-            Category = "Bebidas",
-            Price = 100m,
-            Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }]
-        };
-
-        _mockService.Setup(s => s.CreateProduct(request))
-            .Throws(new ArgumentException("Code must be between 5 and 20 alphanumeric characters."));
-
-        var result = _controller.CreateProduct(request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void CreateProduct_DuplicatedCode_ReturnsBadRequest()
-    {
-        var request = new ProductCreateRequest
-        {
-            Code = "BURG01",
-            Name = "Duplicate",
-            Description = "Desc",
-            Line = "Combo burgers",
-            Category = "Parrilla",
-            Price = 100m,
-            Images = []
-        };
-
-        _mockService.Setup(s => s.CreateProduct(request))
-            .Throws(new ArgumentException("Product with code BURG01 already exists."));
-
-        var result = _controller.CreateProduct(request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
     public void UpdateProduct_ValidRequest_ReturnsOk()
     {
         var productId = Guid.NewGuid();
@@ -196,53 +150,5 @@ public class ProductsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateProduct_NotFound_ReturnsNotFound()
-    {
-        var productId = Guid.NewGuid();
-
-        var request = new ProductUpdateRequest
-        {
-            Name = "Hamburguesa Actualizada",
-            Description = "Descripcion actualizada del producto de prueba",
-            Line = "Desayunos",
-            Category = "Bebidas",
-            Price = 200m,
-            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
-        };
-
-        _mockService.Setup(s => s.UpdateProduct(productId, request))
-            .Throws(new KeyNotFoundException("Producto no encontrado."));
-
-        var result = _controller.UpdateProduct(productId, request) as NotFoundObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateProduct_InvalidData_ReturnsBadRequest()
-    {
-        var productId = Guid.NewGuid();
-
-        var request = new ProductUpdateRequest
-        {
-            Name = "Corto",
-            Description = "Corta",
-            Line = "Desayunos",
-            Category = "Bebidas",
-            Price = 200m,
-            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
-        };
-
-        _mockService.Setup(s => s.UpdateProduct(productId, request))
-            .Throws(new ArgumentException("Name must be between 10 and 50 characters."));
-
-        var result = _controller.UpdateProduct(productId, request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
     }
 }

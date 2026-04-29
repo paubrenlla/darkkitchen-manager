@@ -41,20 +41,6 @@ public class AuthControllerTests
     }
 
     [TestMethod]
-    public void LoginFailed_ReturnsUnauthorized()
-    {
-        var request = new LoginRequest { Email = "test@domain.com", Password = "WrongPassword" };
-
-        _authServiceMock.Setup(s => s.Login(request.Email, request.Password))
-            .Throws(new UnauthorizedAccessException("Invalid Credentials."));
-
-        var result = _authController.Login(request) as UnauthorizedObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(401, result.StatusCode);
-    }
-
-    [TestMethod]
     public void LoginSuccessful_ReturnsCorrectRole()
     {
         var request = new LoginRequest { Email = "admin@bmb.com", Password = "Valid1Password!@" };

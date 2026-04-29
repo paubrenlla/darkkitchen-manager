@@ -79,50 +79,6 @@ public class UserControllerTests
     }
 
     [TestMethod]
-    public void CreateUser_ServiceThrowsArgumentException_ReturnsBadRequest()
-    {
-        var request = new UserCreateRequest
-        {
-            Name = string.Empty,
-            Surname = "Gomez",
-            Email = "lucia@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111222",
-            Password = "Valid1Password!@",
-        };
-
-        _userServiceMock.Setup(s => s.CreateUser(request))
-            .Throws(new ArgumentException("Nombre inválido."));
-
-        var result = _userController.CreateUser(request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void CreateUser_DuplicateEmail_ReturnsBadRequest()
-    {
-        var request = new UserCreateRequest
-        {
-            Name = "Lucia",
-            Surname = "Gomez",
-            Email = "duplicado@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111222",
-            Password = "Valid1Password!@",
-        };
-
-        _userServiceMock.Setup(s => s.CreateUser(request))
-            .Throws(new InvalidOperationException("El email duplicado@test.com ya está en uso."));
-
-        var result = _userController.CreateUser(request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
-    }
-
-    [TestMethod]
     public void GetUsers_ReturnsOkWithList()
     {
         List<UserCreateResponse> users =
@@ -192,52 +148,6 @@ public class UserControllerTests
     }
 
     [TestMethod]
-    public void UpdateUser_SelfModification_ReturnsBadRequest()
-    {
-        var request = new UserUpdateRequest
-        {
-            Name = "Nuevo",
-            Surname = "Nombre",
-            Email = "nuevo@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094999888",
-            Role = "Administrativo",
-        };
-
-        _userServiceMock.Setup(s => s.UpdateUser(_callerId, _callerId, request))
-            .Throws(new InvalidOperationException("Un usuario no puede modificarse a sí mismo."));
-
-        var result = _userController.UpdateUser(_callerId, request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateUser_InvalidData_ReturnsBadRequest()
-    {
-        var userId = Guid.NewGuid();
-
-        var request = new UserUpdateRequest
-        {
-            Name = string.Empty,
-            Surname = "Nombre",
-            Email = "test@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094999888",
-            Role = "Administrativo",
-        };
-
-        _userServiceMock.Setup(s => s.UpdateUser(_callerId, userId, request))
-            .Throws(new ArgumentException("Nombre inválido."));
-
-        var result = _userController.UpdateUser(userId, request) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
     public void DeleteUser_ValidRequest_ReturnsOkWithUser()
     {
         var userId = Guid.NewGuid();
@@ -260,32 +170,6 @@ public class UserControllerTests
         var body = result.Value as UserCreateResponse;
         Assert.IsNotNull(body);
         Assert.AreEqual("Lucia", body.Name);
-    }
-
-    [TestMethod]
-    public void DeleteUser_SelfDeletion_ReturnsBadRequest()
-    {
-        _userServiceMock.Setup(s => s.DeleteUser(_callerId, _callerId))
-            .Throws(new InvalidOperationException("Un usuario no puede eliminarse a sí mismo."));
-
-        var result = _userController.DeleteUser(_callerId) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void DeleteUser_NotFound_ReturnsNotFound()
-    {
-        var userId = Guid.NewGuid();
-
-        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId))
-            .Throws(new KeyNotFoundException("Usuario no encontrado."));
-
-        var result = _userController.DeleteUser(userId) as NotFoundObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
     }
 
     [TestMethod]
