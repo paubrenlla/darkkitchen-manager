@@ -10,6 +10,7 @@ using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,5 +44,12 @@ public static class DependencyResolution
         services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
 
         return services;
+    }
+
+    public static void ApplyMigrations(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DarkKitchenContext>();
+        context.Database.Migrate();
     }
 }
