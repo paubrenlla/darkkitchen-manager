@@ -271,6 +271,20 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
+    public void GetOrders_AsCliente_ReturnsNoContentWhenEmpty()
+    {
+        var clientId = Guid.NewGuid();
+        SetCallerContext(clientId, "Cliente");
+
+        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns(new List<OrderListResponse>());
+
+        var result = _controller.GetOrders(null, null, null, null) as NoContentResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(204, result.StatusCode);
+    }
+
+    [TestMethod]
     public void GetOrders_AsPreparador_WithDates_ReturnsAllOrders()
     {
         var preparadorId = Guid.NewGuid();
@@ -303,6 +317,21 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
+    public void GetOrders_AsPreparador_ReturnsNoContentWhenEmpty()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
+
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns(new List<OrderListResponse>());
+
+        var result = _controller.GetOrders(from, to, null, null) as NoContentResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(204, result.StatusCode);
+    }
+
+    [TestMethod]
     public void GetOrders_AsPreparador_WithoutDates_ReturnsBadRequest()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
@@ -321,8 +350,21 @@ public class OrdersControllerTests
         var from = DateTime.Now.AddDays(-7);
         var to = DateTime.Now;
 
+        var orders = new List<OrderListResponse>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                OrderNumber = 1,
+                ClientId = Guid.NewGuid(),
+                CreatedAt = DateTime.Now,
+                Status = "Pending",
+                Total = 100m,
+                ProductCount = 2
+            }
+        };
         _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, "Pending", "Rivera"))
-            .Returns([]);
+            .Returns(orders);
 
         var result = _controller.GetOrders(from, to, "Pending", "Rivera") as OkObjectResult;
 

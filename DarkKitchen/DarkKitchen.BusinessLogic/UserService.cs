@@ -56,7 +56,8 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
             throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
         }
 
-        User existingUser = _userRepository.GetById(userId);
+        User existingUser = _userRepository.GetById(userId)
+                            ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
 
         IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
         var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);

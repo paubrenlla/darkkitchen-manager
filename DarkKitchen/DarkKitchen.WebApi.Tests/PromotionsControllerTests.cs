@@ -1,4 +1,4 @@
-﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
 using Microsoft.AspNetCore.Http;
@@ -70,14 +70,14 @@ public class PromotionsControllerTests
     }
 
     [TestMethod]
-    public void GetPromotions_NoResults_ShouldReturnOkWithEmptyList()
+    public void GetPromotions_NoResults_ShouldReturnNoContent()
     {
         _mockService.Setup(s => s.GetPromotions(null, "Desayunos", null)).Returns([]);
 
-        var result = _controller.GetPromotions(null, "Desayunos", null) as OkObjectResult;
+        var result = _controller.GetPromotions(null, "Desayunos", null) as NoContentResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
+        Assert.AreEqual(204, result.StatusCode);
     }
 
     [TestMethod]

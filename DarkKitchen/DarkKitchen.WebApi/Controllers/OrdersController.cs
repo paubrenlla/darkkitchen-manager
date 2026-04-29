@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -98,10 +98,20 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             }
 
             IEnumerable<OrderListResponse> preparadorOrders = _orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, address);
+            if(!preparadorOrders.Any())
+            {
+                return NoContent();
+            }
+
             return Ok(preparadorOrders);
         }
 
         IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
+        if(!clientOrders.Any())
+        {
+            return NoContent();
+        }
+
         return Ok(clientOrders);
     }
 
