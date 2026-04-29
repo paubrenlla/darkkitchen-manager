@@ -19,7 +19,13 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
-        return Ok(_promotionService.GetPromotions(date, line, productCode));
+        var promotions = _promotionService.GetPromotions(date, line, productCode);
+        if (!promotions.Any())
+        {
+            return NoContent();
+        }
+
+        return Ok(promotions);
     }
 
     [HttpPost]
