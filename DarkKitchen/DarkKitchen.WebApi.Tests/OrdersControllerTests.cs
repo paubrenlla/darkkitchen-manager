@@ -276,7 +276,7 @@ public class OrdersControllerTests
         var clientId = Guid.NewGuid();
         SetCallerContext(clientId, "Cliente");
 
-        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns(new List<OrderListResponse>());
+        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns([]);
 
         var result = _controller.GetOrders(null, null, null, null) as NoContentResult;
 
@@ -323,7 +323,7 @@ public class OrdersControllerTests
         var from = DateTime.Now.AddDays(-7);
         var to = DateTime.Now;
 
-        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns(new List<OrderListResponse>());
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns([]);
 
         var result = _controller.GetOrders(from, to, null, null) as NoContentResult;
 

@@ -44,4 +44,11 @@ public static class DependencyResolution
 
         return services;
     }
+
+    public static void ApplyMigrations(this IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DarkKitchenContext>();
+        context.Database.Migrate();
+    }
 }
