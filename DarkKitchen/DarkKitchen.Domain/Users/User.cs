@@ -1,0 +1,137 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
+using DarkKitchen.Domain.Users.Encryptor;
+
+namespace DarkKitchen.Domain.Users;
+
+public class User
+{
+    [ExcludeFromCodeCoverage]
+    protected User()
+    {
+        Name = null!;
+        Surname = null!;
+        Email = null!;
+        Phone = null!;
+        HashedPassword = null!;
+    }
+
+    public User(string name, string surname, string email, PhoneNumber phone, string password, Role role, IPasswordHasher passwordHasher)
+    {
+        ValidateName(name);
+        ValidateSurname(surname);
+        ValidateEmail(email);
+        ValidatePassword(password);
+
+        Id = Guid.NewGuid();
+        Name = name;
+        Surname = surname;
+        Email = email;
+        Phone = phone;
+        HashedPassword = passwordHasher.HashPassword(password);
+        Role = role;
+    }
+
+    public User(string name, string surname, string email, PhoneNumber phone, string password, IPasswordHasher passwordHasher)
+        : this(name, surname, email, phone, password, Role.Cliente, passwordHasher)
+    {
+    }
+
+    public Guid Id { get; private set; }
+    public string Name { get; private set; }
+    public string Surname { get; private set; }
+    public string Email { get; private set; }
+    public PhoneNumber Phone { get; private set; }
+    public string HashedPassword { get; private set; }
+    public Role Role { get; private set; }
+
+    private static void ValidateName(string name)
+    {
+        if(string.IsNullOrWhiteSpace(name) || name.Length < 1)
+        {
+            throw new ArgumentException("Name must have at least 1 character.");
+        }
+    }
+
+    private static void ValidateSurname(string surname)
+    {
+        if(string.IsNullOrWhiteSpace(surname) || surname.Length < 3 || surname.Length > 25)
+        {
+            throw new ArgumentException("Surname must be between 3 and 25 characters.");
+        }
+    }
+
+    private static void ValidateEmail(string email)
+    {
+        var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$");
+
+        if(string.IsNullOrWhiteSpace(email) || !emailRegex.IsMatch(email))
+        {
+            throw new ArgumentException("Invalid email format.");
+        }
+    }
+
+    private static void ValidatePassword(string password)
+    {
+        if(string.IsNullOrWhiteSpace(password) || password.Length < 15 || password.Length > 25)
+        {
+            throw new ArgumentException("Password must be between 15 and 25 characters.");
+        }
+
+        if(!Regex.IsMatch(password, @"[A-Z]"))
+        {
+            throw new ArgumentException("Password must contain at least one uppercase letter.");
+        }
+
+        if(!Regex.IsMatch(password, @"[a-z]"))
+        {
+            throw new ArgumentException("Password must contain at least one lowercase letter.");
+        }
+
+        if(!Regex.IsMatch(password, @"[0-9]"))
+        {
+            throw new ArgumentException("Password must contain at least one number.");
+        }
+
+        if(!Regex.IsMatch(password, @"[^a-zA-Z0-9]"))
+        {
+            throw new ArgumentException("Password must contain at least one symbol.");
+        }
+
+        if(HasSequentialChars(password))
+        {
+            throw new ArgumentException("Password cannot contain sequences.");
+        }
+    }
+
+    private static bool HasSequentialChars(string text)
+    {
+        for(var i = 0; i < text.Length - 2; i++)
+        {
+            if(text[i] + 1 == text[i + 1] && text[i + 1] + 1 == text[i + 2])
+            {
+                return true;
+            }
+
+            if(text[i] - 1 == text[i + 1] && text[i + 1] - 1 == text[i + 2])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void UpdateDetails(string name, string surname, string email, PhoneNumber phone, Role role)
+    {
+        ValidateName(name);
+        ValidateSurname(surname);
+        ValidateEmail(email);
+
+        Name = name;
+        Surname = surname;
+        Email = email;
+        Phone = phone;
+        Role = role;
+    }
+}
