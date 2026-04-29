@@ -1,5 +1,4 @@
 using DarkKitchen.Domain.Orders;
-using DarkKitchen.Domain.Orders.States;
 using DarkKitchen.Domain.Orders.States.Types;
 
 namespace DarkKitchen.Domain.Tests;

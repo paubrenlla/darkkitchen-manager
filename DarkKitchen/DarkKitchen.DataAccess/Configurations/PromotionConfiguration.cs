@@ -1,6 +1,4 @@
-﻿using DarkKitchen.Domain;
-using DarkKitchen.Domain.Products;
-using DarkKitchen.Domain.Promotions;
+﻿using DarkKitchen.Domain.Promotions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

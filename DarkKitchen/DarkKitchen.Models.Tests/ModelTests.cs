@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;

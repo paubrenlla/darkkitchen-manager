@@ -1,4 +1,3 @@
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
