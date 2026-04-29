@@ -318,16 +318,16 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
 
-        DateTime from = DateTime.Now.AddDays(-7);
-        DateTime to = DateTime.Now;
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
 
-        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, "Pending", "Montevideo"))
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, "Pending", "Rivera"))
             .Returns([]);
 
-        var result = _controller.GetOrders(from, to, "Pending", "Montevideo") as OkObjectResult;
+        var result = _controller.GetOrders(from, to, "Pending", "Rivera") as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, "Pending", "Montevideo"), Times.Once);
+        _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, "Pending", "Rivera"), Times.Once);
     }
 
     [TestMethod]

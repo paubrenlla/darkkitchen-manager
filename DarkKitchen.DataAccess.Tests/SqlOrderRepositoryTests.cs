@@ -142,18 +142,18 @@ public class SqlOrderRepositoryTests
     }
 
     [TestMethod]
-    public void GetByStatus_WithCityFilter_ShouldFilter()
+    public void GetByStatus_WithAddressFilter_ShouldFilter()
     {
         _repository.Add(CreateOrder());
 
         var from = DateTime.Now.AddHours(-1);
         var to = DateTime.Now.AddHours(1);
 
-        var resultMontevideo = _repository.GetByStatus(from, to, city: "Montevideo").ToList();
-        var resultSalto = _repository.GetByStatus(from, to, city: "Salto").ToList();
+        var resultRivera = _repository.GetByStatus(from, to, address: "Rivera").ToList();
+        var resultOtra = _repository.GetByStatus(from, to, address: "Otra calle").ToList();
 
-        Assert.AreEqual(1, resultMontevideo.Count);
-        Assert.AreEqual(0, resultSalto.Count);
+        Assert.AreEqual(1, resultRivera.Count);
+        Assert.AreEqual(0, resultOtra.Count);
     }
 
     [TestMethod]
