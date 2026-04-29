@@ -1,4 +1,4 @@
-using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.PhoneValidations;
 
 namespace DarkKitchen.Domain.Tests;
 

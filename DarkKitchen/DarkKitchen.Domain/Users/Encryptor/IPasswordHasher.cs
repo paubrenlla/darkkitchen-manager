@@ -1,4 +1,4 @@
-namespace DarkKitchen.Domain.Users;
+namespace DarkKitchen.Domain.Users.Encryptor;
 
 public interface IPasswordHasher
 {

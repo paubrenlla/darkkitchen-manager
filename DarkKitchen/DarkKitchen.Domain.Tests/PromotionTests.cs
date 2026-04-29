@@ -1,4 +1,5 @@
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 
 namespace DarkKitchen.Domain.Tests;
 

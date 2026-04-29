@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain;
+﻿using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
 using Microsoft.EntityFrameworkCore;
 

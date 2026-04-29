@@ -1,5 +1,5 @@
-using DarkKitchen.Domain;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
 using Moq;

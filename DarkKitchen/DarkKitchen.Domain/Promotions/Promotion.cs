@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using DarkKitchen.Domain.Products;
 
-namespace DarkKitchen.Domain;
+namespace DarkKitchen.Domain.Promotions;
 
 public class Promotion
 {

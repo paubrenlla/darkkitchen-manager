@@ -1,5 +1,5 @@
 using DarkKitchen.BusinessLogic.PhoneNumber;
-using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.PhoneValidations;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;

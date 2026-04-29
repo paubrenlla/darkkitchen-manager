@@ -1,6 +1,8 @@
 ﻿using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
+using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IDataAccess;
 using Moq;
 
