@@ -364,4 +364,26 @@ public class UserServiceTests
 
         _userService.UpdateUser(adminId, userId, request);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void UpdateUser_UserNotFound_ShouldThrowKeyNotFoundException()
+    {
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        _userRepositoryMock.Setup(r => r.GetById(userId)).Returns((User)null!);
+
+        var request = new UserUpdateRequest
+        {
+            Name = "Nuevo",
+            Surname = "Nombre",
+            Email = "nuevo@test.com",
+            CountryPrefix = "+598",
+            PhoneNumber = "094999888",
+            Role = "Administrativo",
+        };
+
+        _userService.UpdateUser(adminId, userId, request);
+    }
 }
