@@ -1,13 +1,8 @@
 namespace DarkKitchen.Domain.Orders.States.Types;
 
-public class PendingState : BaseOrderState
+public class DelayedState : BaseOrderState
 {
-    public override OrderState State => OrderState.Pending;
-
-    public override void Delay(Order order)
-    {
-        order.TransitionTo(OrderState.Delayed);
-    }
+    public override OrderState State => OrderState.Delayed;
 
     public override void Prepare(Order order)
     {

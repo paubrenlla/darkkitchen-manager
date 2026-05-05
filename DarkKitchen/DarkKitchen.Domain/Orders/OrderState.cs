@@ -8,6 +8,11 @@ public enum OrderState
     Pending,
 
     /// <summary>
+    ///     Order preparation is delayed.
+    /// </summary>
+    Delayed,
+
+    /// <summary>
     ///     Order is being prepared.
     /// </summary>
     Prepared,

@@ -9,6 +9,7 @@ public static class OrderStateFactory
         return state switch
         {
             OrderState.Pending => new PendingState(),
+            OrderState.Delayed => new DelayedState(),
             OrderState.Prepared => new PreparedState(),
             OrderState.Shipping => new ShippingState(),
             OrderState.Delivered => new DeliveredState(),
