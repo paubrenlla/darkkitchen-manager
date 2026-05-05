@@ -90,6 +90,13 @@ public class OrderService(
         _orderRepository.Update(o);
     }
 
+    public void Delay(Guid orderId)
+    {
+        Order o = GetOrderOrThrow(orderId);
+        OrderStateFactory.Create(o.State).Delay(o);
+        _orderRepository.Update(o);
+    }
+
     public void Cancel(Guid orderId)
     {
         Order o = GetOrderOrThrow(orderId);
