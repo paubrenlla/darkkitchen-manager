@@ -136,6 +136,47 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
+    public void UpdateStatus_Demorado_AsPreparador_ReturnsOk()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var orderId = Guid.NewGuid();
+        OrderDetailResponse detailResponse = BuildDetailResponse();
+
+        _mockOrderService.Setup(s => s.Delay(orderId));
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+
+        var result =
+            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        _mockOrderService.Verify(s => s.Delay(orderId), Times.Once);
+    }
+
+    [TestMethod]
+    public void UpdateStatus_Demorado_AsAdministrativo_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+        var orderId = Guid.NewGuid();
+
+        var result =
+            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
+
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void UpdateStatus_Demorado_AsCliente_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Cliente");
+        var orderId = Guid.NewGuid();
+
+        var result =
+            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
+
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
     public void UpdateStatus_Cancelado_AsAdministrativo_ReturnsOk()
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");

@@ -9,6 +9,7 @@ public interface IOrderService
     IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state);
     IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? address);
     void Prepare(Guid orderId);
+    void Delay(Guid orderId);
     void Cancel(Guid orderId);
     void Ship(Guid orderId);
     void Deliver(Guid orderId);

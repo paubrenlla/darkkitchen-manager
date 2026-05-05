@@ -37,6 +37,15 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 _orderService.Prepare(id);
                 break;
 
+            case "demorado":
+                if(callerRole != "Preparador")
+                {
+                    return Forbid();
+                }
+
+                _orderService.Delay(id);
+                break;
+
             case "cancelado":
                 if(callerRole != "Administrativo")
                 {

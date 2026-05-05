@@ -120,6 +120,27 @@ public class OrderServiceTests
     }
 
     [TestMethod]
+    public void Delay_WhenOrderIsPending_ShouldTransitionAndUpdate()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+
+        _orderService.Delay(orderId);
+
+        Assert.AreEqual(OrderState.Delayed, order.State);
+        _orderRepositoryMock.Verify(r => r.Update(order), Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Delay_WhenOrderNotFound_ShouldThrowKeyNotFoundException()
+    {
+        _orderRepositoryMock.Setup(r => r.GetById(It.IsAny<Guid>())).Returns((Order?)null);
+        _orderService.Delay(Guid.NewGuid());
+    }
+
+    [TestMethod]
     public void Ship_WhenOrderIsPrepared_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();

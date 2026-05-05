@@ -4,6 +4,11 @@ public abstract class BaseOrderState : IOrderState
 {
     public abstract OrderState State { get; }
 
+    public virtual void Delay(Order order)
+    {
+        throw new InvalidOperationException($"No se puede demorar un pedido en estado {State}");
+    }
+
     public virtual void Prepare(Order order)
     {
         throw new InvalidOperationException($"No se puede preparar un pedido en estado {State}");

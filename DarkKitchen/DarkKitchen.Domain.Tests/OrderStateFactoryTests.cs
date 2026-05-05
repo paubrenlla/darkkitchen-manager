@@ -9,6 +9,7 @@ public class OrderStateFactoryTests
 {
     [DataTestMethod]
     [DataRow(OrderState.Pending, typeof(PendingState))]
+    [DataRow(OrderState.Delayed, typeof(DelayedState))]
     [DataRow(OrderState.Prepared, typeof(PreparedState))]
     [DataRow(OrderState.Shipping, typeof(ShippingState))]
     [DataRow(OrderState.Delivered, typeof(DeliveredState))]
