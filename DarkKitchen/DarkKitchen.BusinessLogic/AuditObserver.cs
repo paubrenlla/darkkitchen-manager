@@ -2,6 +2,7 @@ using System.Text;
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
 
 namespace DarkKitchen.BusinessLogic;
@@ -96,6 +97,19 @@ public class AuditObserver(IAuditRepository auditRepository)
             EntityName = domainEvent.EntityName,
             ResponsibleUser = domainEvent.ResponsibleUser,
             ChangeDescription = $"Producto dado de alta.\nID Interno: {domainEvent.NewState.Id}\nCódigo: {domainEvent.NewState.Code}\nNombre: {domainEvent.NewState.Name}\n"
+        };
+
+        _auditRepository.Save(auditLog);
+    }
+
+    public void Handle(EntityCreatedEvent<Promotion> domainEvent)
+    {
+        var auditLog = new AuditLog
+        {
+            EntityId = domainEvent.EntityId,
+            EntityName = domainEvent.EntityName,
+            ResponsibleUser = domainEvent.ResponsibleUser,
+            ChangeDescription = $"Promoción creada exitosamente.\nID Interno: {domainEvent.NewState.Id}\nNombre: {domainEvent.NewState.Name}\nDescuento: {domainEvent.NewState.DiscountPercentage}%\n"
         };
 
         _auditRepository.Save(auditLog);
