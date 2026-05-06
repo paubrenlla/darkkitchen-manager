@@ -109,7 +109,15 @@ public class ProductsControllerTests
             IsActive = true
         };
 
-        _mockService.Setup(s => s.CreateProduct(request)).Returns(response);
+        _mockService.Setup(s => s.CreateProduct(request, It.IsAny<string>())).Returns(response);
+
+        var claims = new List<System.Security.Claims.Claim> { new(System.Security.Claims.ClaimTypes.Email, "admin@darkkitchen.com") };
+        var identity = new System.Security.Claims.ClaimsIdentity(claims, "Test");
+        var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
 
         var result = _controller.CreateProduct(request) as ObjectResult;
 
