@@ -113,11 +113,13 @@ public class ProductServiceTests
             Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }]
         };
 
-        ProductResponse result = _productService.CreateProduct(request);
+        ProductResponse result = _productService.CreateProduct(request, "admin@darkkitchen.com");
 
         Assert.IsNotNull(result);
         Assert.AreEqual("NEW01", result.Code);
         _mockRepository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.NewState.Code == "NEW01")), Times.Once);
     }
 
     [TestMethod]
@@ -135,7 +137,7 @@ public class ProductServiceTests
             Images = [new ProductImageDto { Url = "valid.jpg", SizeInBytes = 1000 }]
         };
 
-        _productService.CreateProduct(request);
+        _productService.CreateProduct(request, "admin@darkkitchen.com");
     }
 
     [TestMethod]
@@ -202,6 +204,8 @@ public class ProductServiceTests
         ProductResponse result = _productService.UpdateProduct(productId, request, "admin@darkkitchen.com");
 
         Assert.IsFalse(result.IsActive);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityDeactivatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.EntityId == productId)), Times.Once);
     }
 
     [TestMethod]
@@ -228,6 +232,8 @@ public class ProductServiceTests
         ProductResponse result = _productService.UpdateProduct(productId, request, "admin@darkkitchen.com");
 
         Assert.IsTrue(result.IsActive);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityActivatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.EntityId == productId)), Times.Once);
     }
 
     [TestMethod]
