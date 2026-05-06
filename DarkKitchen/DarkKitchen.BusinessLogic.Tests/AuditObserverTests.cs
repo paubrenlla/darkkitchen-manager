@@ -214,4 +214,65 @@ public class AuditObserverTests
                 log.ChangeDescription.Contains("Descuento: 20%"))),
             Times.Once);
     }
+
+    [TestMethod]
+    public void Handle_PromotionModifiedEvent_ShouldLogChanges()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var oldPromo = new Promotion("Old Name", 10, DateTime.Now, DateTime.Now.AddDays(7), []);
+        var newPromo = new Promotion("New Name", 15, DateTime.Now, DateTime.Now.AddDays(7), []);
+        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, oldPromo.Id);
+
+        var domainEvent = new EntityModifiedEvent<Promotion>
+        {
+            EntityId = oldPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = "admin@darkkitchen.com",
+            OldState = oldPromo,
+            NewState = newPromo
+        };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.EntityId == oldPromo.Id &&
+                log.ChangeDescription.Contains("Name cambió de 'Old Name' a 'New Name'") &&
+                log.ChangeDescription.Contains("DiscountPercentage cambió de '10' a '15'"))),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void Handle_PromotionModifiedEvent_ShouldLogProductsChange()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var line = new ProductLine("Line");
+        var cat = new ProductCategory("Cat");
+        var prod1 = new Product("CODE1", "Product Valid Name 1", "Description description description", line, cat, 100m, [new ProductImage("img.jpg", 1000)]);
+        var prod2 = new Product("CODE2", "Product Valid Name 2", "Description description description", line, cat, 200m, [new ProductImage("img.jpg", 1000)]);
+
+        var oldPromo = new Promotion("Promo", 10, DateTime.Now, DateTime.Now.AddDays(7), [prod1]);
+        var newPromo = new Promotion("Promo", 10, DateTime.Now, DateTime.Now.AddDays(7), [prod2]);
+        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, oldPromo.Id);
+
+        var domainEvent = new EntityModifiedEvent<Promotion>
+        {
+            EntityId = oldPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = "admin@darkkitchen.com",
+            OldState = oldPromo,
+            NewState = newPromo
+        };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.ChangeDescription.Contains("La lista de productos de la promoción fue modificada."))),
+            Times.Once);
+    }
 }
