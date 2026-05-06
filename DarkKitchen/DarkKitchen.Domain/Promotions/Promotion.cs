@@ -83,4 +83,17 @@ public class Promotion
     {
         return IsActive && date >= StartDate && date <= EndDate;
     }
+
+    public Promotion Clone()
+    {
+        var clone = new Promotion(Name, DiscountPercentage, StartDate, EndDate, new List<Product>(Products));
+        typeof(Promotion).GetProperty(nameof(Id))!.SetValue(clone, Id);
+
+        if(!IsActive)
+        {
+            clone.Deactivate();
+        }
+
+        return clone;
+    }
 }
