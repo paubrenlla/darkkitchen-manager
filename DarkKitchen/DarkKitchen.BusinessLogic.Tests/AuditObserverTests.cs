@@ -1,6 +1,7 @@
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
 using Moq;
 
@@ -182,6 +183,35 @@ public class AuditObserverTests
                 log.ChangeDescription.Contains($"ID Interno: {newProduct.Id}") &&
                 log.ChangeDescription.Contains("Código: CODE1") &&
                 log.ChangeDescription.Contains("Nombre: Valid Name"))),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void Handle_PromotionCreatedEvent_ShouldLogCreation()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var newPromo = new Promotion("SUMMER26", 20, DateTime.Now, DateTime.Now.AddDays(7), []);
+        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, Guid.NewGuid());
+
+        var domainEvent = new EntityCreatedEvent<Promotion>
+        {
+            EntityId = newPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = "admin@darkkitchen.com",
+            NewState = newPromo
+        };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.EntityId == newPromo.Id &&
+                log.EntityName == "Promotion" &&
+                log.ChangeDescription.Contains("Promoción creada exitosamente.") &&
+                log.ChangeDescription.Contains($"Nombre: SUMMER26") &&
+                log.ChangeDescription.Contains("Descuento: 20%"))),
             Times.Once);
     }
 }
