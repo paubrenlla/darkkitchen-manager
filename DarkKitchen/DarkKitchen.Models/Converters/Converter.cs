@@ -1,3 +1,4 @@
+using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
@@ -126,5 +127,18 @@ public static class Converter
             .ToList();
 
         return new Product(request.Code, request.Name, request.Description, line, category, request.Price, images);
+    }
+
+    public static AuditLogResponse ToAuditLogResponse(AuditLog auditLog)
+    {
+        return new AuditLogResponse
+        {
+            Id = auditLog.Id,
+            Timestamp = auditLog.Timestamp,
+            EntityName = auditLog.EntityName,
+            EntityId = auditLog.EntityId,
+            ChangeDescription = auditLog.ChangeDescription,
+            ResponsibleUser = auditLog.ResponsibleUser
+        };
     }
 }

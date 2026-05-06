@@ -15,6 +15,7 @@ DELETE FROM Products;
 DELETE FROM ProductLines;
 DELETE FROM ProductCategories;
 DELETE FROM Users;
+DELETE FROM AuditLogs;
 
 -- =============================================
 -- VARIABLES
@@ -263,3 +264,14 @@ VALUES
     (NEWID(), @Prod2Id, 1, 200.00, 0, NULL, @Order1Id),
     (NEWID(), @Prod3Id, 1, 120.00, 0, NULL, @Order2Id),
     (NEWID(), @Prod1Id, 3, 150.00, 10, 'Black Friday', @Order3Id);
+
+-- =============================================
+-- LOGS DE AUDITORIA
+-- =============================================
+
+INSERT INTO AuditLogs (Id, Timestamp, EntityName, EntityId, ChangeDescription, ResponsibleUser)
+VALUES
+    (NEWID(), '2026-04-25 10:00:00', 'Product', @Prod1Id, 'Producto antiguo creado', 'admin@bmb.com'),
+    (NEWID(), '2026-05-01 08:30:00', 'Product', @Prod1Id, 'Alta de Hamburguesa Clasica', 'admin@bmb.com'),
+    (NEWID(), '2026-05-01 15:00:00', 'Promotion', @Promo1Id, 'Nueva promo Black Friday configurada', 'admin@bmb.com'),
+    (NEWID(), '2026-05-05 12:00:00', 'Product', @Prod1Id, 'Modificación de precio: de 140 a 150', 'admin@bmb.com');

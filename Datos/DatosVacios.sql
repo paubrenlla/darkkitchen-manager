@@ -15,6 +15,7 @@ DELETE FROM Products;
 DELETE FROM ProductLines;
 DELETE FROM ProductCategories;
 DELETE FROM Users;
+DELETE FROM AuditLogs;
 
 -- =============================================
 -- USUARIO ADMIN INICIAL

@@ -1,3 +1,4 @@
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
@@ -9,6 +10,7 @@ namespace DarkKitchen.BusinessLogic.Tests;
 public class ProductServiceTests
 {
     private List<ProductImage> _defaultImages = null!;
+    private Mock<IDomainEventPublisher> _mockEventPublisher = null!;
     private Mock<IProductRepository> _mockRepository = null!;
     private ProductService _productService = null!;
     private List<Product> _testProducts = null!;
@@ -17,6 +19,7 @@ public class ProductServiceTests
     public void Setup()
     {
         _mockRepository = new Mock<IProductRepository>();
+        _mockEventPublisher = new Mock<IDomainEventPublisher>();
         _defaultImages = [new ProductImage("photo.jpg", 100000)];
 
         var lineCombo = new ProductLine("Combo burgers");
@@ -35,7 +38,7 @@ public class ProductServiceTests
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);
-        _productService = new ProductService(_mockRepository.Object);
+        _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object);
     }
 
     [TestMethod]
@@ -110,40 +113,31 @@ public class ProductServiceTests
             Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }]
         };
 
-        ProductResponse result = _productService.CreateProduct(request);
+        ProductResponse result = _productService.CreateProduct(request, "admin@darkkitchen.com");
 
         Assert.IsNotNull(result);
         Assert.AreEqual("NEW01", result.Code);
         _mockRepository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.NewState.Code == "NEW01")), Times.Once);
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
     public void CreateProduct_DuplicatedCode_ShouldThrow()
     {
-        var request1 = new ProductCreateRequest
+        var request = new ProductCreateRequest
         {
-            Code = "PIE01",
-            Name = "Pie",
-            Description = "Desc",
-            Line = "Pie",
-            Category = "Cakes",
+            Code = "BURG01", // This code already exists in _testProducts
+            Name = "Valid Product Name",
+            Description = "This is a valid long description",
+            Line = "Combo burgers",
+            Category = "Parrilla",
             Price = 100,
-            Images = []
-        };
-        var request2 = new ProductCreateRequest
-        {
-            Code = "PIE01",
-            Name = "Duplicate",
-            Description = "Desc",
-            Line = "Pie",
-            Category = "Cakes",
-            Price = 100,
-            Images = []
+            Images = [new ProductImageDto { Url = "valid.jpg", SizeInBytes = 1000 }]
         };
 
-        _productService.CreateProduct(request1);
-        _productService.CreateProduct(request2);
+        _productService.CreateProduct(request, "admin@darkkitchen.com");
     }
 
     [TestMethod]
@@ -163,7 +157,7 @@ public class ProductServiceTests
 
         _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
 
-        ProductResponse result = _productService.UpdateProduct(productId, request);
+        ProductResponse result = _productService.UpdateProduct(productId, request, "admin@darkkitchen.com");
 
         Assert.IsNotNull(result);
         Assert.AreEqual("Hamburguesa Actualizada", result.Name);
@@ -186,7 +180,7 @@ public class ProductServiceTests
             Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
         };
 
-        _productService.UpdateProduct(Guid.NewGuid(), request);
+        _productService.UpdateProduct(Guid.NewGuid(), request, "admin@darkkitchen.com");
     }
 
     [TestMethod]
@@ -207,8 +201,72 @@ public class ProductServiceTests
 
         _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
 
-        ProductResponse result = _productService.UpdateProduct(productId, request);
+        ProductResponse result = _productService.UpdateProduct(productId, request, "admin@darkkitchen.com");
 
         Assert.IsFalse(result.IsActive);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityDeactivatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.EntityId == productId)), Times.Once);
+    }
+
+    [TestMethod]
+    public void UpdateProduct_WithIsActiveTrue_ShouldActivateProduct()
+    {
+        Guid productId = _testProducts[0].Id;
+
+        // Deactivate it first so we can test the activation branch
+        _testProducts[0].Deactivate();
+
+        var request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }],
+            IsActive = true
+        };
+
+        _mockRepository.Setup(r => r.GetById(productId)).Returns(_testProducts[0]);
+
+        ProductResponse result = _productService.UpdateProduct(productId, request, "admin@darkkitchen.com");
+
+        Assert.IsTrue(result.IsActive);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityActivatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com" && e.EntityId == productId)), Times.Once);
+    }
+
+    [TestMethod]
+    public void UpdateProduct_ValidRequest_ShouldPublishEntityModifiedEvent()
+    {
+        Guid productId = _testProducts[0].Id;
+        Product existingProduct = _testProducts[0];
+
+        var expectedOldPrice = existingProduct.Price;
+
+        var updateRequest = new ProductUpdateRequest
+        {
+            Name = "New Valid Name",
+            Description = existingProduct.Description,
+            Line = "Combo burgers",
+            Category = "Parrilla",
+            Price = 150m,
+            Images = [new ProductImageDto { Url = "photo.jpg", SizeInBytes = 100000 }]
+        };
+
+        var currentUser = "admin@darkkitchen.com";
+
+        _mockRepository.Setup(r => r.GetById(productId)).Returns(existingProduct);
+
+        _productService.UpdateProduct(productId, updateRequest, currentUser);
+
+        _mockEventPublisher.Verify(
+            p => p.Publish(It.Is<EntityModifiedEvent<Product>>(e =>
+                e.EntityId == productId &&
+                e.ResponsibleUser == currentUser &&
+                e.OldState.Price == expectedOldPrice &&
+                e.NewState.Price == 150m &&
+                !ReferenceEquals(e.OldState, e.NewState))),
+            Times.Once);
     }
 }

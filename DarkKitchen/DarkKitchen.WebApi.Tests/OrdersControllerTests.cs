@@ -442,4 +442,36 @@ public class OrdersControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void UpdateStatus_Entregado_AsAdministrativo_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Entregado" }) as ForbidResult;
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void UpdateStatus_NoEntregado_AsAdministrativo_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "NoEntregado" }) as ForbidResult;
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void GetOrders_AsPreparador_OnlyFromDate_ReturnsBadRequest()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var result = _controller.GetOrders(DateTime.Now, null, null, null) as BadRequestObjectResult;
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void GetOrders_AsPreparador_OnlyToDate_ReturnsBadRequest()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var result = _controller.GetOrders(null, DateTime.Now, null, null) as BadRequestObjectResult;
+        Assert.IsNotNull(result);
+    }
 }
