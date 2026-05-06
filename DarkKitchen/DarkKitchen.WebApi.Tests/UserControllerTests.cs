@@ -246,4 +246,28 @@ public class UserControllerTests
 
         Assert.IsNotNull(result);
     }
+
+    [TestMethod]
+    public void CreateUser_AnonymousWithRole_ReturnsForbid()
+    {
+        _userController.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var request = new UserCreateRequest { Name = "N", Surname = "S", Email = "t@t.com", Password = "Valid1Password!@", Role = "Cliente", CountryPrefix = "+598", PhoneNumber = "0941" };
+
+        var result = _userController.CreateUser(request) as ForbidResult;
+
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void CreateUser_WithNoRoleInRequest_ReturnsCreated()
+    {
+        SetCallerContext(_callerId, "Cualquiera");
+        var request = new UserCreateRequest { Name = "N", Surname = "S", Email = "t@t.com", Password = "Valid1Password!@", Role = null, CountryPrefix = "+598", PhoneNumber = "0941" };
+        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(new UserCreateResponse { Name = "N", Surname = "S", Email = "t@t.com", Phone = "P", Role = "Cliente" });
+
+        var result = _userController.CreateUser(request) as ObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(201, result.StatusCode);
+    }
 }

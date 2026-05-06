@@ -167,4 +167,15 @@ public class ProductsControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
     }
+
+    [TestMethod]
+    public void CreateProduct_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var request = new ProductCreateRequest { Code = "U1", Name = "N", Description = "D", Line = "Desayunos", Category = "Bebidas", Price = 10, Images = [] };
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+
+        _controller.CreateProduct(request);
+
+        _mockService.Verify(s => s.CreateProduct(request, "Unknown"), Times.Once);
+    }
 }

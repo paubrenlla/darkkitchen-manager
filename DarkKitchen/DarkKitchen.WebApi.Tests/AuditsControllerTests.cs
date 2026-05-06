@@ -57,4 +57,20 @@ public class AuditsControllerTests
 
         _controller.GetAudits(from, to, null, null);
     }
+
+    [TestMethod]
+    public void GetAudits_OnlyFromProvided_ShouldReturnBadRequest()
+    {
+        var result = _controller.GetAudits(DateTime.UtcNow, null, null, null);
+        var badRequestResult = result as BadRequestObjectResult;
+        Assert.IsNotNull(badRequestResult);
+    }
+
+    [TestMethod]
+    public void GetAudits_OnlyToProvided_ShouldReturnBadRequest()
+    {
+        var result = _controller.GetAudits(null, DateTime.UtcNow, null, null);
+        var badRequestResult = result as BadRequestObjectResult;
+        Assert.IsNotNull(badRequestResult);
+    }
 }
