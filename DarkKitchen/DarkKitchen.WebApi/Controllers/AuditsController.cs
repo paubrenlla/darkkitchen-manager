@@ -23,14 +23,7 @@ public class AuditsController(IAuditService auditService) : ControllerBase
             return BadRequest("Los filtros 'from' y 'to' son obligatorios.");
         }
 
-        try
-        {
-            var audits = _auditService.GetAudits(from.Value, to.Value, entityName, entityId);
-            return Ok(audits);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var audits = _auditService.GetAudits(from.Value, to.Value, entityName, entityId);
+        return Ok(audits);
     }
 }

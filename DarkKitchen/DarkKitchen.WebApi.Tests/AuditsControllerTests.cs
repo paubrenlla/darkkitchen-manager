@@ -46,7 +46,8 @@ public class AuditsControllerTests
     }
 
     [TestMethod]
-    public void GetAudits_ServiceThrowsArgumentException_ShouldReturnBadRequest()
+    [ExpectedException(typeof(ArgumentException))]
+    public void GetAudits_ServiceThrowsArgumentException_ShouldThrow()
     {
         var from = DateTime.UtcNow;
         var to = DateTime.UtcNow.AddDays(-1);
@@ -54,10 +55,6 @@ public class AuditsControllerTests
 
         _mockService.Setup(s => s.GetAudits(from, to, null, null)).Throws(new ArgumentException(errorMessage));
 
-        var result = _controller.GetAudits(from, to, null, null);
-
-        var badRequestResult = result as BadRequestObjectResult;
-        Assert.IsNotNull(badRequestResult);
-        Assert.AreEqual(errorMessage, badRequestResult.Value);
+        _controller.GetAudits(from, to, null, null);
     }
 }
