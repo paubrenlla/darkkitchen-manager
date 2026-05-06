@@ -1,3 +1,4 @@
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IBusinessLogic;
@@ -9,10 +10,12 @@ namespace DarkKitchen.BusinessLogic;
 
 public class PromotionService(
     IPromotionRepository promotionRepository,
-    IProductRepository productRepository) : IPromotionService
+    IProductRepository productRepository,
+    IDomainEventPublisher publisher) : IPromotionService
 {
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IPromotionRepository _promotionRepository = promotionRepository;
+    private readonly IDomainEventPublisher _publisher = publisher;
 
     public IEnumerable<PromotionCreateResponse> GetPromotions(DateTime? date, string? line, string? productCode)
     {
@@ -37,7 +40,7 @@ public class PromotionService(
         return filtered.Select(Converter.ToPromotionCreateResponse);
     }
 
-    public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request)
+    public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request, string responsibleUser)
     {
         IEnumerable<Product> allProducts = _productRepository.GetAll();
         var selectedProducts = allProducts
@@ -57,10 +60,19 @@ public class PromotionService(
             selectedProducts);
 
         _promotionRepository.Add(promotion);
+
+        _publisher.Publish(new EntityCreatedEvent<Promotion>
+        {
+            EntityId = promotion.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = responsibleUser,
+            NewState = promotion
+        });
+
         return Converter.ToPromotionCreateResponse(promotion);
     }
 
-    public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request)
+    public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request, string responsibleUser)
     {
         Promotion existingPromo = _promotionRepository.GetById(id)
                                   ?? throw new KeyNotFoundException("La promoción no existe.");
