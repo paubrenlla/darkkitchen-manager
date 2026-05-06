@@ -131,4 +131,32 @@ public class DomainEventPublisherTests
             log.EntityName == "Promotion" &&
             log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
     }
+
+    [TestMethod]
+    public void Publish_PromotionModifiedEvent_ShouldInvokeAuditObserver()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+        var publisher = new DomainEventPublisher(observer);
+
+        var oldPromo = new Promotion("Old Name", 10, DateTime.Now, DateTime.Now.AddDays(7), []);
+        var newPromo = new Promotion("New Name", 10, DateTime.Now, DateTime.Now.AddDays(7), []);
+        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, oldPromo.Id);
+
+        var domainEvent = new EntityModifiedEvent<Promotion>
+        {
+            EntityId = oldPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = "admin@darkkitchen.com",
+            OldState = oldPromo,
+            NewState = newPromo
+        };
+
+        publisher.Publish(domainEvent);
+
+        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
+            log.EntityId == oldPromo.Id &&
+            log.EntityName == "Promotion" &&
+            log.ChangeDescription.Contains("Name cambió de 'Old Name' a 'New Name'"))), Times.Once);
+    }
 }
