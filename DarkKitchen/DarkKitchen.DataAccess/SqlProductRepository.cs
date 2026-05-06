@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,15 +48,11 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
         var category = _context.ProductCategories.FirstOrDefault(c => c.Name == product.Category.Name)
                        ?? product.Category;
 
-        foreach(var image in existing.Images.ToList())
-        {
-            _context.Set<ProductImage>().Remove(image);
-        }
+        var newImages = product.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
 
-        foreach(var image in product.Images)
-        {
-            _context.Set<ProductImage>().Add(new ProductImage(image.Url, image.SizeInBytes));
-        }
+        _context.Set<ProductImage>().AddRange(newImages);
 
         existing.UpdateDetails(
             product.Name,
@@ -64,7 +60,7 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
             line,
             category,
             product.Price,
-            existing.Images.ToList());
+            newImages);
 
         if(product.IsActive)
         {
