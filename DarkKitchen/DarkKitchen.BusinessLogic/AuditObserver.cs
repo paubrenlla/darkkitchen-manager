@@ -1,8 +1,8 @@
+using System.Text;
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
-using System.Text;
 
 namespace DarkKitchen.BusinessLogic;
 
@@ -57,6 +57,45 @@ public class AuditObserver(IAuditRepository auditRepository)
             EntityName = domainEvent.EntityName,
             ResponsibleUser = domainEvent.ResponsibleUser,
             ChangeDescription = sb.ToString()
+        };
+
+        _auditRepository.Save(auditLog);
+    }
+
+    public void Handle(EntityCreatedEvent<Product> domainEvent)
+    {
+        var auditLog = new AuditLog
+        {
+            EntityId = domainEvent.EntityId,
+            EntityName = domainEvent.EntityName,
+            ResponsibleUser = domainEvent.ResponsibleUser,
+            ChangeDescription = $"Producto creado exitosamente.\nID Interno: {domainEvent.NewState.Id}\nCódigo: {domainEvent.NewState.Code}\nNombre: {domainEvent.NewState.Name}\n"
+        };
+
+        _auditRepository.Save(auditLog);
+    }
+
+    public void Handle(EntityDeactivatedEvent<Product> domainEvent)
+    {
+        var auditLog = new AuditLog
+        {
+            EntityId = domainEvent.EntityId,
+            EntityName = domainEvent.EntityName,
+            ResponsibleUser = domainEvent.ResponsibleUser,
+            ChangeDescription = $"Producto dado de baja.\nID Interno: {domainEvent.OldState.Id}\nCódigo: {domainEvent.OldState.Code}\nNombre: {domainEvent.OldState.Name}\n"
+        };
+
+        _auditRepository.Save(auditLog);
+    }
+
+    public void Handle(EntityActivatedEvent<Product> domainEvent)
+    {
+        var auditLog = new AuditLog
+        {
+            EntityId = domainEvent.EntityId,
+            EntityName = domainEvent.EntityName,
+            ResponsibleUser = domainEvent.ResponsibleUser,
+            ChangeDescription = $"Producto dado de alta.\nID Interno: {domainEvent.NewState.Id}\nCódigo: {domainEvent.NewState.Code}\nNombre: {domainEvent.NewState.Name}\n"
         };
 
         _auditRepository.Save(auditLog);
