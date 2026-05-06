@@ -2,6 +2,7 @@ using DarkKitchen.BusinessLogic.Events;
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
 using Moq;
 
@@ -103,5 +104,31 @@ public class DomainEventPublisherTests
         publisher.Publish(domainEvent);
 
         mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto dado de alta."))), Times.Once);
+    }
+
+    [TestMethod]
+    public void Publish_PromotionCreatedEvent_ShouldInvokeAuditObserver()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+        var publisher = new DomainEventPublisher(observer);
+
+        var newPromo = new Promotion("SUMMER26", 20, DateTime.Now, DateTime.Now.AddDays(7), []);
+        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, Guid.NewGuid());
+
+        var domainEvent = new EntityCreatedEvent<Promotion>
+        {
+            EntityId = newPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = "admin@darkkitchen.com",
+            NewState = newPromo
+        };
+
+        publisher.Publish(domainEvent);
+
+        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
+            log.EntityId == newPromo.Id &&
+            log.EntityName == "Promotion" &&
+            log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
     }
 }
