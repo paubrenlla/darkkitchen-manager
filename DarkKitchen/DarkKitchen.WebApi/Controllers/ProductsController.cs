@@ -26,7 +26,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
     {
-        return StatusCode(StatusCodes.Status201Created, _productService.CreateProduct(request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        return StatusCode(StatusCodes.Status201Created, _productService.CreateProduct(request, currentUser));
     }
 
     [HttpPut("{id}")]
