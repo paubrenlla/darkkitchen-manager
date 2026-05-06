@@ -35,7 +35,7 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
         return products.Select(Converter.ToProductResponse);
     }
 
-    public ProductResponse CreateProduct(ProductCreateRequest request)
+    public ProductResponse CreateProduct(ProductCreateRequest request, string currentUser)
     {
         if(_productRepository.GetAll().Any(p => p.Code == request.Code))
         {
@@ -44,6 +44,14 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
 
         var product = Converter.ToProduct(request);
         _productRepository.Add(product);
+        var domainEvent = new EntityCreatedEvent<Product>
+        {
+            EntityId = product.Id,
+            EntityName = nameof(Product),
+            ResponsibleUser = currentUser,
+            NewState = product
+        };
+        _eventPublisher.Publish(domainEvent);
         return Converter.ToProductResponse(product);
     }
 
@@ -86,6 +94,29 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
         };
 
         _eventPublisher.Publish(domainEvent);
+
+        if (oldProduct.IsActive && !product.IsActive)
+        {
+            var deactivationEvent = new EntityDeactivatedEvent<Product>
+            {
+                EntityId = id,
+                EntityName = nameof(Product),
+                ResponsibleUser = currentUser,
+                OldState = oldProduct
+            };
+            _eventPublisher.Publish(deactivationEvent);
+        }
+        else if (!oldProduct.IsActive && product.IsActive)
+        {
+            var activationEvent = new EntityActivatedEvent<Product>
+            {
+                EntityId = id,
+                EntityName = nameof(Product),
+                ResponsibleUser = currentUser,
+                NewState = product
+            };
+            _eventPublisher.Publish(activationEvent);
+        }
 
         return Converter.ToProductResponse(product);
     }
