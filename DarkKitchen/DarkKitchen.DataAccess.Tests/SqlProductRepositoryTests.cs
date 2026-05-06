@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace DarkKitchen.DataAccess.Tests;
@@ -156,5 +156,28 @@ public class SqlProductRepositoryTests
         var result = _repository.GetById(product.Id);
         Assert.IsNotNull(result);
         Assert.IsFalse(result.IsActive);
+    }
+
+    [TestMethod]
+    public void Update_ReplaceImages_ShouldDeleteOldAndPersistNew()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        var oldImageId = product.Images[0].Id;
+
+        var newImages = new List<ProductImage>
+        {
+            new ProductImage("https://example.com/img1.jpg", 10000),
+            new ProductImage("https://example.com/img2.jpg", 20000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, product.Line, product.Category, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+
+        Assert.AreEqual(2, result.Images.Count);
+        Assert.IsFalse(result.Images.Any(i => i.Id == oldImageId));
+        Assert.IsTrue(result.Images.Any(i => i.Url == "https://example.com/img1.jpg"));
     }
 }
