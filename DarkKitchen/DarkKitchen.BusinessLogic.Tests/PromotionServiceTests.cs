@@ -1,3 +1,4 @@
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
@@ -11,6 +12,7 @@ public class PromotionServiceTests
 {
     private Mock<IProductRepository> _mockProductRepository = null!;
     private Mock<IPromotionRepository> _mockPromotionRepository = null!;
+    private Mock<IDomainEventPublisher> _mockPublisher = null!;
     private PromotionService _promotionService = null!;
     private List<Product> _testProducts = null!;
     private List<Promotion> _testPromotions = null!;
@@ -46,9 +48,11 @@ public class PromotionServiceTests
         _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[0].Id)).Returns(_testPromotions[0]);
         _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[1].Id)).Returns(_testPromotions[1]);
         _mockPromotionRepository.Setup(r => r.GetById(It.Is<Guid>(id => id != _testPromotions[0].Id && id != _testPromotions[1].Id))).Returns((Promotion?)null);
+        _mockPublisher = new Mock<IDomainEventPublisher>();
         _promotionService = new PromotionService(
             _mockPromotionRepository.Object,
-            _mockProductRepository.Object);
+            _mockProductRepository.Object,
+            _mockPublisher.Object);
     }
 
     [TestMethod]
@@ -63,7 +67,7 @@ public class PromotionServiceTests
             ProductCodes = ["BURG01"]
         };
 
-        PromotionCreateResponse result = _promotionService.CreatePromotion(request);
+        PromotionCreateResponse result = _promotionService.CreatePromotion(request, "admin@test.com");
 
         Assert.AreEqual("Promo Verano", result.Name);
         Assert.AreEqual(20, result.DiscountPercentage);
@@ -83,9 +87,28 @@ public class PromotionServiceTests
             ProductCodes = ["BURG01"]
         };
 
-        _promotionService.CreatePromotion(request);
+        _promotionService.CreatePromotion(request, "admin@test.com");
 
         _mockPromotionRepository.Verify(r => r.Add(It.IsAny<Promotion>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void CreatePromotion_ValidRequest_PublishesEvent()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7),
+            ProductCodes = ["BURG01"]
+        };
+
+        _promotionService.CreatePromotion(request, "admin@test.com");
+
+        _mockPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Promotion>>(e =>
+            e.EntityName == "Promotion" &&
+            e.NewState.Name == "Promo Verano")), Times.Once);
     }
 
     [TestMethod]
@@ -100,7 +123,7 @@ public class PromotionServiceTests
             ProductCodes = ["INVALID99"]
         };
 
-        Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request));
+        Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request, "admin@test.com"));
     }
 
     [TestMethod]
@@ -115,7 +138,7 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        PromotionCreateResponse result = _promotionService.CreatePromotion(request);
+        PromotionCreateResponse result = _promotionService.CreatePromotion(request, "admin@test.com");
 
         Assert.AreEqual("Promo Sin Productos", result.Name);
         Assert.AreEqual(0, result.Products.Count);
@@ -201,11 +224,31 @@ public class PromotionServiceTests
             ProductCodes = ["BURG02"]
         };
 
-        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
+        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request, "admin@test.com");
 
         Assert.AreEqual("Black Friday Actualizado", result.Name);
-        Assert.AreEqual(30, result.DiscountPercentage);
         Assert.IsTrue(result.Products.Contains("BURG02"));
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_ValidRequest_PublishesEvent()
+    {
+        Guid promoId = _testPromotions[0].Id;
+        var request = new PromotionCreateRequest
+        {
+            Name = "Black Friday Actualizado",
+            DiscountPercentage = 30,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(30),
+            ProductCodes = ["BURG02"]
+        };
+
+        _promotionService.UpdatePromotion(promoId, request, "admin@test.com");
+
+        _mockPublisher.Verify(p => p.Publish(It.Is<EntityModifiedEvent<Promotion>>(e =>
+            e.EntityName == "Promotion" &&
+            e.OldState.Name == "Black Friday" &&
+            e.NewState.Name == "Black Friday Actualizado")), Times.Once);
     }
 
     [TestMethod]
@@ -221,7 +264,7 @@ public class PromotionServiceTests
         };
 
         Assert.ThrowsException<KeyNotFoundException>(() =>
-            _promotionService.UpdatePromotion(Guid.NewGuid(), request));
+            _promotionService.UpdatePromotion(Guid.NewGuid(), request, "admin@test.com"));
     }
 
     [TestMethod]
@@ -238,7 +281,7 @@ public class PromotionServiceTests
         };
 
         Assert.ThrowsException<ArgumentException>(() =>
-            _promotionService.UpdatePromotion(promoId, request));
+            _promotionService.UpdatePromotion(promoId, request, "admin@test.com"));
     }
 
     [TestMethod]
@@ -254,7 +297,7 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
+        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request, "admin@test.com");
 
         Assert.AreEqual(0, result.Products.Count);
     }

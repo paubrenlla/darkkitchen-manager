@@ -212,4 +212,27 @@ public class PromotionTests
 
         Assert.IsTrue(promotion.IsVigente(DateTime.Today.AddDays(5)));
     }
+
+    [TestMethod]
+    public void Clone_ActivePromotion_ShouldReturnActiveClone()
+    {
+        var promotion = new Promotion("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+
+        var clone = promotion.Clone();
+
+        Assert.AreEqual(promotion.Id, clone.Id);
+        Assert.AreEqual(promotion.Name, clone.Name);
+        Assert.IsTrue(clone.IsActive);
+    }
+
+    [TestMethod]
+    public void Clone_InactivePromotion_ShouldReturnInactiveClone()
+    {
+        var promotion = new Promotion("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
+        promotion.Deactivate();
+
+        var clone = promotion.Clone();
+
+        Assert.IsFalse(clone.IsActive);
+    }
 }

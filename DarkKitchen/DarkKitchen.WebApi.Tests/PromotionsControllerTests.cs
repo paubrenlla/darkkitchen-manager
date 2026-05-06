@@ -41,6 +41,13 @@ public class PromotionsControllerTests
         ];
 
         _controller = new PromotionsController(_mockService.Object);
+        var claims = new List<System.Security.Claims.Claim> { new(System.Security.Claims.ClaimTypes.Email, "admin@test.com") };
+        var identity = new System.Security.Claims.ClaimsIdentity(claims, "Test");
+        var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
     }
 
     [TestMethod]
@@ -99,7 +106,7 @@ public class PromotionsControllerTests
             EndDate = new DateTime(2025, 12, 31),
             Products = ["BURG01"]
         };
-        _mockService.Setup(s => s.CreatePromotion(request)).Returns(expected);
+        _mockService.Setup(s => s.CreatePromotion(request, It.IsAny<string>())).Returns(expected);
 
         var result = _controller.CreatePromotion(request) as ObjectResult;
 
@@ -128,7 +135,7 @@ public class PromotionsControllerTests
             EndDate = new DateTime(2025, 12, 31),
             Products = ["BURG01"]
         };
-        _mockService.Setup(s => s.UpdatePromotion(id, request)).Returns(expected);
+        _mockService.Setup(s => s.UpdatePromotion(id, request, It.IsAny<string>())).Returns(expected);
 
         var result = _controller.UpdatePromotion(id, request) as OkObjectResult;
 
