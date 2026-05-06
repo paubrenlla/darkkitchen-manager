@@ -274,4 +274,6 @@ VALUES
     (NEWID(), '2026-04-25 10:00:00', 'Product', @Prod1Id, 'Producto antiguo creado', 'admin@bmb.com'),
     (NEWID(), '2026-05-01 08:30:00', 'Product', @Prod1Id, 'Alta de Hamburguesa Clasica', 'admin@bmb.com'),
     (NEWID(), '2026-05-01 15:00:00', 'Promotion', @Promo1Id, 'Nueva promo Black Friday configurada', 'admin@bmb.com'),
-    (NEWID(), '2026-05-05 12:00:00', 'Product', @Prod1Id, 'Modificación de precio: de 140 a 150', 'admin@bmb.com');
+    (NEWID(), '2026-05-02 10:00:00', 'Promotion', @Promo2Id, 'Nueva promo Semana de Turismo configurada', 'admin@bmb.com'),
+    (NEWID(), '2026-05-05 12:00:00', 'Product', @Prod1Id, 'Modificación de precio: de 140 a 150', 'admin@bmb.com'),
+    (NEWID(), '2026-05-06 09:00:00', 'Promotion', @Promo1Id, 'Descuento actualizado: de 10% a 12%', 'admin@bmb.com');
