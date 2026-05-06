@@ -32,13 +32,15 @@ public class PromotionsController(IPromotionService promotionService) : Controll
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreatePromotion([FromBody] PromotionCreateRequest request)
     {
-        return StatusCode(StatusCodes.Status201Created, _promotionService.CreatePromotion(request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        return StatusCode(StatusCodes.Status201Created, _promotionService.CreatePromotion(request, currentUser));
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdatePromotion(Guid id, [FromBody] PromotionCreateRequest request)
     {
-        return Ok(_promotionService.UpdatePromotion(id, request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        return Ok(_promotionService.UpdatePromotion(id, request, currentUser));
     }
 }
