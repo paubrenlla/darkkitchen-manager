@@ -45,6 +45,7 @@ public static class DependencyResolution
         services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
 
         services.AddScoped<IAuditRepository, SqlAuditRepository>();
+        services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<AuditObserver>();
         services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
