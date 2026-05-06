@@ -95,7 +95,7 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
 
         _eventPublisher.Publish(domainEvent);
 
-        if (oldProduct.IsActive && !product.IsActive)
+        if(oldProduct.IsActive && !product.IsActive)
         {
             var deactivationEvent = new EntityDeactivatedEvent<Product>
             {
@@ -106,7 +106,7 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
             };
             _eventPublisher.Publish(deactivationEvent);
         }
-        else if (!oldProduct.IsActive && product.IsActive)
+        else if(!oldProduct.IsActive && product.IsActive)
         {
             var activationEvent = new EntityActivatedEvent<Product>
             {

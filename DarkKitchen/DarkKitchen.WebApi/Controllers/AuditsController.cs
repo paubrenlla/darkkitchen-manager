@@ -18,7 +18,7 @@ public class AuditsController(IAuditService auditService) : ControllerBase
         [FromQuery] string? entityName,
         [FromQuery] Guid? entityId)
     {
-        if (!from.HasValue || !to.HasValue)
+        if(!from.HasValue || !to.HasValue)
         {
             return BadRequest("Los filtros 'from' y 'to' son obligatorios.");
         }

@@ -11,7 +11,7 @@ public class AuditService(IAuditRepository auditRepository) : IAuditService
 
     public IEnumerable<AuditLogResponse> GetAudits(DateTime from, DateTime to, string? entityName, Guid? entityId)
     {
-        if (from > to)
+        if(from > to)
         {
             throw new ArgumentException("La fecha 'desde' no puede ser mayor que la fecha 'hasta'.");
         }

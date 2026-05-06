@@ -18,12 +18,12 @@ public class SqlAuditRepository(DarkKitchenContext context) : IAuditRepository
         IQueryable<AuditLog> query = _context.AuditLogs
             .Where(l => l.Timestamp >= from && l.Timestamp <= to);
 
-        if (!string.IsNullOrEmpty(entityName))
+        if(!string.IsNullOrEmpty(entityName))
         {
             query = query.Where(l => l.EntityName == entityName);
         }
 
-        if (entityId.HasValue)
+        if(entityId.HasValue)
         {
             query = query.Where(l => l.EntityId == entityId.Value);
         }

@@ -17,8 +17,8 @@ public class DomainEventPublisherTests
         var observer = new AuditObserver(mockAuditRepository.Object);
         var publisher = new DomainEventPublisher(observer);
 
-        var oldProduct = new Product("CODE1", "Old Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
-        var newProduct = new Product("CODE1", "New Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Old Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
+        var newProduct = new Product("CODE1", "New Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
 
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
@@ -43,7 +43,7 @@ public class DomainEventPublisherTests
         var observer = new AuditObserver(mockAuditRepository.Object);
         var publisher = new DomainEventPublisher(observer);
 
-        var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
 
         var domainEvent = new EntityCreatedEvent<Product>
@@ -66,7 +66,7 @@ public class DomainEventPublisherTests
         var observer = new AuditObserver(mockAuditRepository.Object);
         var publisher = new DomainEventPublisher(observer);
 
-        var oldProduct = new Product("CODE1", "Old Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Old Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(oldProduct, Guid.NewGuid());
 
         var domainEvent = new EntityDeactivatedEvent<Product>
@@ -89,7 +89,7 @@ public class DomainEventPublisherTests
         var observer = new AuditObserver(mockAuditRepository.Object);
         var publisher = new DomainEventPublisher(observer);
 
-        var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
 
         var domainEvent = new EntityActivatedEvent<Product>

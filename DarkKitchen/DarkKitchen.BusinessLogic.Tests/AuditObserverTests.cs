@@ -16,9 +16,9 @@ public class AuditObserverTests
         var observer = new AuditObserver(mockAuditRepository.Object);
 
         var oldProduct = new Product("CODE1", "Old Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"),
-            100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+            100m, [new ProductImage("img.jpg", 1000)]);
         var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"),
-            150m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+            150m, [new ProductImage("img.jpg", 1000)]);
 
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
@@ -47,8 +47,8 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var oldProduct = new Product("CODE1", "Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
-        var newProduct = new Product("CODE1", "Valid Name", "This is a new valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
+        var newProduct = new Product("CODE1", "Valid Name", "This is a new valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
 
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
@@ -65,8 +65,8 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
-        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
 
         typeof(Product).GetProperty("IsActive")!.SetValue(newProduct, false);
 
@@ -85,8 +85,8 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Old Line"), new ProductCategory("Old Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
-        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("New Line"), new ProductCategory("New Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Old Line"), new ProductCategory("Old Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("New Line"), new ProductCategory("New Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
 
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
@@ -107,8 +107,8 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img1.jpg", 1000) });
-        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img2.jpg", 2000) });
+        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img1.jpg", 1000)]);
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img2.jpg", 2000)]);
 
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
@@ -125,7 +125,7 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
 
         var domainEvent = new EntityCreatedEvent<Product> { EntityId = newProduct.Id, EntityName = "Product", ResponsibleUser = "admin", NewState = newProduct };
@@ -147,7 +147,7 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(oldProduct, Guid.NewGuid());
 
         var domainEvent = new EntityDeactivatedEvent<Product> { EntityId = oldProduct.Id, EntityName = "Product", ResponsibleUser = "admin", OldState = oldProduct };
@@ -169,7 +169,7 @@ public class AuditObserverTests
         var mockAuditRepository = new Mock<IAuditRepository>();
         var observer = new AuditObserver(mockAuditRepository.Object);
 
-        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
 
         var domainEvent = new EntityActivatedEvent<Product> { EntityId = newProduct.Id, EntityName = "Product", ResponsibleUser = "admin", NewState = newProduct };
