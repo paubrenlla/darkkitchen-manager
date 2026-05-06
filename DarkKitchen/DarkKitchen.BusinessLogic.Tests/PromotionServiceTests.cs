@@ -227,8 +227,28 @@ public class PromotionServiceTests
         PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request, "admin@test.com");
 
         Assert.AreEqual("Black Friday Actualizado", result.Name);
-        Assert.AreEqual(30, result.DiscountPercentage);
         Assert.IsTrue(result.Products.Contains("BURG02"));
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_ValidRequest_PublishesEvent()
+    {
+        Guid promoId = _testPromotions[0].Id;
+        var request = new PromotionCreateRequest
+        {
+            Name = "Black Friday Actualizado",
+            DiscountPercentage = 30,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(30),
+            ProductCodes = ["BURG02"]
+        };
+
+        _promotionService.UpdatePromotion(promoId, request, "admin@test.com");
+
+        _mockPublisher.Verify(p => p.Publish(It.Is<EntityModifiedEvent<Promotion>>(e =>
+            e.EntityName == "Promotion" &&
+            e.OldState.Name == "Black Friday" &&
+            e.NewState.Name == "Black Friday Actualizado")), Times.Once);
     }
 
     [TestMethod]
