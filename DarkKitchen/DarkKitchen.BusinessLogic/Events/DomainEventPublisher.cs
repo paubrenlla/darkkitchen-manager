@@ -30,5 +30,9 @@ public class DomainEventPublisher(AuditObserver auditObserver) : IDomainEventPub
         {
             _auditObserver.Handle(promotionCreatedEvent);
         }
+        else if(domainEvent is EntityModifiedEvent<Promotion> promotionModifiedEvent)
+        {
+            _auditObserver.Handle(promotionModifiedEvent);
+        }
     }
 }
