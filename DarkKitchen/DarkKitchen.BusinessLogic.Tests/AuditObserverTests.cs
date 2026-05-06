@@ -118,4 +118,70 @@ public class AuditObserverTests
 
         mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Las imágenes del producto fueron modificadas."))), Times.Once);
     }
+
+    [TestMethod]
+    public void Handle_EntityCreatedEvent_ShouldLogCreation()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
+
+        var domainEvent = new EntityCreatedEvent<Product> { EntityId = newProduct.Id, EntityName = "Product", ResponsibleUser = "admin", NewState = newProduct };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.ChangeDescription.Contains("Producto creado exitosamente.") &&
+                log.ChangeDescription.Contains($"ID Interno: {newProduct.Id}") &&
+                log.ChangeDescription.Contains("Código: CODE1") &&
+                log.ChangeDescription.Contains("Nombre: Valid Name"))),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void Handle_EntityDeactivatedEvent_ShouldLogDeactivation()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var oldProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        typeof(Product).GetProperty("Id")!.SetValue(oldProduct, Guid.NewGuid());
+
+        var domainEvent = new EntityDeactivatedEvent<Product> { EntityId = oldProduct.Id, EntityName = "Product", ResponsibleUser = "admin", OldState = oldProduct };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.ChangeDescription.Contains("Producto dado de baja.") &&
+                log.ChangeDescription.Contains($"ID Interno: {oldProduct.Id}") &&
+                log.ChangeDescription.Contains("Código: CODE1") &&
+                log.ChangeDescription.Contains("Nombre: Valid Name"))),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void Handle_EntityActivatedEvent_ShouldLogActivation()
+    {
+        var mockAuditRepository = new Mock<IAuditRepository>();
+        var observer = new AuditObserver(mockAuditRepository.Object);
+
+        var newProduct = new Product("CODE1", "Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, new List<ProductImage> { new ProductImage("img.jpg", 1000) });
+        typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
+
+        var domainEvent = new EntityActivatedEvent<Product> { EntityId = newProduct.Id, EntityName = "Product", ResponsibleUser = "admin", NewState = newProduct };
+
+        observer.Handle(domainEvent);
+
+        mockAuditRepository.Verify(
+            r => r.Save(It.Is<AuditLog>(log =>
+                log.ChangeDescription.Contains("Producto dado de alta.") &&
+                log.ChangeDescription.Contains($"ID Interno: {newProduct.Id}") &&
+                log.ChangeDescription.Contains("Código: CODE1") &&
+                log.ChangeDescription.Contains("Nombre: Valid Name"))),
+            Times.Once);
+    }
 }
