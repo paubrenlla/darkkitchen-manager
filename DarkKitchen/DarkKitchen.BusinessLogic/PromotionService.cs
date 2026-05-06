@@ -86,6 +86,8 @@ public class PromotionService(
             throw new ArgumentException("Uno o más códigos de producto no son válidos.");
         }
 
+        var oldState = existingPromo.Clone();
+
         existingPromo.Update(
             request.Name,
             request.DiscountPercentage,
@@ -94,6 +96,16 @@ public class PromotionService(
             selectedProducts);
 
         _promotionRepository.Update(existingPromo);
+
+        _publisher.Publish(new EntityModifiedEvent<Promotion>
+        {
+            EntityId = existingPromo.Id,
+            EntityName = "Promotion",
+            ResponsibleUser = responsibleUser,
+            OldState = oldState,
+            NewState = existingPromo
+        });
+
         return Converter.ToPromotionCreateResponse(existingPromo);
     }
 
