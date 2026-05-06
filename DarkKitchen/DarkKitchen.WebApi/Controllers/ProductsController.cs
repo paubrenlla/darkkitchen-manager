@@ -1,4 +1,4 @@
-﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +33,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
     {
-        return Ok(_productService.UpdateProduct(id, request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        return Ok(_productService.UpdateProduct(id, request, currentUser));
     }
 }

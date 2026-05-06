@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
+using DarkKitchen.BusinessLogic.Events;
 using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.Domain.Users.PhoneValidations;
@@ -41,6 +43,10 @@ public static class DependencyResolution
         services.AddScoped<IShippingStrategy>(sp => new ExpressShippingStrategy(150m));
         services.AddScoped<IShippingStrategy>(sp => new TwentyFourHoursShippingStrategy(50m));
         services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
+
+        services.AddScoped<IAuditRepository, SqlAuditRepository>();
+        services.AddScoped<AuditObserver>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
         return services;
     }
