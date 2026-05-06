@@ -1,5 +1,6 @@
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 
 namespace DarkKitchen.BusinessLogic.Events;
 
@@ -24,6 +25,10 @@ public class DomainEventPublisher(AuditObserver auditObserver) : IDomainEventPub
         else if(domainEvent is EntityActivatedEvent<Product> activatedEvent)
         {
             _auditObserver.Handle(activatedEvent);
+        }
+        else if(domainEvent is EntityCreatedEvent<Promotion> promotionCreatedEvent)
+        {
+            _auditObserver.Handle(promotionCreatedEvent);
         }
     }
 }
