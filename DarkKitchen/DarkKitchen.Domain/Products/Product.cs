@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace DarkKitchen.Domain.Products;
@@ -18,6 +18,7 @@ public class Product
     public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
 
     private readonly List<ProductImage> _images;
+
     [ExcludeFromCodeCoverage]
     protected Product()
     {
@@ -29,7 +30,8 @@ public class Product
         _images = [];
     }
 
-    public Product(string code, string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
+    public Product(string code, string name, string description, ProductLine line, ProductCategory category,
+        decimal price, List<ProductImage> images)
     {
         ValidateCode(code);
         ValidateName(name);
@@ -121,7 +123,8 @@ public class Product
         }
     }
 
-    public void UpdateDetails(string name, string description, ProductLine line, ProductCategory category, decimal price, List<ProductImage> images)
+    public void UpdateDetails(string name, string description, ProductLine line, ProductCategory category,
+        decimal price, List<ProductImage> images)
     {
         ValidateName(name);
         ValidateDescription(description);
@@ -137,5 +140,18 @@ public class Product
         Price = price;
         _images.Clear();
         _images.AddRange(images);
+    }
+
+    public Product Clone()
+    {
+        var clone = new Product(Code, Name, Description, Line, Category, Price, new List<ProductImage>(_images));
+        typeof(Product).GetProperty(nameof(Id))!.SetValue(clone, Id);
+
+        if(!IsActive)
+        {
+            clone.Deactivate();
+        }
+
+        return clone;
     }
 }
