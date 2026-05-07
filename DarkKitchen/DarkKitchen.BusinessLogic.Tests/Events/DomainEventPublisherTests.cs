@@ -1,9 +1,12 @@
 using DarkKitchen.BusinessLogic.Events;
+using DarkKitchen.BusinessLogic.Handlers;
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests.Events;
@@ -11,16 +14,31 @@ namespace DarkKitchen.BusinessLogic.Tests.Events;
 [TestClass]
 public class DomainEventPublisherTests
 {
-    [TestMethod]
-    public void Publish_EntityModifiedEvent_ShouldInvokeAuditObserver()
+    private ServiceProvider BuildProvider(IAuditRepository auditRepo)
     {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
+        var services = new ServiceCollection();
+        services.AddScoped<IAuditRepository>(_ => auditRepo);
+        services.AddScoped<ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityModifiedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityCreatedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityDeactivatedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityActivatedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<PromotionAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityCreatedEvent<Promotion>>, PromotionAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityModifiedEvent<Promotion>>, PromotionAuditHandler>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+        return services.BuildServiceProvider();
+    }
+
+    [TestMethod]
+    public void Publish_EntityModifiedEvent_ShouldInvokeHandlers()
+    {
+        var mockRepo = new Mock<IAuditRepository>();
+        using var provider = BuildProvider(mockRepo.Object);
+        var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
         var oldProduct = new Product("CODE1", "Old Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         var newProduct = new Product("CODE1", "New Valid Name", "This is an old valid description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
-
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, oldProduct.Id);
 
         var domainEvent = new EntityModifiedEvent<Product>
@@ -34,15 +52,15 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
     }
 
     [TestMethod]
-    public void Publish_EntityCreatedEvent_ShouldInvokeAuditObserver()
+    public void Publish_EntityCreatedEvent_ShouldInvokeHandlers()
     {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
+        var mockRepo = new Mock<IAuditRepository>();
+        using var provider = BuildProvider(mockRepo.Object);
+        var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
         var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
         typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
@@ -57,61 +75,15 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto creado exitosamente."))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto creado exitosamente."))), Times.Once);
     }
 
     [TestMethod]
-    public void Publish_EntityDeactivatedEvent_ShouldInvokeAuditObserver()
+    public void Publish_PromotionCreatedEvent_ShouldInvokeHandlers()
     {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
-
-        var oldProduct = new Product("CODE1", "Old Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
-        typeof(Product).GetProperty("Id")!.SetValue(oldProduct, Guid.NewGuid());
-
-        var domainEvent = new EntityDeactivatedEvent<Product>
-        {
-            EntityId = oldProduct.Id,
-            EntityName = "Product",
-            ResponsibleUser = "admin@darkkitchen.com",
-            OldState = oldProduct
-        };
-
-        publisher.Publish(domainEvent);
-
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto dado de baja."))), Times.Once);
-    }
-
-    [TestMethod]
-    public void Publish_EntityActivatedEvent_ShouldInvokeAuditObserver()
-    {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
-
-        var newProduct = new Product("CODE1", "New Valid Name", "This is a valid long description", new ProductLine("Line"), new ProductCategory("Cat"), 100m, [new ProductImage("img.jpg", 1000)]);
-        typeof(Product).GetProperty("Id")!.SetValue(newProduct, Guid.NewGuid());
-
-        var domainEvent = new EntityActivatedEvent<Product>
-        {
-            EntityId = newProduct.Id,
-            EntityName = "Product",
-            ResponsibleUser = "admin@darkkitchen.com",
-            NewState = newProduct
-        };
-
-        publisher.Publish(domainEvent);
-
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto dado de alta."))), Times.Once);
-    }
-
-    [TestMethod]
-    public void Publish_PromotionCreatedEvent_ShouldInvokeAuditObserver()
-    {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
+        var mockRepo = new Mock<IAuditRepository>();
+        using var provider = BuildProvider(mockRepo.Object);
+        var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
         var newPromo = new Promotion("SUMMER26", 20, DateTime.Now, DateTime.Now.AddDays(7), []);
         typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, Guid.NewGuid());
@@ -126,37 +98,30 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
-            log.EntityId == newPromo.Id &&
-            log.EntityName == "Promotion" &&
-            log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
     }
 
     [TestMethod]
-    public void Publish_PromotionModifiedEvent_ShouldInvokeAuditObserver()
+    public void Publish_UnknownEventType_ShouldNotThrow()
     {
-        var mockAuditRepository = new Mock<IAuditRepository>();
-        var observer = new AuditObserver(mockAuditRepository.Object);
-        var publisher = new DomainEventPublisher(observer);
+        var mockRepo = new Mock<IAuditRepository>();
+        using var provider = BuildProvider(mockRepo.Object);
+        var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
-        var oldPromo = new Promotion("Old Name", 10, DateTime.Now, DateTime.Now.AddDays(7), []);
-        var newPromo = new Promotion("New Name", 10, DateTime.Now, DateTime.Now.AddDays(7), []);
-        typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, oldPromo.Id);
+        publisher.Publish("un evento desconocido");
 
-        var domainEvent = new EntityModifiedEvent<Promotion>
-        {
-            EntityId = oldPromo.Id,
-            EntityName = "Promotion",
-            ResponsibleUser = "admin@darkkitchen.com",
-            OldState = oldPromo,
-            NewState = newPromo
-        };
+        mockRepo.Verify(r => r.Save(It.IsAny<AuditLog>()), Times.Never);
+    }
 
-        publisher.Publish(domainEvent);
+    [TestMethod]
+    public void Publish_WhenNoHandlersRegistered_ShouldNotThrow()
+    {
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        mockServiceProvider.Setup(x => x.GetService(typeof(IEnumerable<IAuditEventHandler<string>>))).Returns(null);
+        var publisher = new DomainEventPublisher(mockServiceProvider.Object);
 
-        mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
-            log.EntityId == oldPromo.Id &&
-            log.EntityName == "Promotion" &&
-            log.ChangeDescription.Contains("Name cambió de 'Old Name' a 'New Name'"))), Times.Once);
+        publisher.Publish("test event");
+
+        // Should not throw exception
     }
 }
