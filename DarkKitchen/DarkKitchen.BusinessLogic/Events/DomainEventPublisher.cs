@@ -1,38 +1,24 @@
 using DarkKitchen.Domain.Events;
-using DarkKitchen.Domain.Products;
-using DarkKitchen.Domain.Promotions;
+using DarkKitchen.IBusinessLogic;
 
 namespace DarkKitchen.BusinessLogic.Events;
 
-public class DomainEventPublisher(AuditObserver auditObserver) : IDomainEventPublisher
+public class DomainEventPublisher(IServiceProvider serviceProvider) : IDomainEventPublisher
 {
-    private readonly AuditObserver _auditObserver = auditObserver;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public void Publish<T>(T domainEvent)
     {
-        if(domainEvent is EntityModifiedEvent<Product> productEvent)
+        var handlers = (IEnumerable<IAuditEventHandler<T>>?)_serviceProvider.GetService(typeof(IEnumerable<IAuditEventHandler<T>>));
+
+        if(handlers == null)
         {
-            _auditObserver.Handle(productEvent);
+            return;
         }
-        else if(domainEvent is EntityCreatedEvent<Product> createdEvent)
+
+        foreach(var handler in handlers)
         {
-            _auditObserver.Handle(createdEvent);
-        }
-        else if(domainEvent is EntityDeactivatedEvent<Product> deactivatedEvent)
-        {
-            _auditObserver.Handle(deactivatedEvent);
-        }
-        else if(domainEvent is EntityActivatedEvent<Product> activatedEvent)
-        {
-            _auditObserver.Handle(activatedEvent);
-        }
-        else if(domainEvent is EntityCreatedEvent<Promotion> promotionCreatedEvent)
-        {
-            _auditObserver.Handle(promotionCreatedEvent);
-        }
-        else if(domainEvent is EntityModifiedEvent<Promotion> promotionModifiedEvent)
-        {
-            _auditObserver.Handle(promotionModifiedEvent);
+            handler.Handle(domainEvent);
         }
     }
 }
