@@ -1,5 +1,6 @@
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users;
@@ -16,6 +17,7 @@ public class DarkKitchenContext(DbContextOptions<DarkKitchenContext> options) : 
     public DbSet<Order> Orders { get; set; }
     public DbSet<Promotion> Promotions { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<ShippingType> ShippingTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
