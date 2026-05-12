@@ -67,11 +67,11 @@ public class ReportServiceTests
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        var order1 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)],
+        var order1 = new Order(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 10, 150m)],
             0m);
-        var order2 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 5, 200m)],
+        var order2 = new Order(Guid.NewGuid(), address, "Express", [new OrderItem(_product2Id, 5, 200m)],
             0m);
-        var order3 = new Order(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)],
+        var order3 = new Order(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 3, 150m)],
             0m);
 
         List<Order> orders = [order1, order2, order3];
@@ -94,9 +94,9 @@ public class ReportServiceTests
         DateTime from = DateTime.Now.AddDays(-30);
         DateTime to = DateTime.Now;
 
-        var validOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express,
+        var validOrder = new Order(Guid.NewGuid(), address, "Express",
             [new OrderItem(_product1Id, 5, 150m)], 0m);
-        var cancelledOrder = new Order(Guid.NewGuid(), address, DeliveryType.Express,
+        var cancelledOrder = new Order(Guid.NewGuid(), address, "Express",
             [new OrderItem(_product2Id, 100, 200m)], 0m);
         cancelledOrder.TransitionTo(OrderState.Cancelled);
 
@@ -135,12 +135,12 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 10, 150m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product2Id, 9, 200m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product3Id, 8, 120m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product4.Id, 7, 100m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product5.Id, 6, 100m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(product6.Id, 5, 100m)], 0m)
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 10, 150m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product2Id, 9, 200m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product3Id, 8, 120m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(product4.Id, 7, 100m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(product5.Id, 6, 100m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(product6.Id, 5, 100m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -172,9 +172,9 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 3, 150m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 7, 150m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 2, 150m)], 0m)
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 3, 150m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 7, 150m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 2, 150m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -197,8 +197,8 @@ public class ReportServiceTests
 
         List<Order> orders =
         [
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(_product1Id, 5, 150m)], 0m),
-            new(Guid.NewGuid(), address, DeliveryType.Express, [new OrderItem(unknownProductId, 100, 50m)], 0m)
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(_product1Id, 5, 150m)], 0m),
+            new(Guid.NewGuid(), address, "Express", [new OrderItem(unknownProductId, 100, 50m)], 0m)
         ];
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
@@ -357,7 +357,7 @@ public class ReportServiceTests
     private static Order CreateOrderWithDate(Guid clientId, Address address, DateTime date, decimal itemPrice)
     {
         var items = new List<OrderItem> { new(Guid.NewGuid(), 1, itemPrice) };
-        var order = new Order(clientId, address, DeliveryType.Express, items, 0m);
+        var order = new Order(clientId, address, "Express", items, 0m);
         order.SetCreatedAt(date);
         return order;
     }

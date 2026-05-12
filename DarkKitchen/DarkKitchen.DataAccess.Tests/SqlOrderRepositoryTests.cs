@@ -39,7 +39,7 @@ public class SqlOrderRepositoryTests
         return new Order(
             clientId ?? _clientId,
             address,
-            DeliveryType.Express,
+            "Express",
             [new OrderItem(Guid.NewGuid(), 2, 100m)],
             150m);
     }
