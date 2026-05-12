@@ -2,6 +2,7 @@ using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.Plugin.Contracts;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;
@@ -38,7 +39,7 @@ public class ProductServiceTests
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);
-        _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object);
+        _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, []);
     }
 
     [TestMethod]
@@ -268,5 +269,69 @@ public class ProductServiceTests
                 e.NewState.Price == 150m &&
                 !ReferenceEquals(e.OldState, e.NewState))),
             Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void ImportProducts_ImporterNotFound_ShouldThrow()
+    {
+        _productService.ImportProducts("NonExistentImporter", "file.json", "admin@darkkitchen.com");
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void ImportProducts_DuplicateCode_ShouldThrow()
+    {
+        var duplicateDto = new ProductImportDto
+        {
+            Code = "BURG01",
+            Name = "Producto Duplicado Test",
+            Description = "Descripcion de producto duplicado test",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/photo.jpg", SizeInBytes = 10000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([duplicateDto]);
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+        service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+    }
+
+    [TestMethod]
+    public void ImportProducts_ValidImport_ShouldCreateAndReturnProducts()
+    {
+        var importDto = new ProductImportDto
+        {
+            Code = "IMP01",
+            Name = "Producto Importado Test",
+            Description = "Descripcion de producto importado test",
+            LineName = "Desayunos",
+            CategoryName = "Bebidas",
+            Price = 250m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/imported.jpg", SizeInBytes = 15000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
+
+        var emptyRepo = new Mock<IProductRepository>();
+        emptyRepo.Setup(r => r.GetAll()).Returns(new List<Product>());
+
+        var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var results = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com").ToList();
+
+        Assert.AreEqual(1, results.Count);
+        Assert.AreEqual("IMP01", results[0].Code);
+        Assert.AreEqual("Producto Importado Test", results[0].Name);
+        Assert.AreEqual(250m, results[0].Price);
+        emptyRepo.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
+            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com")), Times.Once);
     }
 }
