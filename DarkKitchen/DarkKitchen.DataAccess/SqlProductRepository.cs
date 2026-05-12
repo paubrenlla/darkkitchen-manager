@@ -73,4 +73,14 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
 
         _context.SaveChanges();
     }
+
+    public IEnumerable<ProductLine> GetAllLines()
+    {
+        return _context.ProductLines.AsNoTracking().ToList();
+    }
+
+    public IEnumerable<ProductCategory> GetAllCategories()
+    {
+        return _context.ProductCategories.AsNoTracking().ToList();
+    }
 }
