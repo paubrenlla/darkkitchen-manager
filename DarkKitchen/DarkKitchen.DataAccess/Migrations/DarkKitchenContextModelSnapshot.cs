@@ -53,6 +53,28 @@ namespace DarkKitchen.DataAccess.Migrations
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("DarkKitchen.Domain.Orders.Delivery.ShippingType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ShippingTypes", (string)null);
+                });
+
             modelBuilder.Entity("DarkKitchen.Domain.Orders.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -75,10 +97,6 @@ namespace DarkKitchen.DataAccess.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
