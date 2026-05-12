@@ -1,5 +1,6 @@
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users;
@@ -139,6 +140,16 @@ public static class Converter
             EntityId = auditLog.EntityId,
             ChangeDescription = auditLog.ChangeDescription,
             ResponsibleUser = auditLog.ResponsibleUser
+        };
+    }
+
+    public static ShippingTypeResponse ToShippingTypeResponse(ShippingType shippingType)
+    {
+        return new ShippingTypeResponse
+        {
+            Id = shippingType.Id,
+            Name = shippingType.Name,
+            Cost = shippingType.Cost,
         };
     }
 }
