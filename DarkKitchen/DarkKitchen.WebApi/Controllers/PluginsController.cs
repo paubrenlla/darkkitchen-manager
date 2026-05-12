@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using DarkKitchen.Plugin.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,14 +5,9 @@ namespace DarkKitchen.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PluginsController : ControllerBase
+public class PluginsController(IEnumerable<IProductImporter> importers) : ControllerBase
 {
-    private readonly IEnumerable<IProductImporter> _importers;
-
-    public PluginsController(IEnumerable<IProductImporter> importers)
-    {
-        _importers = importers;
-    }
+    private readonly IEnumerable<IProductImporter> _importers = importers;
 
     [HttpGet("importers")]
     public IActionResult GetImporters()

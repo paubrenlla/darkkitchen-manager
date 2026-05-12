@@ -1,10 +1,7 @@
-using System.Collections.Generic;
+namespace DarkKitchen.Plugin.Contracts;
 
-namespace DarkKitchen.Plugin.Contracts
+public interface IProductImporter
 {
-    public interface IProductImporter
-    {
-        string Name { get; }
-        IEnumerable<ProductImportDto> ImportProducts(string filePath);
-    }
+    string Name { get; }
+    IEnumerable<ProductImportDto> ImportProducts(string filePath);
 }

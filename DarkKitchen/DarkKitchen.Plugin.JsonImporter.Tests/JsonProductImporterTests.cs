@@ -52,10 +52,10 @@ public class JsonProductImporterTests
                 LineName = "Line 1",
                 CategoryName = "Category 1",
                 Price = 99.99m,
-                ImagePaths = new List<string>
-                {
+                ImagePaths =
+                [
                     "https://img.darkkitchen.com/limonada.jpg", "https://img.darkkitchen.com/limonada2.jpg"
-                }
+                ]
             }
         };
 
