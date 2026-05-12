@@ -52,9 +52,10 @@ public class JsonProductImporterTests
                 LineName = "Line 1",
                 CategoryName = "Category 1",
                 Price = 99.99m,
-                ImagePaths =
+                Images =
                 [
-                    "https://img.darkkitchen.com/limonada.jpg", "https://img.darkkitchen.com/limonada2.jpg"
+                    new ImageImportDto { Url = "https://img.darkkitchen.com/limonada.jpg", SizeInBytes = 10240 },
+                    new ImageImportDto { Url = "https://img.darkkitchen.com/limonada2.jpg", SizeInBytes = 20480 }
                 ]
             }
         };
@@ -72,9 +73,11 @@ public class JsonProductImporterTests
         Assert.AreEqual("Line 1", importedProduct.LineName);
         Assert.AreEqual("Category 1", importedProduct.CategoryName);
         Assert.AreEqual(99.99m, importedProduct.Price);
-        Assert.IsNotNull(importedProduct.ImagePaths);
-        Assert.AreEqual(2, importedProduct.ImagePaths.Count);
-        Assert.AreEqual("https://img.darkkitchen.com/limonada.jpg", importedProduct.ImagePaths[0]);
-        Assert.AreEqual("https://img.darkkitchen.com/limonada2.jpg", importedProduct.ImagePaths[1]);
+        Assert.IsNotNull(importedProduct.Images);
+        Assert.AreEqual(2, importedProduct.Images.Count);
+        Assert.AreEqual("https://img.darkkitchen.com/limonada.jpg", importedProduct.Images[0].Url);
+        Assert.AreEqual(10240, importedProduct.Images[0].SizeInBytes);
+        Assert.AreEqual("https://img.darkkitchen.com/limonada2.jpg", importedProduct.Images[1].Url);
+        Assert.AreEqual(20480, importedProduct.Images[1].SizeInBytes);
     }
 }
