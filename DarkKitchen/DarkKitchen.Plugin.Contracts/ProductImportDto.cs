@@ -8,6 +8,6 @@ namespace DarkKitchen.Plugin.Contracts
         public string? LineName { get; set; }
         public string? CategoryName { get; set; }
         public decimal Price { get; set; }
-        public List<string>? ImagesBase64 { get; set; }
+        public List<string>? ImagePaths { get; set; }
     }
 }
