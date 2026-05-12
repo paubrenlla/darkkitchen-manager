@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Models.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.Contracts", "DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj", "{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.JsonImporter", "DarkKitchen.Plugin.JsonImporter\DarkKitchen.Plugin.JsonImporter.csproj", "{F62DEAFA-6B53-449F-8203-82A1CCB00591}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.JsonImporter.Tests", "DarkKitchen.Plugin.JsonImporter.Tests\DarkKitchen.Plugin.JsonImporter.Tests.csproj", "{80901F3C-3C32-4CBA-AB20-DD42983AE603}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,5 +102,17 @@ Global
 		{6ED11938-0437-4E56-A9BB-3B81A5724412}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ED11938-0437-4E56-A9BB-3B81A5724412}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ED11938-0437-4E56-A9BB-3B81A5724412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F62DEAFA-6B53-449F-8203-82A1CCB00591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F62DEAFA-6B53-449F-8203-82A1CCB00591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F62DEAFA-6B53-449F-8203-82A1CCB00591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F62DEAFA-6B53-449F-8203-82A1CCB00591}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
