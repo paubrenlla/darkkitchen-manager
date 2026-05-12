@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.ServiceFactory.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Models.Tests", "DarkKitchen.Models.Tests\DarkKitchen.Models.Tests.csproj", "{6ED11938-0437-4E56-A9BB-3B81A5724412}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.Contracts", "DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj", "{1A6FFDEA-75CC-4D1F-AA19-A3546D646E45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
