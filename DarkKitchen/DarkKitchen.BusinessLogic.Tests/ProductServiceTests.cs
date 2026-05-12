@@ -39,6 +39,8 @@ public class ProductServiceTests
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);
+        _mockRepository.Setup(r => r.GetAllLines()).Returns(_testProducts.Select(p => p.Line).DistinctBy(l => l.Name));
+        _mockRepository.Setup(r => r.GetAllCategories()).Returns(_testProducts.Select(p => p.Category).DistinctBy(c => c.Name));
         _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, []);
     }
 
@@ -332,6 +334,41 @@ public class ProductServiceTests
         Assert.AreEqual(250m, results[0].Price);
         emptyRepo.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
         _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
-            e.EntityName == "Product" && e.ResponsibleUser == "admin@darkkitchen.com")), Times.Once);
+            e.EntityName == nameof(Product) && e.ResponsibleUser == "admin@darkkitchen.com")), Times.Once);
+    }
+
+    [TestMethod]
+    public void ImportProducts_ExistingLineAndCategory_ShouldReuseInstances()
+    {
+        var existingLine = _testProducts[0].Line; // "Combo burgers"
+        var existingCategory = _testProducts[0].Category; // "Parrilla"
+
+        var importDto = new ProductImportDto
+        {
+            Code = "IMP02",
+            Name = "Producto Con Linea Existente",
+            Description = "Descripcion del producto con linea existente",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/photo.jpg", SizeInBytes = 10000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
+
+        _mockRepository.Setup(r => r.GetAll()).Returns(new List<Product>());
+        _mockRepository.Setup(r => r.GetAllLines()).Returns([existingLine]);
+        _mockRepository.Setup(r => r.GetAllCategories()).Returns([existingCategory]);
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var results = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com").ToList();
+
+        Assert.AreEqual(1, results.Count);
+        _mockRepository.Verify(r => r.Add(It.Is<Product>(p =>
+            p.Line.Id == existingLine.Id &&
+            p.Category.Id == existingCategory.Id)), Times.Once);
     }
 }
