@@ -4,14 +4,19 @@ using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.Plugin.Contracts;
 
 namespace DarkKitchen.BusinessLogic;
 
-public class ProductService(IProductRepository productRepository, IDomainEventPublisher eventPublisher)
+public class ProductService(
+    IProductRepository productRepository,
+    IDomainEventPublisher eventPublisher,
+    IEnumerable<IProductImporter> importers)
     : IProductService
 {
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IDomainEventPublisher _eventPublisher = eventPublisher;
+    private readonly IEnumerable<IProductImporter> _importers = importers;
 
     public IEnumerable<ProductResponse> GetProducts(string? name, string? line, string? category)
     {
@@ -119,5 +124,53 @@ public class ProductService(IProductRepository productRepository, IDomainEventPu
         }
 
         return Converter.ToProductResponse(product);
+    }
+
+    public IEnumerable<ProductResponse> ImportProducts(string importerName, string filePath, string currentUser)
+    {
+        var importer = _importers.FirstOrDefault(i =>
+            i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"Importer '{importerName}' not found.");
+
+        var importedDtos = importer.ImportProducts(filePath);
+        var results = new List<ProductResponse>();
+
+        foreach(var dto in importedDtos)
+        {
+            if(_productRepository.GetAll().Any(p => p.Code == dto.Code))
+            {
+                throw new ArgumentException($"Product with code {dto.Code} already exists.");
+            }
+
+            var line = new ProductLine(dto.LineName!);
+            var category = new ProductCategory(dto.CategoryName!);
+            var images = dto.Images?
+                .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
+                .ToList() ?? [];
+
+            var product = new Product(
+                dto.Code!,
+                dto.Name!,
+                dto.Description!,
+                line,
+                category,
+                dto.Price,
+                images);
+
+            _productRepository.Add(product);
+
+            var domainEvent = new EntityCreatedEvent<Product>
+            {
+                EntityId = product.Id,
+                EntityName = nameof(Product),
+                ResponsibleUser = currentUser,
+                NewState = product
+            };
+            _eventPublisher.Publish(domainEvent);
+
+            results.Add(Converter.ToProductResponse(product));
+        }
+
+        return results;
     }
 }
