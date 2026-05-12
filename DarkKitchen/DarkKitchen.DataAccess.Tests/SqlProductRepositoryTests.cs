@@ -180,4 +180,32 @@ public class SqlProductRepositoryTests
         Assert.IsFalse(result.Images.Any(i => i.Id == oldImageId));
         Assert.IsTrue(result.Images.Any(i => i.Url == "https://example.com/img1.jpg"));
     }
+
+    [TestMethod]
+    public void GetAllLines_ShouldReturnAllLines()
+    {
+        var line2 = new ProductLine("Línea 2");
+        _context.ProductLines.Add(line2);
+        _context.SaveChanges();
+
+        var result = _repository.GetAllLines().ToList();
+
+        Assert.AreEqual(2, result.Count); // _defaultLine + line2
+        Assert.IsTrue(result.Any(l => l.Name == "Combo burgers"));
+        Assert.IsTrue(result.Any(l => l.Name == "Línea 2"));
+    }
+
+    [TestMethod]
+    public void GetAllCategories_ShouldReturnAllCategories()
+    {
+        var cat2 = new ProductCategory("Categoría 2");
+        _context.ProductCategories.Add(cat2);
+        _context.SaveChanges();
+
+        var result = _repository.GetAllCategories().ToList();
+
+        Assert.AreEqual(2, result.Count); // _defaultCategory + cat2
+        Assert.IsTrue(result.Any(c => c.Name == "Parrilla"));
+        Assert.IsTrue(result.Any(c => c.Name == "Categoría 2"));
+    }
 }
