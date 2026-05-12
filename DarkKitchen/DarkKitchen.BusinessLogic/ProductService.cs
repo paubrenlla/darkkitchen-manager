@@ -47,7 +47,14 @@ public class ProductService(
             throw new ArgumentException($"Product with code {request.Code} already exists.");
         }
 
-        var product = Converter.ToProduct(request);
+        var line = GetOrCreateLine(request.Line);
+        var category = GetOrCreateCategory(request.Category);
+        var images = request.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
+
+        var product = new Product(request.Code, request.Name, request.Description, line, category, request.Price, images);
+
         _productRepository.Add(product);
         var domainEvent = new EntityCreatedEvent<Product>
         {
@@ -142,8 +149,8 @@ public class ProductService(
                 throw new ArgumentException($"Product with code {dto.Code} already exists.");
             }
 
-            var line = new ProductLine(dto.LineName!);
-            var category = new ProductCategory(dto.CategoryName!);
+            var line = GetOrCreateLine(dto.LineName!);
+            var category = GetOrCreateCategory(dto.CategoryName!);
             var images = dto.Images?
                 .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
                 .ToList() ?? [];
@@ -172,5 +179,19 @@ public class ProductService(
         }
 
         return results;
+    }
+
+    private ProductLine GetOrCreateLine(string name)
+    {
+        return _productRepository.GetAllLines()
+            .FirstOrDefault(l => l.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            ?? new ProductLine(name);
+    }
+
+    private ProductCategory GetOrCreateCategory(string name)
+    {
+        return _productRepository.GetAllCategories()
+            .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            ?? new ProductCategory(name);
     }
 }
