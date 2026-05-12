@@ -41,7 +41,7 @@ public class OrderServiceTests
         _items = [new OrderItem(Guid.NewGuid(), 1, 100m)];
         _clientId = Guid.NewGuid();
 
-        _shippingCalculatorMock.Setup(s => s.CalculateShippingCost(It.IsAny<DeliveryType>())).Returns(0m);
+        _shippingCalculatorMock.Setup(s => s.CalculateShippingCost(It.IsAny<string>())).Returns(0m);
     }
 
     [TestMethod]
@@ -64,7 +64,7 @@ public class OrderServiceTests
         _promotionServiceMock.Setup(p => p.GetBestPromotionForProduct(product.Id, It.IsAny<DateTime>()))
             .Returns(("Promo Test", 10m));
 
-        _shippingCalculatorMock.Setup(s => s.CalculateShippingCost(DeliveryType.Express)).Returns(100m);
+        _shippingCalculatorMock.Setup(s => s.CalculateShippingCost("Express")).Returns(100m);
 
         var request = new OrderCreateRequest
         {
@@ -89,7 +89,7 @@ public class OrderServiceTests
     public void Prepare_WhenOrderExists_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
         _orderService.Prepare(orderId);
@@ -110,7 +110,7 @@ public class OrderServiceTests
     public void Cancel_WhenOrderExists_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
         _orderService.Cancel(orderId);
@@ -123,7 +123,7 @@ public class OrderServiceTests
     public void Delay_WhenOrderIsPending_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
         _orderService.Delay(orderId);
@@ -144,7 +144,7 @@ public class OrderServiceTests
     public void Ship_WhenOrderIsPrepared_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         order.TransitionTo(OrderState.Prepared);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
@@ -158,7 +158,7 @@ public class OrderServiceTests
     public void Deliver_WhenOrderIsShipping_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         order.TransitionTo(OrderState.Prepared);
         order.TransitionTo(OrderState.Shipping);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
@@ -173,7 +173,7 @@ public class OrderServiceTests
     public void NotDelivered_WhenOrderIsShipping_ShouldTransitionAndUpdate()
     {
         var orderId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         order.TransitionTo(OrderState.Prepared);
         order.TransitionTo(OrderState.Shipping);
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
@@ -187,7 +187,7 @@ public class OrderServiceTests
     [TestMethod]
     public void GetOrdersByClient_ShouldDelegateToRepository()
     {
-        var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items, 0m) };
+        var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
         var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
 
         _orderRepositoryMock
@@ -206,21 +206,30 @@ public class OrderServiceTests
     [ExpectedException(typeof(ArgumentException))]
     public void CreateOrder_InvalidDeliveryType_ShouldThrow()
     {
+        _shippingCalculatorMock
+            .Setup(s => s.CalculateShippingCost("TipoInvalido"))
+            .Throws(new ArgumentException("Tipo de envío 'TipoInvalido' no existe."));
+
         var request = new OrderCreateRequest
         {
-            DeliveryType = "Invalid",
-            Items =
-            [
-            ],
-            Address = null!
+            DeliveryType = "TipoInvalido",
+            Address = new OrderAddressDto
+            {
+                Street = "Rivera",
+                Number = "1234",
+                City = "Montevideo",
+                Country = "Uruguay",
+            },
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 1 }],
         };
+
         _orderService.CreateOrder(_clientId, request);
     }
 
     [TestMethod]
     public void GetOrderById_WhenExists_ShouldReturnDetailResponse()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, _items, 0m);
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
         var orderId = order.Id;
         _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
 
@@ -270,7 +279,7 @@ public class OrderServiceTests
     {
         var from = DateTime.Now.AddDays(-1);
         var to = DateTime.Now.AddDays(1);
-        var orders = new List<Order> { new(_clientId, _address, DeliveryType.Express, _items, 0m) };
+        var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
         var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);

@@ -42,7 +42,7 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForClient_ShouldIncludeClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
@@ -53,7 +53,7 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForClient_WhenUserNotFound_ShouldReturnEmptyClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns((User?)null);
 
         var result = _enricher.EnrichForClient(order);
@@ -64,7 +64,7 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForClient_ShouldNotIncludeItems()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
@@ -80,7 +80,7 @@ public class OrderEnricherTests
             new OrderItem(_product.Id, 2, 150m),
             new OrderItem(Guid.NewGuid(), 3, 100m),
         };
-        var order = new Order(_clientId, _address, DeliveryType.Express, items, 0m);
+        var order = new Order(_clientId, _address, "Express", items, 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
@@ -91,7 +91,7 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForPreparador_ShouldIncludeClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(_product.Id)).Returns(_product);
 
@@ -103,7 +103,7 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForPreparador_ShouldIncludeItemsWithProductDetails()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 2, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 2, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(_product.Id)).Returns(_product);
 
@@ -119,7 +119,7 @@ public class OrderEnricherTests
     public void EnrichForPreparador_WhenProductNotFound_ShouldUseEmptyStrings()
     {
         var unknownProductId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(unknownProductId, 1, 100m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(unknownProductId, 1, 100m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(unknownProductId)).Returns((Product?)null);
 
