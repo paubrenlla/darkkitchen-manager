@@ -43,9 +43,9 @@ public static class DependencyResolution
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPromotionRepository, SqlPromotionRepository>();
         services.AddScoped<IPromotionService, PromotionService>();
-        services.AddScoped<IShippingStrategy>(sp => new ExpressShippingStrategy(150m));
-        services.AddScoped<IShippingStrategy>(sp => new TwentyFourHoursShippingStrategy(50m));
         services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
+        services.AddScoped<IShippingTypeRepository, SqlShippingTypeRepository>();
+        services.AddScoped<IShippingTypeService, ShippingTypeService>();
 
         services.AddScoped<IAuditRepository, SqlAuditRepository>();
         services.AddScoped<IAuditService, AuditService>();

@@ -10,9 +10,10 @@ public class Order
     {
         _items = [];
         DeliveryAddress = null!;
+        Type = null!;
     }
 
-    public Order(Guid clientId, Address deliveryAddress, DeliveryType type, List<OrderItem> items, decimal shippingCost)
+    public Order(Guid clientId, Address deliveryAddress, string type, List<OrderItem> items, decimal shippingCost)
     {
         if(items == null || !items.Any())
         {
@@ -34,7 +35,7 @@ public class Order
     public int? OrderNumber { get; private set; }
     public Guid ClientId { get; private set; }
     public Address DeliveryAddress { get; private set; }
-    public DeliveryType Type { get; }
+    public string Type { get; }
     public DateTime CreatedAt { get; private set; }
     public DateTime LastTransitionDate { get; private set; }
     public OrderState State { get; private set; }

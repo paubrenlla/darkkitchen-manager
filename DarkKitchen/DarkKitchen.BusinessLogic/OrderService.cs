@@ -1,7 +1,6 @@
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.Domain.Orders.States;
-using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
@@ -24,10 +23,12 @@ public class OrderService(
 
     public OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request)
     {
-        if(!Enum.TryParse(request.DeliveryType, true, out DeliveryType deliveryType))
+        if(string.IsNullOrWhiteSpace(request.DeliveryType))
         {
-            throw new ArgumentException("Tipo de entrega inválido.");
+            throw new ArgumentException("El tipo de entrega es obligatorio.");
         }
+
+        var shippingCost = _shippingCalculator.CalculateShippingCost(request.DeliveryType);
 
         var address = new Address(
             request.Address.Street,
@@ -38,10 +39,10 @@ public class OrderService(
 
         var orderItems = new List<OrderItem>();
 
-        foreach(OrderItemDto itemReq in request.Items)
+        foreach(var itemReq in request.Items)
         {
-            Product product = _productRepository.GetAll().FirstOrDefault(p => p.Id == itemReq.ProductId)
-                              ?? throw new KeyNotFoundException($"El producto {itemReq.ProductId} no existe.");
+            var product = _productRepository.GetAll().FirstOrDefault(p => p.Id == itemReq.ProductId)
+                          ?? throw new KeyNotFoundException($"El producto {itemReq.ProductId} no existe.");
 
             if(!product.IsActive)
             {
@@ -51,16 +52,10 @@ public class OrderService(
 
             var (promoName, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
 
-            orderItems.Add(new OrderItem(
-                product.Id,
-                itemReq.Quantity,
-                product.Price,
-                discount,
-                promoName));
+            orderItems.Add(new OrderItem(product.Id, itemReq.Quantity, product.Price, discount, promoName));
         }
 
-        var shippingCost = _shippingCalculator.CalculateShippingCost(deliveryType);
-        var order = new Order(clientId, address, deliveryType, orderItems, shippingCost);
+        var order = new Order(clientId, address, request.DeliveryType, orderItems, shippingCost);
 
         _orderRepository.Add(order);
         return Converter.ToOrderCreateResponse(order);
