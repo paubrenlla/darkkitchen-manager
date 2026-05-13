@@ -16,6 +16,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.CreatedAt).IsRequired();
         builder.Property(o => o.LastTransitionDate).IsRequired();
         builder.Property(o => o.ShippingCost).HasColumnType("decimal(18,2)");
+        builder.Property(o => o.Type)
+            .IsRequired()
+            .HasMaxLength(50)
+            .HasColumnType("nvarchar(50)");
 
         builder.Ignore(o => o.Subtotal);
         builder.Ignore(o => o.Tax);
