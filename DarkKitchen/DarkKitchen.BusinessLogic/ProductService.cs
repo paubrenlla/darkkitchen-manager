@@ -47,21 +47,19 @@ public class ProductService(
             throw new ArgumentException($"Product with code {request.Code} already exists.");
         }
 
-        var line = GetOrCreateLine(request.Line);
-        var category = GetOrCreateCategory(request.Category);
+        ProductLine line = GetOrCreateLine(request.Line);
+        ProductCategory category = GetOrCreateCategory(request.Category);
         var images = request.Images
             .Select(i => new ProductImage(i.Url, i.SizeInBytes))
             .ToList();
 
-        var product = new Product(request.Code, request.Name, request.Description, line, category, request.Price, images);
+        var product = new Product(request.Code, request.Name, request.Description, line, category, request.Price,
+            images);
 
         _productRepository.Add(product);
         var domainEvent = new EntityCreatedEvent<Product>
         {
-            EntityId = product.Id,
-            EntityName = nameof(Product),
-            ResponsibleUser = currentUser,
-            NewState = product
+            EntityId = product.Id, EntityName = nameof(Product), ResponsibleUser = currentUser, NewState = product
         };
         _eventPublisher.Publish(domainEvent);
         return Converter.ToProductResponse(product);
@@ -111,10 +109,7 @@ public class ProductService(
         {
             var deactivationEvent = new EntityDeactivatedEvent<Product>
             {
-                EntityId = id,
-                EntityName = nameof(Product),
-                ResponsibleUser = currentUser,
-                OldState = oldProduct
+                EntityId = id, EntityName = nameof(Product), ResponsibleUser = currentUser, OldState = oldProduct
             };
             _eventPublisher.Publish(deactivationEvent);
         }
@@ -122,10 +117,7 @@ public class ProductService(
         {
             var activationEvent = new EntityActivatedEvent<Product>
             {
-                EntityId = id,
-                EntityName = nameof(Product),
-                ResponsibleUser = currentUser,
-                NewState = product
+                EntityId = id, EntityName = nameof(Product), ResponsibleUser = currentUser, NewState = product
             };
             _eventPublisher.Publish(activationEvent);
         }
@@ -135,21 +127,23 @@ public class ProductService(
 
     public ProductImportResponse ImportProducts(string importerName, string filePath, string currentUser)
     {
-        var importer = _importers.FirstOrDefault(i =>
-            i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new ArgumentException($"Importer '{importerName}' not found.");
+        IProductImporter importer = _importers.FirstOrDefault(i =>
+                                        i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
+                                    ?? throw new ArgumentException($"Importer '{importerName}' not found.");
 
-        var importedDtos = importer.ImportProducts(filePath);
+        IEnumerable<ProductImportDto> importedDtos = importer.ImportProducts(filePath);
         var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
 
         // Optimización: Cargamos datos existentes una sola vez para evitar N+1 queries
         var existingCodes = _productRepository.GetAll().Select(p => p.Code).ToHashSet();
         var existingLines = _productRepository.GetAllLines()
-            .ToDictionary(l => l.Name.ToLower(), l => l);
+            .GroupBy(l => l.Name.Trim().ToLower())
+            .ToDictionary(g => g.Key, g => g.First());
         var existingCategories = _productRepository.GetAllCategories()
-            .ToDictionary(c => c.Name.ToLower(), c => c);
+            .GroupBy(c => c.Name.Trim().ToLower())
+            .ToDictionary(g => g.Key, g => g.First());
 
-        foreach(var dto in importedDtos)
+        foreach(ProductImportDto dto in importedDtos)
         {
             try
             {
@@ -159,22 +153,24 @@ public class ProductService(
                 }
 
                 // Obtener o crear línea (usando caché en memoria)
-                var lineNameKey = dto.LineName!.ToLower();
-                if(!existingLines.TryGetValue(lineNameKey, out var line))
+                var lineNameKey = dto.LineName!.Trim().ToLower();
+
+                if(!existingLines.TryGetValue(lineNameKey, out ProductLine? line))
                 {
-                    line = new ProductLine(dto.LineName!);
+                    line = new ProductLine(dto.LineName!.Trim());
                     existingLines[lineNameKey] = line;
                 }
 
                 // Obtener o crear categoría (usando caché en memoria)
-                var categoryNameKey = dto.CategoryName!.ToLower();
-                if(!existingCategories.TryGetValue(categoryNameKey, out var category))
+                var categoryNameKey = dto.CategoryName!.Trim().ToLower();
+
+                if(!existingCategories.TryGetValue(categoryNameKey, out ProductCategory? category))
                 {
-                    category = new ProductCategory(dto.CategoryName!);
+                    category = new ProductCategory(dto.CategoryName!.Trim());
                     existingCategories[categoryNameKey] = category;
                 }
 
-                var images = dto.Images?
+                List<ProductImage> images = dto.Images?
                     .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
                     .ToList() ?? [];
 
@@ -215,14 +211,14 @@ public class ProductService(
     private ProductLine GetOrCreateLine(string name)
     {
         return _productRepository.GetAllLines()
-            .FirstOrDefault(l => l.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ?? new ProductLine(name);
+                   .FirstOrDefault(l => l.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? new ProductLine(name);
     }
 
     private ProductCategory GetOrCreateCategory(string name)
     {
         return _productRepository.GetAllCategories()
-            .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ?? new ProductCategory(name);
+                   .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? new ProductCategory(name);
     }
 }
