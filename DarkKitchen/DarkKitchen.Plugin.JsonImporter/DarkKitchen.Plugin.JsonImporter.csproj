@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj" />
@@ -9,5 +9,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <!-- Automatización: Copia la DLL del plugin a la carpeta /Plugins del WebApi después de compilar -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mkdir -p ../DarkKitchen.WebApi/bin/Debug/net8.0/Plugins/&#xA;cp $(OutDir)$(TargetName).dll ../DarkKitchen.WebApi/bin/Debug/net8.0/Plugins/" />
+  </Target>
 
 </Project>
