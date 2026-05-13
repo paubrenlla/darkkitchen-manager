@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.JsonImpo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.JsonImporter.Tests", "DarkKitchen.Plugin.JsonImporter.Tests\DarkKitchen.Plugin.JsonImporter.Tests.csproj", "{80901F3C-3C32-4CBA-AB20-DD42983AE603}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.CsvImporter", "DarkKitchen.Plugin.CsvImporter\DarkKitchen.Plugin.CsvImporter.csproj", "{368D65A7-D2AB-44ED-86FE-22E496A1E84E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkKitchen.Plugin.CsvImporter.Tests", "DarkKitchen.Plugin.CsvImporter.Tests\DarkKitchen.Plugin.CsvImporter.Tests.csproj", "{FC8AE817-470B-4D75-9A53-5C287D861AFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +118,13 @@ Global
 		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80901F3C-3C32-4CBA-AB20-DD42983AE603}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368D65A7-D2AB-44ED-86FE-22E496A1E84E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368D65A7-D2AB-44ED-86FE-22E496A1E84E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368D65A7-D2AB-44ED-86FE-22E496A1E84E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368D65A7-D2AB-44ED-86FE-22E496A1E84E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8AE817-470B-4D75-9A53-5C287D861AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8AE817-470B-4D75-9A53-5C287D861AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8AE817-470B-4D75-9A53-5C287D861AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8AE817-470B-4D75-9A53-5C287D861AFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
