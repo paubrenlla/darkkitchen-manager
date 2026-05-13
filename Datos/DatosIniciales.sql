@@ -219,7 +219,7 @@ VALUES
 -- PEDIDOS
 -- =============================================
 
-INSERT INTO Orders (Id, OrderNumber, ClientId, Street, DoorNumber, Apartment, City, Country, Type, CreatedAt, LastTransitionDate, State, ShippingCost)
+INSERT INTO Orders (Id, OrderNumber, ClientId, Street, DoorNumber, Apartment, City, Country, CreatedAt, LastTransitionDate, State, ShippingCost)
 VALUES
     (
         @Order1Id,
@@ -230,7 +230,6 @@ VALUES
         NULL,
         'Montevideo',
         'Uruguay',
-        'Express',
         '2026-01-15 10:00:00',
         '2026-01-15 12:00:00',
         'Delivered',
@@ -245,7 +244,6 @@ VALUES
         '3B',
         'Montevideo',
         'Uruguay',
-        'TwentyFourHours',
         '2026-02-10 14:30:00',
         '2026-02-10 14:30:00',
         'Pending',
@@ -260,7 +258,6 @@ VALUES
         NULL,
         'Montevideo',
         'Uruguay',
-        'Express',
         '2026-02-20 09:15:00',
         '2026-02-20 09:30:00',
         'Cancelled',
