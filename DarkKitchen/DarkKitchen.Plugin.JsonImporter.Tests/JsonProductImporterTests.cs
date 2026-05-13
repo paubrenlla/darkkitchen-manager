@@ -80,4 +80,15 @@ public class JsonProductImporterTests
         Assert.AreEqual("https://img.darkkitchen.com/limonada2.jpg", importedProduct.Images[1].Url);
         Assert.AreEqual(20480, importedProduct.Images[1].SizeInBytes);
     }
+
+    [TestMethod]
+    public void ImportProducts_WithNullJson_ShouldReturnEmptyList()
+    {
+        File.WriteAllText(_testFilePath, "null");
+
+        var result = _importer.ImportProducts(_testFilePath);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count());
+    }
 }

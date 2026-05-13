@@ -95,4 +95,40 @@ public class CsvProductImporterTests
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("CSV01", result.First().Code);
     }
+
+    [TestMethod]
+    public void ImportProducts_WithInvalidDataTypes_ShouldUseDefaultValues()
+    {
+        var csvLines = new[]
+        {
+            "Code,Name,Description,Line,Category,Price,ImageUrls,ImageSizes",
+            "INV01,Name,Desc,L,C,INVALID_PRICE,https://img.com/1.jpg,INVALID_SIZE"
+        };
+        File.WriteAllLines(_testFilePath, csvLines);
+
+        var result = _importer.ImportProducts(_testFilePath).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(0, result.First().Price);
+        Assert.AreEqual(0, result.First().Images!.First().SizeInBytes);
+    }
+
+    [TestMethod]
+    public void ImportProducts_WithMismatchedImagesAndSizes_ShouldHandleIt()
+    {
+        var csvLines = new[]
+        {
+            "Code,Name,Description,Line,Category,Price,ImageUrls,ImageSizes",
+            "MIS01,Name,Desc,L,C,100,url1;url2;url3,100;200", // 3 URLs, solo 2 tamaños
+            "EMPTY_IMG,Name,Desc,L,C,100,url1;;url3,100;200;300" // URL vacía en el medio
+        };
+        File.WriteAllLines(_testFilePath, csvLines);
+
+        var result = _importer.ImportProducts(_testFilePath).ToList();
+
+        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual(3, result[0].Images!.Count);
+        Assert.AreEqual(0, result[0].Images!.ElementAt(2).SizeInBytes); // El tercer tamaño no existe, usa 0
+        Assert.AreEqual(2, result[1].Images!.Count); // Ignora la URL vacía del medio
+    }
 }
