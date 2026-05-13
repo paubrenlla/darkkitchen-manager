@@ -188,24 +188,28 @@ public class ProductsControllerTests
             FilePath = "/data/products.json"
         };
 
-        var importedProducts = new List<ProductResponse>
+        var importResponse = new ProductImportResponse
         {
-            new()
-            {
-                Code = "IMP01",
-                Name = "Producto Importado Test",
-                Description = "Descripcion de producto importado test",
-                Price = 250m,
-                Line = "Desayunos",
-                Category = "Bebidas",
-                Images = ["https://img.darkkitchen.com/imported.jpg"],
-                IsActive = true
-            }
+            TotalProcessed = 1,
+            Successful = 1,
+            ImportedProducts =
+            [
+                new ProductResponse
+                {
+                    Code = "IMP01",
+                    Name = "Producto Importado Test",
+                    Description = "Descripcion del producto importado de prueba",
+                    Line = "Desayunos",
+                    Category = "Bebidas",
+                    Price = 250m,
+                    Images = ["https://img.darkkitchen.com/imported.jpg"]
+                },
+            ],
         };
 
         _mockService
             .Setup(s => s.ImportProducts("JSON Importer", "/data/products.json", "admin@darkkitchen.com"))
-            .Returns(importedProducts);
+            .Returns(importResponse);
 
         var claims = new List<System.Security.Claims.Claim> { new(System.Security.Claims.ClaimTypes.Email, "admin@darkkitchen.com") };
         var identity = new System.Security.Claims.ClaimsIdentity(claims, "Test");
@@ -219,10 +223,10 @@ public class ProductsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
-        var resultValue = result.Value as List<ProductResponse>;
+        var resultValue = result.Value as ProductImportResponse;
         Assert.IsNotNull(resultValue);
-        Assert.AreEqual(1, resultValue.Count);
-        Assert.AreEqual("IMP01", resultValue[0].Code);
+        Assert.AreEqual(1, resultValue.Successful);
+        Assert.AreEqual("IMP01", resultValue.ImportedProducts[0].Code);
     }
 
     [TestMethod]
