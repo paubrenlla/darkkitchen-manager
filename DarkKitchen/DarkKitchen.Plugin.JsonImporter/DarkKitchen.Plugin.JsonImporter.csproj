@@ -12,7 +12,7 @@
 
   <!-- Automatización: Copia la DLL del plugin a la carpeta /Plugins del WebApi después de compilar -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir -p ../DarkKitchen.WebApi/bin/Debug/net8.0/Plugins/&#xA;cp $(OutDir)$(TargetName).dll ../DarkKitchen.WebApi/bin/Debug/net8.0/Plugins/" />
+    <Exec Command="mkdir -p ../DarkKitchen.WebApi/bin/$(Configuration)/$(TargetFramework)/Plugins/&#xA;cp $(OutDir)$(TargetName).dll ../DarkKitchen.WebApi/bin/$(Configuration)/$(TargetFramework)/Plugins/" />
   </Target>
 
 </Project>
