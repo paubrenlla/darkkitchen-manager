@@ -133,52 +133,61 @@ public class ProductService(
         return Converter.ToProductResponse(product);
     }
 
-    public IEnumerable<ProductResponse> ImportProducts(string importerName, string filePath, string currentUser)
+    public ProductImportResponse ImportProducts(string importerName, string filePath, string currentUser)
     {
         var importer = _importers.FirstOrDefault(i =>
             i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
             ?? throw new ArgumentException($"Importer '{importerName}' not found.");
 
         var importedDtos = importer.ImportProducts(filePath);
-        var results = new List<ProductResponse>();
+        var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
 
         foreach(var dto in importedDtos)
         {
-            if(_productRepository.GetAll().Any(p => p.Code == dto.Code))
+            try
             {
-                throw new ArgumentException($"Product with code {dto.Code} already exists.");
+                if(_productRepository.GetAll().Any(p => p.Code == dto.Code))
+                {
+                    throw new ArgumentException($"Product with code {dto.Code} already exists.");
+                }
+
+                var line = GetOrCreateLine(dto.LineName!);
+                var category = GetOrCreateCategory(dto.CategoryName!);
+                var images = dto.Images?
+                    .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
+                    .ToList() ?? [];
+
+                var product = new Product(
+                    dto.Code!,
+                    dto.Name!,
+                    dto.Description!,
+                    line,
+                    category,
+                    dto.Price,
+                    images);
+
+                _productRepository.Add(product);
+
+                var domainEvent = new EntityCreatedEvent<Product>
+                {
+                    EntityId = product.Id,
+                    EntityName = nameof(Product),
+                    ResponsibleUser = currentUser,
+                    NewState = product
+                };
+                _eventPublisher.Publish(domainEvent);
+
+                response.ImportedProducts.Add(Converter.ToProductResponse(product));
+                response.Successful++;
             }
-
-            var line = GetOrCreateLine(dto.LineName!);
-            var category = GetOrCreateCategory(dto.CategoryName!);
-            var images = dto.Images?
-                .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
-                .ToList() ?? [];
-
-            var product = new Product(
-                dto.Code!,
-                dto.Name!,
-                dto.Description!,
-                line,
-                category,
-                dto.Price,
-                images);
-
-            _productRepository.Add(product);
-
-            var domainEvent = new EntityCreatedEvent<Product>
+            catch(Exception ex)
             {
-                EntityId = product.Id,
-                EntityName = nameof(Product),
-                ResponsibleUser = currentUser,
-                NewState = product
-            };
-            _eventPublisher.Publish(domainEvent);
-
-            results.Add(Converter.ToProductResponse(product));
+                response.Failed++;
+                response.Errors.Add($"Code {dto.Code ?? "Unknown"}: {ex.Message}");
+            }
         }
 
-        return results;
+        return response;
     }
 
     private ProductLine GetOrCreateLine(string name)
