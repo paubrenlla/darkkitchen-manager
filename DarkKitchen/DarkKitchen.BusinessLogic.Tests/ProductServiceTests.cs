@@ -281,8 +281,7 @@ public class ProductServiceTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void ImportProducts_DuplicateCode_ShouldThrow()
+    public void ImportProducts_DuplicateCode_ShouldNotThrowButReportError()
     {
         var duplicateDto = new ProductImportDto
         {
@@ -300,7 +299,12 @@ public class ProductServiceTests
         mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([duplicateDto]);
 
         var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
-        service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(0, result.Successful);
+        Assert.AreEqual(1, result.Failed);
+        Assert.AreEqual(1, result.Errors.Count);
+        Assert.IsTrue(result.Errors[0].Contains("already exists"));
     }
 
     [TestMethod]
@@ -326,15 +330,61 @@ public class ProductServiceTests
 
         var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
 
-        var results = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com").ToList();
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
 
-        Assert.AreEqual(1, results.Count);
-        Assert.AreEqual("IMP01", results[0].Code);
-        Assert.AreEqual("Producto Importado Test", results[0].Name);
-        Assert.AreEqual(250m, results[0].Price);
+        Assert.AreEqual(1, result.Successful);
+        Assert.AreEqual(0, result.Failed);
+        Assert.AreEqual("IMP01", result.ImportedProducts[0].Code);
+        Assert.AreEqual("Producto Importado Test", result.ImportedProducts[0].Name);
+        Assert.AreEqual(250m, result.ImportedProducts[0].Price);
         emptyRepo.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
         _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
             e.EntityName == nameof(Product) && e.ResponsibleUser == "admin@darkkitchen.com")), Times.Once);
+    }
+
+    [TestMethod]
+    public void ImportProducts_PartialSuccess_ShouldReportBoth()
+    {
+        var validDto = new ProductImportDto
+        {
+            Code = "VALID01",
+            Name = "Producto Valido Largo",
+            Description = "Esta es una descripcion lo suficientemente larga para que pase el dominio.",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/ok.jpg", SizeInBytes = 100 }]
+        };
+        var invalidDto = new ProductImportDto
+        {
+            Code = "INVALID01",
+            Name = "Invalido",
+            Description = "Desc",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = -10m, // Precio inválido
+            Images = [] // Sin imágenes
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([validDto, invalidDto]);
+
+        var emptyRepo = new Mock<IProductRepository>();
+        emptyRepo.Setup(r => r.GetAll()).Returns(new List<Product>());
+        emptyRepo.Setup(r => r.GetAllLines()).Returns(new List<ProductLine>());
+        emptyRepo.Setup(r => r.GetAllCategories()).Returns(new List<ProductCategory>());
+
+        var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(2, result.TotalProcessed);
+        Assert.AreEqual(1, result.Successful);
+        Assert.AreEqual(1, result.Failed);
+        Assert.AreEqual(1, result.ImportedProducts.Count);
+        Assert.AreEqual(1, result.Errors.Count);
+        Assert.IsTrue(result.Errors[0].Contains("INVALID01"));
     }
 
     [TestMethod]
@@ -364,9 +414,9 @@ public class ProductServiceTests
 
         var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
 
-        var results = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com").ToList();
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
 
-        Assert.AreEqual(1, results.Count);
+        Assert.AreEqual(1, result.Successful);
         _mockRepository.Verify(r => r.Add(It.Is<Product>(p =>
             p.Line.Id == existingLine.Id &&
             p.Category.Id == existingCategory.Id)), Times.Once);
