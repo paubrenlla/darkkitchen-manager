@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using DarkKitchen.Plugin.CsvImporter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DarkKitchen.Plugin.CsvImporter.Tests;

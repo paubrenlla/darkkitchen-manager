@@ -59,7 +59,10 @@ public class ProductService(
         _productRepository.Add(product);
         var domainEvent = new EntityCreatedEvent<Product>
         {
-            EntityId = product.Id, EntityName = nameof(Product), ResponsibleUser = currentUser, NewState = product
+            EntityId = product.Id,
+            EntityName = nameof(Product),
+            ResponsibleUser = currentUser,
+            NewState = product
         };
         _eventPublisher.Publish(domainEvent);
         return Converter.ToProductResponse(product);
@@ -109,7 +112,10 @@ public class ProductService(
         {
             var deactivationEvent = new EntityDeactivatedEvent<Product>
             {
-                EntityId = id, EntityName = nameof(Product), ResponsibleUser = currentUser, OldState = oldProduct
+                EntityId = id,
+                EntityName = nameof(Product),
+                ResponsibleUser = currentUser,
+                OldState = oldProduct
             };
             _eventPublisher.Publish(deactivationEvent);
         }
@@ -117,7 +123,10 @@ public class ProductService(
         {
             var activationEvent = new EntityActivatedEvent<Product>
             {
-                EntityId = id, EntityName = nameof(Product), ResponsibleUser = currentUser, NewState = product
+                EntityId = id,
+                EntityName = nameof(Product),
+                ResponsibleUser = currentUser,
+                NewState = product
             };
             _eventPublisher.Publish(activationEvent);
         }

@@ -28,6 +28,7 @@ public class CsvProductImporter : IProductImporter
             }
 
             var parts = line.Split(',');
+
             if(parts.Length < 6)
             {
                 continue;
@@ -40,8 +41,11 @@ public class CsvProductImporter : IProductImporter
                 Description = parts[2].Trim(),
                 LineName = parts[3].Trim(),
                 CategoryName = parts[4].Trim(),
-                Price = decimal.TryParse(parts[5].Trim(), System.Globalization.CultureInfo.InvariantCulture, out var p) ? p : 0,
-                Images = new List<ImageImportDto>()
+                Price = decimal.TryParse(parts[5].Trim(), System.Globalization.CultureInfo.InvariantCulture,
+                    out var p)
+                    ? p
+                    : 0,
+                Images = []
             };
 
             // Parsear imágenes (formato: url1;url2, size1;size2)
@@ -50,16 +54,12 @@ public class CsvProductImporter : IProductImporter
                 var urls = parts[6].Split(';');
                 var sizes = parts[7].Split(';');
 
-                for(int i = 0; i < urls.Length; i++)
+                for(var i = 0; i < urls.Length; i++)
                 {
                     if(!string.IsNullOrWhiteSpace(urls[i]))
                     {
-                        var size = (i < sizes.Length && long.TryParse(sizes[i], out var s)) ? s : 0;
-                        dto.Images.Add(new ImageImportDto
-                        {
-                            Url = urls[i].Trim(),
-                            SizeInBytes = size
-                        });
+                        var size = i < sizes.Length && long.TryParse(sizes[i], out var s) ? s : 0;
+                        dto.Images.Add(new ImageImportDto { Url = urls[i].Trim(), SizeInBytes = size });
                     }
                 }
             }
