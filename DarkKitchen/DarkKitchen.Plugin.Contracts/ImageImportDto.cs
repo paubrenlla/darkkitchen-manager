@@ -1,8 +1,7 @@
-namespace DarkKitchen.Plugin.Contracts
+namespace DarkKitchen.Plugin.Contracts;
+
+public class ImageImportDto
 {
-    public class ImageImportDto
-    {
-        public string? Url { get; set; }
-        public long SizeInBytes { get; set; }
-    }
+    public string? Url { get; set; }
+    public long SizeInBytes { get; set; }
 }
