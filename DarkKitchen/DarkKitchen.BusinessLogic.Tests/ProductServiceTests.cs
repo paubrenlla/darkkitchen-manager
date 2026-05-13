@@ -2,6 +2,7 @@ using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.Plugin.Contracts;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;
@@ -38,7 +39,9 @@ public class ProductServiceTests
         ];
 
         _mockRepository.Setup(r => r.GetAll()).Returns(_testProducts);
-        _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object);
+        _mockRepository.Setup(r => r.GetAllLines()).Returns(_testProducts.Select(p => p.Line).DistinctBy(l => l.Name));
+        _mockRepository.Setup(r => r.GetAllCategories()).Returns(_testProducts.Select(p => p.Category).DistinctBy(c => c.Name));
+        _productService = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, []);
     }
 
     [TestMethod]
@@ -268,5 +271,163 @@ public class ProductServiceTests
                 e.NewState.Price == 150m &&
                 !ReferenceEquals(e.OldState, e.NewState))),
             Times.Once);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void ImportProducts_ImporterNotFound_ShouldThrow()
+    {
+        _productService.ImportProducts("NonExistentImporter", "file.json", "admin@darkkitchen.com");
+    }
+
+    [TestMethod]
+    public void ImportProducts_DuplicateCode_ShouldNotThrowButReportError()
+    {
+        var duplicateDto = new ProductImportDto
+        {
+            Code = "BURG01",
+            Name = "Producto Duplicado Test",
+            Description = "Descripcion de producto duplicado test",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/photo.jpg", SizeInBytes = 10000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([duplicateDto]);
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(0, result.Successful);
+        Assert.AreEqual(1, result.Failed);
+        Assert.AreEqual(1, result.Errors.Count);
+        Assert.IsTrue(result.Errors[0].Contains("already exists"));
+    }
+
+    [TestMethod]
+    public void ImportProducts_ValidImport_ShouldCreateAndReturnProducts()
+    {
+        var importDto = new ProductImportDto
+        {
+            Code = "IMP01",
+            Name = "Producto Importado Test",
+            Description = "Descripcion de producto importado test",
+            LineName = "Desayunos",
+            CategoryName = "Bebidas",
+            Price = 250m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/imported.jpg", SizeInBytes = 15000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
+
+        var emptyRepo = new Mock<IProductRepository>();
+        emptyRepo.Setup(r => r.GetAll()).Returns([]);
+
+        var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(1, result.Successful);
+        Assert.AreEqual(0, result.Failed);
+        Assert.AreEqual("IMP01", result.ImportedProducts[0].Code);
+        Assert.AreEqual("Producto Importado Test", result.ImportedProducts[0].Name);
+        Assert.AreEqual(250m, result.ImportedProducts[0].Price);
+        emptyRepo.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+        _mockEventPublisher.Verify(p => p.Publish(It.Is<EntityCreatedEvent<Product>>(e =>
+            e.EntityName == nameof(Product) && e.ResponsibleUser == "admin@darkkitchen.com")), Times.Once);
+    }
+
+    [TestMethod]
+    public void ImportProducts_PartialSuccess_ShouldReportBoth()
+    {
+        var validDto = new ProductImportDto
+        {
+            Code = "VALID01",
+            Name = "Producto Valido Largo",
+            Description = "Esta es una descripcion lo suficientemente larga para que pase el dominio.",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/ok.jpg", SizeInBytes = 100 }]
+        };
+        var invalidDto = new ProductImportDto
+        {
+            Code = "INVALID01",
+            Name = "Invalido",
+            Description = "Desc",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = -10m, // Precio inválido
+            Images = [] // Sin imágenes
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([validDto, invalidDto]);
+
+        var emptyRepo = new Mock<IProductRepository>();
+        emptyRepo.Setup(r => r.GetAll()).Returns([]);
+        emptyRepo.Setup(r => r.GetAllLines()).Returns([]);
+        emptyRepo.Setup(r => r.GetAllCategories()).Returns([]);
+
+        var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(2, result.TotalProcessed);
+        Assert.AreEqual(1, result.Successful);
+        Assert.AreEqual(1, result.Failed);
+        Assert.AreEqual(1, result.ImportedProducts.Count);
+        Assert.AreEqual(1, result.Errors.Count);
+        Assert.IsTrue(result.Errors[0].Contains("INVALID01"));
+
+        // Verificamos la optimización: 1 sola llamada para 2 productos
+        emptyRepo.Verify(r => r.GetAll(), Times.Once);
+        emptyRepo.Verify(r => r.GetAllLines(), Times.Once);
+        emptyRepo.Verify(r => r.GetAllCategories(), Times.Once);
+    }
+
+    [TestMethod]
+    public void ImportProducts_ExistingLineAndCategory_ShouldReuseInstances()
+    {
+        var existingLine = _testProducts[0].Line; // "Combo burgers"
+        var existingCategory = _testProducts[0].Category; // "Parrilla"
+
+        var importDto = new ProductImportDto
+        {
+            Code = "IMP02",
+            Name = "Producto Con Linea Existente",
+            Description = "Descripcion del producto con linea existente",
+            LineName = "Combo burgers",
+            CategoryName = "Parrilla",
+            Price = 100m,
+            Images = [new ImageImportDto { Url = "https://img.darkkitchen.com/photo.jpg", SizeInBytes = 10000 }]
+        };
+
+        var mockImporter = new Mock<IProductImporter>();
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
+
+        _mockRepository.Setup(r => r.GetAll()).Returns([]);
+        _mockRepository.Setup(r => r.GetAllLines()).Returns([existingLine]);
+        _mockRepository.Setup(r => r.GetAllCategories()).Returns([existingCategory]);
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var result = service.ImportProducts("Test Importer", "file.json", "admin@darkkitchen.com");
+
+        Assert.AreEqual(1, result.Successful);
+        _mockRepository.Verify(r => r.Add(It.Is<Product>(p =>
+            p.Line.Id == existingLine.Id &&
+            p.Category.Id == existingCategory.Id)), Times.Once);
+
+        _mockRepository.Verify(r => r.GetAll(), Times.Once);
+        _mockRepository.Verify(r => r.GetAllLines(), Times.Once);
+        _mockRepository.Verify(r => r.GetAllCategories(), Times.Once);
     }
 }

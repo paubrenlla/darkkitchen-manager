@@ -6,6 +6,7 @@
 USE DarkKitchenDB;
 
 -- Limpiar datos existentes
+DELETE FROM ShippingTypes;
 DELETE FROM PromotionProducts;
 DELETE FROM OrderItems;
 DELETE FROM Orders;
@@ -45,6 +46,9 @@ DECLARE @Promo2Id UNIQUEIDENTIFIER = 'a7a7a7a7-a7a7-a7a7-a7a7-a7a7a7a7a7a7';
 DECLARE @Order1Id UNIQUEIDENTIFIER = '10000001-0000-0000-0000-000000000001';
 DECLARE @Order2Id UNIQUEIDENTIFIER = '10000002-0000-0000-0000-000000000002';
 DECLARE @Order3Id UNIQUEIDENTIFIER = '10000003-0000-0000-0000-000000000003';
+
+DECLARE @ShipExpressId UNIQUEIDENTIFIER = '00000001-0000-0000-0000-000000000001';
+DECLARE @ShipDiaSigId UNIQUEIDENTIFIER = '00000002-0000-0000-0000-000000000002';
 
 -- =============================================
 -- USUARIOS
@@ -203,10 +207,19 @@ VALUES
     (@Promo2Id, @Prod3Id);
 
 -- =============================================
+-- TIPOS DE ENVIO
+-- =============================================
+
+INSERT INTO ShippingTypes (Id, Name, Cost)
+VALUES
+    (@ShipExpressId, 'Express', 150.00),
+    (@ShipDiaSigId, 'TwentyFourHours', 50.00);
+
+-- =============================================
 -- PEDIDOS
 -- =============================================
 
-INSERT INTO Orders (Id, OrderNumber, ClientId, Street, DoorNumber, Apartment, City, Country, Type, CreatedAt, LastTransitionDate, State, ShippingCost)
+INSERT INTO Orders (Id, OrderNumber, ClientId, Street, DoorNumber, Apartment, City, Country, CreatedAt, LastTransitionDate, State, ShippingCost)
 VALUES
     (
         @Order1Id,
@@ -217,7 +230,6 @@ VALUES
         NULL,
         'Montevideo',
         'Uruguay',
-        'Express',
         '2026-01-15 10:00:00',
         '2026-01-15 12:00:00',
         'Delivered',
@@ -232,7 +244,6 @@ VALUES
         '3B',
         'Montevideo',
         'Uruguay',
-        'TwentyFourHours',
         '2026-02-10 14:30:00',
         '2026-02-10 14:30:00',
         'Pending',
@@ -247,7 +258,6 @@ VALUES
         NULL,
         'Montevideo',
         'Uruguay',
-        'Express',
         '2026-02-20 09:15:00',
         '2026-02-20 09:30:00',
         'Cancelled',

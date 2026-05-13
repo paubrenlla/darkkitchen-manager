@@ -61,6 +61,9 @@ public static class DependencyResolution
         services.AddScoped<IAuditEventHandler<EntityCreatedEvent<Promotion>>, PromotionAuditHandler>();
         services.AddScoped<IAuditEventHandler<EntityModifiedEvent<Promotion>>, PromotionAuditHandler>();
 
+        var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+        services.AddProductImportersPlugins(pluginsPath);
+
         return services;
     }
 

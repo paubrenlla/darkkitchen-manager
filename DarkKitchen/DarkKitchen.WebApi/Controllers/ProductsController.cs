@@ -37,4 +37,13 @@ public class ProductsController(IProductService productService) : ControllerBase
         var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
         return Ok(_productService.UpdateProduct(id, request, currentUser));
     }
+
+    [HttpPost("import")]
+    [Authorize(Roles = "Administrativo")]
+    public IActionResult ImportProducts([FromBody] ProductImportRequest request)
+    {
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        var results = _productService.ImportProducts(request.ImporterName, request.FilePath, currentUser);
+        return StatusCode(StatusCodes.Status201Created, results);
+    }
 }

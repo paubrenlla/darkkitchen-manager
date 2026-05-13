@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="DarkKitchen.Plugin.Contracts">
+      <HintPath>..\DarkKitchen.Plugin.Contracts.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

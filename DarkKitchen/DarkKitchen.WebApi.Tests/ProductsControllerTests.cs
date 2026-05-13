@@ -178,4 +178,70 @@ public class ProductsControllerTests
 
         _mockService.Verify(s => s.CreateProduct(request, "Unknown"), Times.Once);
     }
+
+    [TestMethod]
+    public void ImportProducts_ValidRequest_Returns201WithResults()
+    {
+        var request = new ProductImportRequest
+        {
+            ImporterName = "JSON Importer",
+            FilePath = "/data/products.json"
+        };
+
+        var importResponse = new ProductImportResponse
+        {
+            TotalProcessed = 1,
+            Successful = 1,
+            ImportedProducts =
+            [
+                new ProductResponse
+                {
+                    Code = "IMP01",
+                    Name = "Producto Importado Test",
+                    Description = "Descripcion del producto importado de prueba",
+                    Line = "Desayunos",
+                    Category = "Bebidas",
+                    Price = 250m,
+                    Images = ["https://img.darkkitchen.com/imported.jpg"]
+                },
+            ],
+        };
+
+        _mockService
+            .Setup(s => s.ImportProducts("JSON Importer", "/data/products.json", "admin@darkkitchen.com"))
+            .Returns(importResponse);
+
+        var claims = new List<System.Security.Claims.Claim> { new(System.Security.Claims.ClaimTypes.Email, "admin@darkkitchen.com") };
+        var identity = new System.Security.Claims.ClaimsIdentity(claims, "Test");
+        var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+
+        var result = _controller.ImportProducts(request) as ObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+        var resultValue = result.Value as ProductImportResponse;
+        Assert.IsNotNull(resultValue);
+        Assert.AreEqual(1, resultValue.Successful);
+        Assert.AreEqual("IMP01", resultValue.ImportedProducts[0].Code);
+    }
+
+    [TestMethod]
+    public void ImportProducts_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var request = new ProductImportRequest
+        {
+            ImporterName = "JSON Importer",
+            FilePath = "/data/products.json"
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+
+        _controller.ImportProducts(request);
+
+        _mockService.Verify(s => s.ImportProducts("JSON Importer", "/data/products.json", "Unknown"), Times.Once);
+    }
 }
