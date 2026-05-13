@@ -6,6 +6,7 @@
 USE DarkKitchenDB;
 
 -- Limpiar datos existentes
+DELETE FROM ShippingTypes;
 DELETE FROM PromotionProducts;
 DELETE FROM OrderItems;
 DELETE FROM Orders;
@@ -45,6 +46,9 @@ DECLARE @Promo2Id UNIQUEIDENTIFIER = 'a7a7a7a7-a7a7-a7a7-a7a7-a7a7a7a7a7a7';
 DECLARE @Order1Id UNIQUEIDENTIFIER = '10000001-0000-0000-0000-000000000001';
 DECLARE @Order2Id UNIQUEIDENTIFIER = '10000002-0000-0000-0000-000000000002';
 DECLARE @Order3Id UNIQUEIDENTIFIER = '10000003-0000-0000-0000-000000000003';
+
+DECLARE @ShipExpressId UNIQUEIDENTIFIER = '00000001-0000-0000-0000-000000000001';
+DECLARE @ShipDiaSigId UNIQUEIDENTIFIER = '00000002-0000-0000-0000-000000000002';
 
 -- =============================================
 -- USUARIOS
@@ -201,6 +205,15 @@ VALUES
     (@Promo1Id, @Prod1Id),
     (@Promo1Id, @Prod2Id),
     (@Promo2Id, @Prod3Id);
+
+-- =============================================
+-- TIPOS DE ENVIO
+-- =============================================
+
+INSERT INTO ShippingTypes (Id, Name, Cost)
+VALUES
+    (@ShipExpressId, 'Express', 150.00),
+    (@ShipDiaSigId, 'TwentyFourHours', 50.00);
 
 -- =============================================
 -- PEDIDOS
