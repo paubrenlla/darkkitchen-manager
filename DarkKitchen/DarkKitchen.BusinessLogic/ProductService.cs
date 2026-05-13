@@ -142,17 +142,38 @@ public class ProductService(
         var importedDtos = importer.ImportProducts(filePath);
         var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
 
+        // Optimización: Cargamos datos existentes una sola vez para evitar N+1 queries
+        var existingCodes = _productRepository.GetAll().Select(p => p.Code).ToHashSet();
+        var existingLines = _productRepository.GetAllLines()
+            .ToDictionary(l => l.Name.ToLower(), l => l);
+        var existingCategories = _productRepository.GetAllCategories()
+            .ToDictionary(c => c.Name.ToLower(), c => c);
+
         foreach(var dto in importedDtos)
         {
             try
             {
-                if(_productRepository.GetAll().Any(p => p.Code == dto.Code))
+                if(existingCodes.Contains(dto.Code!))
                 {
                     throw new ArgumentException($"Product with code {dto.Code} already exists.");
                 }
 
-                var line = GetOrCreateLine(dto.LineName!);
-                var category = GetOrCreateCategory(dto.CategoryName!);
+                // Obtener o crear línea (usando caché en memoria)
+                var lineNameKey = dto.LineName!.ToLower();
+                if(!existingLines.TryGetValue(lineNameKey, out var line))
+                {
+                    line = new ProductLine(dto.LineName!);
+                    existingLines[lineNameKey] = line;
+                }
+
+                // Obtener o crear categoría (usando caché en memoria)
+                var categoryNameKey = dto.CategoryName!.ToLower();
+                if(!existingCategories.TryGetValue(categoryNameKey, out var category))
+                {
+                    category = new ProductCategory(dto.CategoryName!);
+                    existingCategories[categoryNameKey] = category;
+                }
+
                 var images = dto.Images?
                     .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
                     .ToList() ?? [];
@@ -167,6 +188,7 @@ public class ProductService(
                     images);
 
                 _productRepository.Add(product);
+                existingCodes.Add(dto.Code!); // Agregamos al caché para evitar duplicados en el mismo archivo
 
                 var domainEvent = new EntityCreatedEvent<Product>
                 {

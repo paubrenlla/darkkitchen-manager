@@ -385,6 +385,11 @@ public class ProductServiceTests
         Assert.AreEqual(1, result.ImportedProducts.Count);
         Assert.AreEqual(1, result.Errors.Count);
         Assert.IsTrue(result.Errors[0].Contains("INVALID01"));
+
+        // Verificamos la optimización: 1 sola llamada para 2 productos
+        emptyRepo.Verify(r => r.GetAll(), Times.Once);
+        emptyRepo.Verify(r => r.GetAllLines(), Times.Once);
+        emptyRepo.Verify(r => r.GetAllCategories(), Times.Once);
     }
 
     [TestMethod]
@@ -420,5 +425,9 @@ public class ProductServiceTests
         _mockRepository.Verify(r => r.Add(It.Is<Product>(p =>
             p.Line.Id == existingLine.Id &&
             p.Category.Id == existingCategory.Id)), Times.Once);
+
+        _mockRepository.Verify(r => r.GetAll(), Times.Once);
+        _mockRepository.Verify(r => r.GetAllLines(), Times.Once);
+        _mockRepository.Verify(r => r.GetAllCategories(), Times.Once);
     }
 }
