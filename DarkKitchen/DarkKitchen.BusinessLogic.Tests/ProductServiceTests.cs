@@ -326,7 +326,7 @@ public class ProductServiceTests
         mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
 
         var emptyRepo = new Mock<IProductRepository>();
-        emptyRepo.Setup(r => r.GetAll()).Returns(new List<Product>());
+        emptyRepo.Setup(r => r.GetAll()).Returns([]);
 
         var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
 
@@ -371,9 +371,9 @@ public class ProductServiceTests
         mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([validDto, invalidDto]);
 
         var emptyRepo = new Mock<IProductRepository>();
-        emptyRepo.Setup(r => r.GetAll()).Returns(new List<Product>());
-        emptyRepo.Setup(r => r.GetAllLines()).Returns(new List<ProductLine>());
-        emptyRepo.Setup(r => r.GetAllCategories()).Returns(new List<ProductCategory>());
+        emptyRepo.Setup(r => r.GetAll()).Returns([]);
+        emptyRepo.Setup(r => r.GetAllLines()).Returns([]);
+        emptyRepo.Setup(r => r.GetAllCategories()).Returns([]);
 
         var service = new ProductService(emptyRepo.Object, _mockEventPublisher.Object, [mockImporter.Object]);
 
@@ -413,7 +413,7 @@ public class ProductServiceTests
         mockImporter.Setup(i => i.Name).Returns("Test Importer");
         mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Returns([importDto]);
 
-        _mockRepository.Setup(r => r.GetAll()).Returns(new List<Product>());
+        _mockRepository.Setup(r => r.GetAll()).Returns([]);
         _mockRepository.Setup(r => r.GetAllLines()).Returns([existingLine]);
         _mockRepository.Setup(r => r.GetAllCategories()).Returns([existingCategory]);
 
