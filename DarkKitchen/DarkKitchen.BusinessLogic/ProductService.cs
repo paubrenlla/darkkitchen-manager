@@ -47,91 +47,94 @@ public class ProductService(
             throw new ArgumentException($"Product with code {request.Code} already exists.");
         }
 
-        ProductLine line = GetOrCreateLine(request.Line);
-        ProductCategory category = GetOrCreateCategory(request.Category);
-        var images = request.Images
-            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
-            .ToList();
-
-        var product = new Product(request.Code, request.Name, request.Description, line, category, request.Price,
-            images);
+        var images = BuildImages(request.Images);
+        var product = new Product(request.Code, request.Name, request.Description, GetOrCreateLine(request.Line), GetOrCreateCategory(request.Category), request.Price, images);
 
         _productRepository.Add(product);
-        var domainEvent = new EntityCreatedEvent<Product>
+        _eventPublisher.Publish(new EntityCreatedEvent<Product>
         {
             EntityId = product.Id,
             EntityName = nameof(Product),
             ResponsibleUser = currentUser,
             NewState = product
-        };
-        _eventPublisher.Publish(domainEvent);
+        });
         return Converter.ToProductResponse(product);
     }
 
     public ProductResponse UpdateProduct(Guid id, ProductUpdateRequest request, string currentUser)
     {
         Product product = _productRepository.GetById(id)
-                          ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
+            ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
         Product oldProduct = product.Clone();
+        var images = BuildImages(request.Images);
 
-        var line = new ProductLine(request.Line);
-        var category = new ProductCategory(request.Category);
-        var images = request.Images
-            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
-            .ToList();
-
-        product.UpdateDetails(request.Name, request.Description, line, category, request.Price, images);
-
-        if(request.IsActive.HasValue)
-        {
-            if(request.IsActive.Value)
-            {
-                product.Activate();
-            }
-            else
-            {
-                product.Deactivate();
-            }
-        }
+        product.UpdateDetails(request.Name, request.Description, new ProductLine(request.Line), new ProductCategory(request.Category), request.Price, images);
+        HandleActivationChange(request.IsActive, product);
 
         _productRepository.Update(id, product);
+        PublishModifiedEvent(id, oldProduct, product, currentUser);
+        PublishActivationEvents(id, oldProduct, product, currentUser);
 
-        var domainEvent = new EntityModifiedEvent<Product>
+        return Converter.ToProductResponse(product);
+    }
+
+    private static List<ProductImage> BuildImages(IEnumerable<ProductImageDto> imageDtos)
+    {
+        return imageDtos.Select(i => new ProductImage(i.Url, i.SizeInBytes)).ToList();
+    }
+
+    private static void HandleActivationChange(bool? isActive, Product product)
+    {
+        if(!isActive.HasValue)
+        {
+            return;
+        }
+
+        if(isActive.Value)
+        {
+            product.Activate();
+        }
+        else
+        {
+            product.Deactivate();
+        }
+    }
+
+    private void PublishModifiedEvent(Guid id, Product oldProduct, Product product, string currentUser)
+    {
+        _eventPublisher.Publish(new EntityModifiedEvent<Product>
         {
             EntityId = id,
             EntityName = nameof(Product),
             ResponsibleUser = currentUser,
             OldState = oldProduct,
             NewState = product
-        };
+        });
+    }
 
-        _eventPublisher.Publish(domainEvent);
-
+    private void PublishActivationEvents(Guid id, Product oldProduct, Product product, string currentUser)
+    {
         if(oldProduct.IsActive && !product.IsActive)
         {
-            var deactivationEvent = new EntityDeactivatedEvent<Product>
+            _eventPublisher.Publish(new EntityDeactivatedEvent<Product>
             {
                 EntityId = id,
                 EntityName = nameof(Product),
                 ResponsibleUser = currentUser,
                 OldState = oldProduct
-            };
-            _eventPublisher.Publish(deactivationEvent);
+            });
         }
         else if(!oldProduct.IsActive && product.IsActive)
         {
-            var activationEvent = new EntityActivatedEvent<Product>
+            _eventPublisher.Publish(new EntityActivatedEvent<Product>
             {
                 EntityId = id,
                 EntityName = nameof(Product),
                 ResponsibleUser = currentUser,
                 NewState = product
-            };
-            _eventPublisher.Publish(activationEvent);
+            });
         }
-
-        return Converter.ToProductResponse(product);
     }
 
     public ProductImportResponse ImportProducts(string importerName, string filePath, string currentUser)

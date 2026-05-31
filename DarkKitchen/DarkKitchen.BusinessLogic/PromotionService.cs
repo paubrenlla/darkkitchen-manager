@@ -42,25 +42,10 @@ public class PromotionService(
 
     public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request, string responsibleUser)
     {
-        IEnumerable<Product> allProducts = _productRepository.GetAll();
-        var selectedProducts = allProducts
-            .Where(p => request.ProductCodes.Contains(p.Code))
-            .ToList();
-
-        if(selectedProducts.Count != request.ProductCodes.Count)
-        {
-            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
-        }
-
-        var promotion = new Promotion(
-            request.Name,
-            request.DiscountPercentage,
-            request.StartDate,
-            request.EndDate,
-            selectedProducts);
+        var selectedProducts = GetValidatedProducts(request.ProductCodes);
+        var promotion = new Promotion(request.Name, request.DiscountPercentage, request.StartDate, request.EndDate, selectedProducts);
 
         _promotionRepository.Add(promotion);
-
         _publisher.Publish(new EntityCreatedEvent<Promotion>
         {
             EntityId = promotion.Id,
@@ -77,24 +62,10 @@ public class PromotionService(
         Promotion existingPromo = _promotionRepository.GetById(id)
                                   ?? throw new KeyNotFoundException("La promoción no existe.");
 
-        var selectedProducts = _productRepository.GetAll()
-            .Where(p => request.ProductCodes.Contains(p.Code))
-            .ToList();
-
-        if(selectedProducts.Count != request.ProductCodes.Count)
-        {
-            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
-        }
-
+        var selectedProducts = GetValidatedProducts(request.ProductCodes);
         var oldState = existingPromo.Clone();
 
-        existingPromo.Update(
-            request.Name,
-            request.DiscountPercentage,
-            request.StartDate,
-            request.EndDate,
-            selectedProducts);
-
+        existingPromo.Update(request.Name, request.DiscountPercentage, request.StartDate, request.EndDate, selectedProducts);
         _promotionRepository.Update(existingPromo);
 
         _publisher.Publish(new EntityModifiedEvent<Promotion>
@@ -107,6 +78,21 @@ public class PromotionService(
         });
 
         return Converter.ToPromotionCreateResponse(existingPromo);
+    }
+
+    private List<Product> GetValidatedProducts(IEnumerable<string> productCodes)
+    {
+        var codes = productCodes.ToList();
+        var selectedProducts = _productRepository.GetAll()
+            .Where(p => codes.Contains(p.Code))
+            .ToList();
+
+        if(selectedProducts.Count != codes.Count)
+        {
+            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
+        }
+
+        return selectedProducts;
     }
 
     public (string? PromotionName, decimal Discount) GetBestPromotionForProduct(Guid productId, DateTime date)

@@ -4,7 +4,6 @@ using DarkKitchen.Domain.Users;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.DTOs;
 using Moq;
 
 namespace DarkKitchen.BusinessLogic.Tests;
