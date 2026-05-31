@@ -13,7 +13,7 @@ public class ShippingCostCalculatorTests
     [TestInitialize]
     public void Setup()
     {
-        _repositoryMock = new Mock<IShippingTypeRepository>();
+        _repositoryMock = new Mock<IShippingTypeRepository>(MockBehavior.Strict);
         _calculator = new ShippingCostCalculator(_repositoryMock.Object);
     }
 
@@ -26,6 +26,7 @@ public class ShippingCostCalculatorTests
         var result = _calculator.CalculateShippingCost("Express");
 
         Assert.AreEqual(150m, result);
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -35,6 +36,8 @@ public class ShippingCostCalculatorTests
         _repositoryMock.Setup(r => r.GetByName("NoExiste")).Returns((ShippingType?)null);
 
         _calculator.CalculateShippingCost("NoExiste");
+
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -45,5 +48,6 @@ public class ShippingCostCalculatorTests
 
         Assert.AreEqual(150m, _calculator.CalculateShippingCost("Express"));
         Assert.AreEqual(80m, _calculator.CalculateShippingCost("Dia siguiente"));
+        _repositoryMock.VerifyAll();
     }
 }
