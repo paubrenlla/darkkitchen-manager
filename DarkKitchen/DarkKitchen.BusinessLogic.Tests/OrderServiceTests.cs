@@ -187,13 +187,14 @@ public class OrderServiceTests
     {
         var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
         var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+        var filter = new OrderFilter();
 
         _orderRepositoryMock
-            .Setup(r => r.GetByClient(_clientId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<string?>()))
+            .Setup(r => r.GetByClient(_clientId, null, null, null))
             .Returns(orders);
         _orderEnricherMock.Setup(e => e.EnrichForClient(It.IsAny<Order>())).Returns(expectedResponse);
 
-        var result = _orderService.GetOrdersByClient(_clientId, null, null, null).ToList();
+        var result = _orderService.GetOrdersByClient(_clientId, filter).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("Juan Sosa", result[0].ClientName);
@@ -276,11 +277,12 @@ public class OrderServiceTests
         var to = DateTime.Now.AddDays(1);
         var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
         var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+        var filter = new OrderFilter { From = from, To = to };
 
         _orderRepositoryMock.Setup(r => r.GetByStatus(from, to, null, null)).Returns(orders);
         _orderEnricherMock.Setup(e => e.EnrichForPreparador(It.IsAny<Order>())).Returns(expectedResponse);
 
-        var result = _orderService.GetOrdersByStatus(from, to, null, null).ToList();
+        var result = _orderService.GetOrdersByStatus(filter).ToList();
 
         Assert.AreEqual(1, result.Count);
         _orderRepositoryMock.VerifyAll();

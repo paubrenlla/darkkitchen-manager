@@ -66,15 +66,15 @@ public class OrderService(
         return Converter.ToOrderDetailResponse(GetOrderOrThrow(orderId));
     }
 
-    public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
+    public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter)
     {
-        return _orderRepository.GetByClient(clientId, from, to, state)
+        return _orderRepository.GetByClient(clientId, filter.From, filter.To, filter.State)
             .Select(_orderEnricher.EnrichForClient);
     }
 
-    public IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? address)
+    public IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter)
     {
-        return _orderRepository.GetByStatus(from, to, state, address)
+        return _orderRepository.GetByStatus(filter.From!.Value, filter.To!.Value, filter.State, filter.Address)
             .Select(_orderEnricher.EnrichForPreparador);
     }
 
