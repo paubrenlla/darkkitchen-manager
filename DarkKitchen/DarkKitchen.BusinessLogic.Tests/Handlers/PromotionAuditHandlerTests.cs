@@ -17,13 +17,15 @@ public class PromotionAuditHandlerTests
     [TestInitialize]
     public void Setup()
     {
-        _mockAuditRepository = new Mock<IAuditRepository>();
+        _mockAuditRepository = new Mock<IAuditRepository>(MockBehavior.Strict);
         _handler = new PromotionAuditHandler(_mockAuditRepository.Object);
     }
 
     [TestMethod]
     public void Handle_EntityCreatedEvent_ShouldSaveAuditLog()
     {
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         var promo = new Promotion("PROMO_SUMMER", 10, DateTime.Now, DateTime.Now.AddDays(1), []);
         var domainEvent = new EntityCreatedEvent<Promotion>
         {
@@ -38,11 +40,14 @@ public class PromotionAuditHandlerTests
         _mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
             log.EntityName == "Promotion" &&
             log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 
     [TestMethod]
     public void Handle_EntityModifiedEvent_ShouldDetectAllChanges()
     {
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         var oldStart = DateTime.Now.AddDays(1);
         var oldEnd = DateTime.Now.AddDays(10);
         var newStart = DateTime.Now.AddDays(2);
@@ -71,5 +76,6 @@ public class PromotionAuditHandlerTests
             log.ChangeDescription.Contains("StartDate cambió de") &&
             log.ChangeDescription.Contains("EndDate cambió de") &&
             log.ChangeDescription.Contains("La lista de productos de la promoción fue modificada."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 }
