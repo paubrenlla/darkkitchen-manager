@@ -1,6 +1,7 @@
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.Domain.Orders.States;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
 using DarkKitchen.Models.Converters;
@@ -29,36 +30,45 @@ public class OrderService(
         }
 
         var shippingCost = _shippingCalculator.CalculateShippingCost(request.DeliveryType);
-
-        var address = new Address(
-            request.Address.Street,
-            request.Address.Number,
-            request.Address.Apartment,
-            request.Address.City,
-            request.Address.Country);
-
-        var orderItems = new List<OrderItem>();
-
-        foreach(var itemReq in request.Items)
-        {
-            var product = _productRepository.GetAll().FirstOrDefault(p => p.Id == itemReq.ProductId)
-                          ?? throw new KeyNotFoundException($"El producto {itemReq.ProductId} no existe.");
-
-            if(!product.IsActive)
-            {
-                throw new InvalidOperationException(
-                    $"No es posible realizar el pedido porque el producto '{product.Name}' está inactivo.");
-            }
-
-            var (promoName, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
-
-            orderItems.Add(new OrderItem(product.Id, itemReq.Quantity, product.Price, discount, promoName));
-        }
-
+        var address = BuildAddress(request.Address);
+        var orderItems = BuildOrderItems(request.Items);
         var order = new Order(clientId, address, request.DeliveryType, orderItems, shippingCost);
 
         _orderRepository.Add(order);
         return Converter.ToOrderCreateResponse(order);
+    }
+
+    private Address BuildAddress(OrderAddressDto dto)
+    {
+        return new Address(dto.Street, dto.Number, dto.Apartment, dto.City, dto.Country);
+    }
+
+    private List<OrderItem> BuildOrderItems(IEnumerable<OrderItemDto> itemRequests)
+    {
+        var orderItems = new List<OrderItem>();
+
+        foreach(var itemReq in itemRequests)
+        {
+            var product = GetActiveProduct(itemReq.ProductId);
+            var (promoName, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
+            orderItems.Add(new OrderItem(product.Id, itemReq.Quantity, product.Price, discount, promoName));
+        }
+
+        return orderItems;
+    }
+
+    private Product GetActiveProduct(Guid productId)
+    {
+        var product = _productRepository.GetAll().FirstOrDefault(p => p.Id == productId)
+                      ?? throw new KeyNotFoundException($"El producto {productId} no existe.");
+
+        if(!product.IsActive)
+        {
+            throw new InvalidOperationException(
+                $"No es posible realizar el pedido porque el producto '{product.Name}' está inactivo.");
+        }
+
+        return product;
     }
 
     public OrderDetailResponse GetOrderById(Guid orderId)
@@ -66,15 +76,15 @@ public class OrderService(
         return Converter.ToOrderDetailResponse(GetOrderOrThrow(orderId));
     }
 
-    public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, DateTime? from, DateTime? to, string? state)
+    public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter)
     {
-        return _orderRepository.GetByClient(clientId, from, to, state)
+        return _orderRepository.GetByClient(clientId, filter.From, filter.To, filter.State)
             .Select(_orderEnricher.EnrichForClient);
     }
 
-    public IEnumerable<OrderListResponse> GetOrdersByStatus(DateTime from, DateTime to, string? state, string? address)
+    public IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter)
     {
-        return _orderRepository.GetByStatus(from, to, state, address)
+        return _orderRepository.GetByStatus(filter.From!.Value, filter.To!.Value, filter.State, filter.Address)
             .Select(_orderEnricher.EnrichForPreparador);
     }
 

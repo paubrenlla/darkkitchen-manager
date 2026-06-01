@@ -33,7 +33,9 @@ public class DomainEventPublisherTests
     [TestMethod]
     public void Publish_EntityModifiedEvent_ShouldInvokeHandlers()
     {
-        var mockRepo = new Mock<IAuditRepository>();
+        var mockRepo = new Mock<IAuditRepository>(MockBehavior.Strict);
+        mockRepo.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         using var provider = BuildProvider(mockRepo.Object);
         var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
@@ -52,13 +54,17 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log =>
+            log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
+        mockRepo.VerifyAll();
     }
 
     [TestMethod]
     public void Publish_EntityCreatedEvent_ShouldInvokeHandlers()
     {
-        var mockRepo = new Mock<IAuditRepository>();
+        var mockRepo = new Mock<IAuditRepository>(MockBehavior.Strict);
+        mockRepo.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         using var provider = BuildProvider(mockRepo.Object);
         var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
@@ -75,13 +81,17 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Producto creado exitosamente."))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log =>
+            log.ChangeDescription.Contains("Producto creado exitosamente."))), Times.Once);
+        mockRepo.VerifyAll();
     }
 
     [TestMethod]
     public void Publish_PromotionCreatedEvent_ShouldInvokeHandlers()
     {
-        var mockRepo = new Mock<IAuditRepository>();
+        var mockRepo = new Mock<IAuditRepository>(MockBehavior.Strict);
+        mockRepo.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         using var provider = BuildProvider(mockRepo.Object);
         var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
@@ -98,13 +108,15 @@ public class DomainEventPublisherTests
 
         publisher.Publish(domainEvent);
 
-        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log => log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
+        mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log =>
+            log.ChangeDescription.Contains("Promoción creada exitosamente."))), Times.Once);
+        mockRepo.VerifyAll();
     }
 
     [TestMethod]
     public void Publish_UnknownEventType_ShouldNotThrow()
     {
-        var mockRepo = new Mock<IAuditRepository>();
+        var mockRepo = new Mock<IAuditRepository>(MockBehavior.Strict);
         using var provider = BuildProvider(mockRepo.Object);
         var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
@@ -116,12 +128,15 @@ public class DomainEventPublisherTests
     [TestMethod]
     public void Publish_WhenNoHandlersRegistered_ShouldNotThrow()
     {
-        var mockServiceProvider = new Mock<IServiceProvider>();
-        mockServiceProvider.Setup(x => x.GetService(typeof(IEnumerable<IAuditEventHandler<string>>))).Returns(null);
+        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IEnumerable<IAuditEventHandler<string>>)))
+            .Returns(null);
+
         var publisher = new DomainEventPublisher(mockServiceProvider.Object);
 
         publisher.Publish("test event");
 
-        // Should not throw exception
+        mockServiceProvider.VerifyAll();
     }
 }

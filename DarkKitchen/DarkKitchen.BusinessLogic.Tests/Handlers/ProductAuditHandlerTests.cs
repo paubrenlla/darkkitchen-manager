@@ -21,13 +21,15 @@ public class ProductAuditHandlerTests
     [TestInitialize]
     public void Setup()
     {
-        _mockAuditRepository = new Mock<IAuditRepository>();
+        _mockAuditRepository = new Mock<IAuditRepository>(MockBehavior.Strict);
         _handler = new ProductAuditHandler(_mockAuditRepository.Object);
     }
 
     [TestMethod]
     public void Handle_EntityCreatedEvent_ShouldSaveAuditLog()
     {
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         var product = new Product(ValidCode, ValidName, ValidDesc, new ProductLine("L"), new ProductCategory("C"), 100, ValidImages);
         var domainEvent = new EntityCreatedEvent<Product>
         {
@@ -43,18 +45,16 @@ public class ProductAuditHandlerTests
             log.EntityName == "Product" &&
             log.ResponsibleUser == "user@test.com" &&
             log.ChangeDescription.Contains("Producto creado exitosamente."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 
     [TestMethod]
     public void Handle_EntityModifiedEvent_ShouldDetectAllChanges()
     {
-        var oldLine = new ProductLine("Old Line");
-        var newLine = new ProductLine("New Line");
-        var oldCat = new ProductCategory("Old Cat");
-        var newCat = new ProductCategory("New Cat");
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
 
-        var oldProduct = new Product(ValidCode, "Old Valid Name", "Old description that is long enough", oldLine, oldCat, 100, ValidImages);
-        var newProduct = new Product(ValidCode, "New Valid Name", "New description that is long enough", newLine, newCat, 150, [new ProductImage("http://new.com/img.jpg", 200)]);
+        var oldProduct = new Product(ValidCode, "Old Valid Name", "Old description that is long enough", new ProductLine("Old Line"), new ProductCategory("Old Cat"), 100, ValidImages);
+        var newProduct = new Product(ValidCode, "New Valid Name", "New description that is long enough", new ProductLine("New Line"), new ProductCategory("New Cat"), 150, [new ProductImage("http://new.com/img.jpg", 200)]);
         newProduct.Deactivate();
 
         var domainEvent = new EntityModifiedEvent<Product>
@@ -76,11 +76,14 @@ public class ProductAuditHandlerTests
             log.ChangeDescription.Contains("Line cambió de 'Old Line' a 'New Line'") &&
             log.ChangeDescription.Contains("Category cambió de 'Old Cat' a 'New Cat'") &&
             log.ChangeDescription.Contains("Las imágenes del producto fueron modificadas."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 
     [TestMethod]
     public void Handle_EntityDeactivatedEvent_ShouldSaveAuditLog()
     {
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         var product = new Product(ValidCode, ValidName, ValidDesc, new ProductLine("L"), new ProductCategory("C"), 100, ValidImages);
         var domainEvent = new EntityDeactivatedEvent<Product>
         {
@@ -94,11 +97,14 @@ public class ProductAuditHandlerTests
 
         _mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
             log.ChangeDescription.Contains("Producto dado de baja."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 
     [TestMethod]
     public void Handle_EntityActivatedEvent_ShouldSaveAuditLog()
     {
+        _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
+
         var product = new Product(ValidCode, ValidName, ValidDesc, new ProductLine("L"), new ProductCategory("C"), 100, ValidImages);
         var domainEvent = new EntityActivatedEvent<Product>
         {
@@ -112,5 +118,6 @@ public class ProductAuditHandlerTests
 
         _mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
             log.ChangeDescription.Contains("Producto dado de alta."))), Times.Once);
+        _mockAuditRepository.VerifyAll();
     }
 }

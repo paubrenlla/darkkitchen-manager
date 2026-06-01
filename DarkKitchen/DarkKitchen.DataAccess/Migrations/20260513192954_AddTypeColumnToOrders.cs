@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace DarkKitchen.DataAccess.Migrations
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
+
     public partial class AddTypeColumnToOrders : Migration
     {
         /// <inheritdoc />

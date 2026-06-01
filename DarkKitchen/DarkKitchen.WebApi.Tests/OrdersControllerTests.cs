@@ -290,25 +290,16 @@ public class OrdersControllerTests
 
         var orders = new List<OrderListResponse>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                OrderNumber = 1,
-                ClientId = clientId,
-                CreatedAt = DateTime.Now,
-                Status = "Pending",
-                Total = 100m,
-                ProductCount = 2
-            }
+            new() { Id = Guid.NewGuid(), OrderNumber = 1, ClientId = clientId, CreatedAt = DateTime.Now, Status = "Pending", Total = 100m, ProductCount = 2 }
         };
 
-        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns(orders);
+        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, It.IsAny<OrderFilter>())).Returns(orders);
 
         var result = _controller.GetOrders(null, null, null, null) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
-        _mockOrderService.Verify(s => s.GetOrdersByClient(clientId, null, null, null), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
@@ -317,44 +308,35 @@ public class OrdersControllerTests
         var clientId = Guid.NewGuid();
         SetCallerContext(clientId, "Cliente");
 
-        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, null, null, null)).Returns([]);
+        _mockOrderService.Setup(s => s.GetOrdersByClient(clientId, It.IsAny<OrderFilter>())).Returns([]);
 
         var result = _controller.GetOrders(null, null, null, null) as NoContentResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
     public void GetOrders_AsPreparador_WithDates_ReturnsAllOrders()
     {
-        var preparadorId = Guid.NewGuid();
-        SetCallerContext(preparadorId, "Preparador");
+        SetCallerContext(Guid.NewGuid(), "Preparador");
 
-        DateTime from = DateTime.Now.AddDays(-7);
-        DateTime to = DateTime.Now;
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
 
         var orders = new List<OrderListResponse>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                OrderNumber = 1,
-                ClientId = Guid.NewGuid(),
-                CreatedAt = DateTime.Now,
-                Status = "Pending",
-                Total = 100m,
-                ProductCount = 2
-            }
+            new() { Id = Guid.NewGuid(), OrderNumber = 1, ClientId = Guid.NewGuid(), CreatedAt = DateTime.Now, Status = "Pending", Total = 100m, ProductCount = 2 }
         };
 
-        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns(orders);
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(It.IsAny<OrderFilter>())).Returns(orders);
 
         var result = _controller.GetOrders(from, to, null, null) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
-        _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, null, null), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
@@ -364,12 +346,13 @@ public class OrdersControllerTests
         var from = DateTime.Now.AddDays(-7);
         var to = DateTime.Now;
 
-        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, null, null)).Returns([]);
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(It.IsAny<OrderFilter>())).Returns([]);
 
         var result = _controller.GetOrders(from, to, null, null) as NoContentResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
@@ -393,24 +376,19 @@ public class OrdersControllerTests
 
         var orders = new List<OrderListResponse>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                OrderNumber = 1,
-                ClientId = Guid.NewGuid(),
-                CreatedAt = DateTime.Now,
-                Status = "Pending",
-                Total = 100m,
-                ProductCount = 2
-            }
+            new() { Id = Guid.NewGuid(), OrderNumber = 1, ClientId = Guid.NewGuid(), CreatedAt = DateTime.Now, Status = "Pending", Total = 100m, ProductCount = 2 }
         };
-        _mockOrderService.Setup(s => s.GetOrdersByStatus(from, to, "Pending", "Rivera"))
-            .Returns(orders);
+
+        _mockOrderService.Setup(s => s.GetOrdersByStatus(It.Is<OrderFilter>(f =>
+            f.From == from &&
+            f.To == to &&
+            f.State == "Pending" &&
+            f.Address == "Rivera"))).Returns(orders);
 
         var result = _controller.GetOrders(from, to, "Pending", "Rivera") as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.GetOrdersByStatus(from, to, "Pending", "Rivera"), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]

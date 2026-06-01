@@ -18,32 +18,41 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
     public UserCreateResponse CreateUser(UserCreateRequest request)
     {
-        Role role;
-
-        if(request.Role == null)
-        {
-            role = Role.Cliente;
-        }
-        else if(!AllowedAdminRoles.Contains(request.Role))
-        {
-            throw new ArgumentException($"Rol inválido. Los roles permitidos son: {string.Join(", ", AllowedAdminRoles)}.");
-        }
-        else
-        {
-            role = Enum.Parse<Role>(request.Role);
-        }
-
-        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
-        var existingUser = _userRepository.GetUserByEmail(request.Email);
-        if(existingUser != null)
-        {
-            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
-        }
-
+        Role role = ParseRole(request.Role);
+        EnsureEmailNotTaken(request.Email);
+        var validPhone = CreateValidPhone(request.CountryPrefix, request.PhoneNumber);
         var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
         _userRepository.Add(user);
         return Converter.ToUserCreateResponse(user);
+    }
+
+    private Role ParseRole(string? roleName)
+    {
+        if(roleName == null)
+        {
+            return Role.Cliente;
+        }
+
+        if(!AllowedAdminRoles.Contains(roleName))
+        {
+            throw new ArgumentException($"Rol inválido. Los roles permitidos son: {string.Join(", ", AllowedAdminRoles)}.");
+        }
+
+        return Enum.Parse<Role>(roleName);
+    }
+
+    private void EnsureEmailNotTaken(string email)
+    {
+        if(_userRepository.GetUserByEmail(email) != null)
+        {
+            throw new InvalidOperationException($"El email {email} ya está en uso.");
+        }
+    }
+
+    private Domain.Users.PhoneNumber CreateValidPhone(string prefix, string number)
+    {
+        IPhoneValidationStrategy strategy = _strategyFactory.GetStrategy(prefix);
+        return Domain.Users.PhoneNumber.Create(prefix, number, strategy);
     }
 
     public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
@@ -53,32 +62,36 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
     public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
     {
-        if(adminId == userId)
-        {
-            throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
-        }
+        ValidateSelfModification(adminId, userId);
 
         User existingUser = _userRepository.GetById(userId)
                             ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
 
-        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
+        ValidateEmailNotTaken(request.Email, userId);
+
+        var validPhone = CreateValidPhone(request.CountryPrefix, request.PhoneNumber);
         Role role = Enum.Parse<Role>(request.Role);
 
-        existingUser.UpdateDetails(
-            request.Name,
-            request.Surname,
-            request.Email,
-            validPhone,
-            role);
-        User userWithEmail = _userRepository.GetUserByEmail(request.Email);
-        if(userWithEmail != null && userWithEmail.Id != userId)
-        {
-            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
-        }
-
+        existingUser.UpdateDetails(request.Name, request.Surname, request.Email, validPhone, role);
         _userRepository.Update(userId, existingUser);
         return Converter.ToUserCreateResponse(existingUser);
+    }
+
+    private void ValidateSelfModification(Guid adminId, Guid userId)
+    {
+        if(adminId == userId)
+        {
+            throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
+        }
+    }
+
+    private void ValidateEmailNotTaken(string email, Guid excludeUserId)
+    {
+        var userWithEmail = _userRepository.GetUserByEmail(email);
+        if(userWithEmail != null && userWithEmail.Id != excludeUserId)
+        {
+            throw new InvalidOperationException($"El email {email} ya está en uso.");
+        }
     }
 
     public UserCreateResponse DeleteUser(Guid adminId, Guid userId)

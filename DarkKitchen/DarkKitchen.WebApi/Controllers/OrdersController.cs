@@ -106,22 +106,14 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 return BadRequest(new { error = "El rango de fechas es obligatorio para el preparador." });
             }
 
-            IEnumerable<OrderListResponse> preparadorOrders = _orderService.GetOrdersByStatus(fromDate.Value, toDate.Value, status, address);
-            if(!preparadorOrders.Any())
-            {
-                return NoContent();
-            }
-
-            return Ok(preparadorOrders);
+            var filter = new OrderFilter { From = fromDate, To = toDate, State = status, Address = address };
+            var orders = _orderService.GetOrdersByStatus(filter);
+            return orders.Any() ? Ok(orders) : NoContent();
         }
 
-        IEnumerable<OrderListResponse> clientOrders = _orderService.GetOrdersByClient(callerId, fromDate, toDate, status);
-        if(!clientOrders.Any())
-        {
-            return NoContent();
-        }
-
-        return Ok(clientOrders);
+        var clientFilter = new OrderFilter { From = fromDate, To = toDate, State = status };
+        var clientOrders = _orderService.GetOrdersByClient(callerId, clientFilter);
+        return clientOrders.Any() ? Ok(clientOrders) : NoContent();
     }
 
     [HttpGet("{id}")]

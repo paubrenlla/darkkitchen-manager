@@ -14,7 +14,7 @@ public class ShippingTypeServiceTests
     [TestInitialize]
     public void Setup()
     {
-        _repositoryMock = new Mock<IShippingTypeRepository>();
+        _repositoryMock = new Mock<IShippingTypeRepository>(MockBehavior.Strict);
         _service = new ShippingTypeService(_repositoryMock.Object);
     }
 
@@ -33,18 +33,21 @@ public class ShippingTypeServiceTests
         Assert.AreEqual(2, result.Count);
         Assert.AreEqual("Express", result[0].Name);
         Assert.AreEqual(150m, result[0].Cost);
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void Create_ValidRequest_ShouldAddAndReturn()
     {
+        _repositoryMock.Setup(r => r.Add(It.IsAny<ShippingType>()));
+
         var request = new ShippingTypeRequest { Name = "Express", Cost = 150m };
 
         var result = _service.Create(request);
 
         Assert.AreEqual("Express", result.Name);
         Assert.AreEqual(150m, result.Cost);
-        _repositoryMock.Verify(r => r.Add(It.IsAny<ShippingType>()), Times.Once);
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -70,6 +73,7 @@ public class ShippingTypeServiceTests
     {
         var existing = new ShippingType("Express", 150m);
         _repositoryMock.Setup(r => r.GetById(existing.Id)).Returns(existing);
+        _repositoryMock.Setup(r => r.Update(It.IsAny<ShippingType>()));
 
         var request = new ShippingTypeRequest { Name = "Express Premium", Cost = 250m };
 
@@ -77,25 +81,29 @@ public class ShippingTypeServiceTests
 
         Assert.AreEqual("Express Premium", result.Name);
         Assert.AreEqual(250m, result.Cost);
-        _repositoryMock.Verify(r => r.Update(It.IsAny<ShippingType>()), Times.Once);
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
     [ExpectedException(typeof(KeyNotFoundException))]
     public void Update_NonExistingId_ShouldThrow()
     {
-        _repositoryMock.Setup(r => r.GetById(It.IsAny<Guid>())).Returns((ShippingType?)null);
+        var unknownId = Guid.NewGuid();
+        _repositoryMock.Setup(r => r.GetById(unknownId)).Returns((ShippingType?)null);
 
-        _service.Update(Guid.NewGuid(), new ShippingTypeRequest { Name = "Express", Cost = 100m });
+        _service.Update(unknownId, new ShippingTypeRequest { Name = "Express", Cost = 100m });
+
+        _repositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void Delete_ExistingId_ShouldCallRepository()
     {
         var id = Guid.NewGuid();
+        _repositoryMock.Setup(r => r.Delete(id));
 
         _service.Delete(id);
 
-        _repositoryMock.Verify(r => r.Delete(id), Times.Once);
+        _repositoryMock.VerifyAll();
     }
 }
