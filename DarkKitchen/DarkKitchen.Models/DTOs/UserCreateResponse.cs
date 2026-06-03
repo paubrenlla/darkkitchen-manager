@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.Models.DTOs;
@@ -15,6 +16,7 @@ public class UserCreateResponse
     {
     }
 
+    [SetsRequiredMembers]
     public UserCreateResponse(User user)
     {
         Id = user.Id;
