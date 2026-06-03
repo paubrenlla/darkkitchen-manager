@@ -20,8 +20,6 @@
         <ProjectReference Include="..\DarkKitchen.IBusinessLogic\DarkKitchen.IBusinessLogic.csproj" />
         <ProjectReference Include="..\DarkKitchen.ServiceFactory\DarkKitchen.ServiceFactory.csproj" />
         <ProjectReference Include="..\DarkKitchen.Models\DarkKitchen.Models.csproj" />
-        <ProjectReference Include="..\DarkKitchen.DataAccess\DarkKitchen.DataAccess.csproj" />
-        <ProjectReference Include="..\DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj" />
     </ItemGroup>
 
 </Project>
