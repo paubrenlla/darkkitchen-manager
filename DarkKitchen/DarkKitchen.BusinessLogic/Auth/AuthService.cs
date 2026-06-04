@@ -2,8 +2,6 @@ using DarkKitchen.Domain.Users;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.IBusinessLogic.IAuth;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
-using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic.Auth;
 
@@ -13,7 +11,7 @@ public class AuthService(IUserRepository userRepository, ITokenService tokenServ
     private readonly ITokenService _tokenService = tokenService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
-    public LoginResponse Login(string email, string password)
+    public LoginResult Login(string email, string password)
     {
         User? user = _userRepository.GetUserByEmail(email);
 
@@ -23,6 +21,6 @@ public class AuthService(IUserRepository userRepository, ITokenService tokenServ
         }
 
         var token = _tokenService.GenerateToken(user);
-        return Converter.ToLoginResponse(token, user);
+        return new LoginResult(token, user);
     }
 }
