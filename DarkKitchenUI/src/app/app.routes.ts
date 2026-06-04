@@ -12,4 +12,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/components/register/register.component').then(m => m.RegisterComponent)
   },
+
+  {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/components/dashboard.component').then(m => m.DashboardComponent)
+  },
+
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  }
 ];
