@@ -91,9 +91,12 @@ public class ProductsControllerTests
     {
         var request = new ProductCreateRequest
         {
-            Code = "NEW01", Name = "Nuevo Producto Test",
+            Code = "NEW01",
+            Name = "Nuevo Producto Test",
             Description = "Descripcion del nuevo producto de prueba",
-            Line = "Desayunos", Category = "Bebidas", Price = 100m,
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 100m,
             Images = [new ProductImageDto { Url = "https://example.com/photo.jpg", SizeInBytes = 50000 }]
         };
 
@@ -115,7 +118,9 @@ public class ProductsControllerTests
         {
             Name = "Hamburguesa Actualizada",
             Description = "Descripcion actualizada del producto de prueba",
-            Line = "Desayunos", Category = "Bebidas", Price = 200m,
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
             Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
         };
 
@@ -134,8 +139,13 @@ public class ProductsControllerTests
     {
         var request = new ProductCreateRequest
         {
-            Code = "U1AAA", Name = "Jugo de Naranja", Description = "D",
-            Line = "Desayunos", Category = "Bebidas", Price = 10, Images = []
+            Code = "U1AAA",
+            Name = "Jugo de Naranja",
+            Description = "D",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 10,
+            Images = []
         };
 
         _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };

@@ -35,12 +35,6 @@ public class AuthServiceTests
             _passwordHasherMock.Object);
     }
 
-    private User CreateTestUser()
-    {
-        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        return new User("Juan", "Perez", ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
-    }
-
     [TestMethod]
     public void LoginWithValidCredentials_ReturnsLoginResponse()
     {

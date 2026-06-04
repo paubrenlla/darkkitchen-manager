@@ -8,7 +8,9 @@ public class LoginResponse
     public required string Token { get; set; }
     public required string Role { get; set; }
 
-    public LoginResponse() { }
+    public LoginResponse()
+    {
+    }
 
     [SetsRequiredMembers]
     public LoginResponse(LoginResult result)

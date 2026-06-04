@@ -9,7 +9,9 @@ public class ShippingTypeResponse
     public required string Name { get; set; }
     public decimal Cost { get; set; }
 
-    public ShippingTypeResponse() { }
+    public ShippingTypeResponse()
+    {
+    }
 
     [SetsRequiredMembers]
     public ShippingTypeResponse(ShippingType shippingType)

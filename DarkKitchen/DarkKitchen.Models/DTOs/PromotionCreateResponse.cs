@@ -12,7 +12,9 @@ public class PromotionCreateResponse
     public DateTime EndDate { get; set; }
     public List<string> Products { get; set; } = [];
 
-    public PromotionCreateResponse() { }
+    public PromotionCreateResponse()
+    {
+    }
 
     [SetsRequiredMembers]
     public PromotionCreateResponse(Promotion promotion)

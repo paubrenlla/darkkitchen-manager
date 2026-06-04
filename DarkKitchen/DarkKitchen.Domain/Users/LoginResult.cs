@@ -1,13 +1,7 @@
 ﻿namespace DarkKitchen.Domain.Users;
 
-public class LoginResult
+public class LoginResult(string token, User user)
 {
-    public string Token { get; }
-    public User User { get; }
-
-    public LoginResult(string token, User user)
-    {
-        Token = token;
-        User = user;
-    }
+    public string Token { get; } = token;
+    public User User { get; } = user;
 }

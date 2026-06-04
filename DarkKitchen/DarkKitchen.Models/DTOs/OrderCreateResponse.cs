@@ -11,7 +11,9 @@ public class OrderCreateResponse
     public decimal ShippingCost { get; set; }
     public decimal Total { get; set; }
 
-    public OrderCreateResponse() { }
+    public OrderCreateResponse()
+    {
+    }
 
     public OrderCreateResponse(Order order)
     {
