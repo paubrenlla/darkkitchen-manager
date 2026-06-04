@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -17,7 +18,7 @@ public class OrdersControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _mockOrderService = new Mock<IOrderService>();
+        _mockOrderService = new Mock<IOrderService>(MockBehavior.Strict);
         _controller = new OrdersController(_mockOrderService.Object);
         SetCallerContext(Guid.NewGuid(), "Administrativo");
     }
@@ -26,7 +27,8 @@ public class OrdersControllerTests
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, callerId.ToString()), new(ClaimTypes.Role, role)
+            new(ClaimTypes.NameIdentifier, callerId.ToString()),
+            new(ClaimTypes.Role, role)
         };
 
         var identity = new ClaimsIdentity(claims, "Test");
@@ -38,18 +40,11 @@ public class OrdersControllerTests
         };
     }
 
-    private static OrderDetailResponse BuildDetailResponse()
+    private static Order CreateTestOrder(Guid? clientId = null)
     {
-        return new OrderDetailResponse
-        {
-            Id = Guid.NewGuid(),
-            OrderNumber = 1,
-            ClientId = Guid.NewGuid(),
-            CreatedAt = DateTime.Now,
-            Status = "Pending",
-            Items = [],
-            Total = 100m
-        };
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        return new Order(clientId ?? Guid.NewGuid(), address, "Express", items, 0m);
     }
 
     [TestMethod]
@@ -61,32 +56,18 @@ public class OrdersControllerTests
         var request = new OrderCreateRequest
         {
             DeliveryType = "Express",
-            Address = new OrderAddressDto
-            {
-                Street = "Rivera",
-                Number = "1234",
-                City = "Montevideo",
-                Country = "Uruguay"
-            },
+            Address = new OrderAddressDto { Street = "Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay" },
             Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 2 }]
         };
 
-        var response = new OrderCreateResponse
-        {
-            Id = Guid.NewGuid(),
-            ClientId = clientId,
-            OrderNumber = 1,
-            Subtotal = 100m,
-            ShippingCost = 50m,
-            Total = 183m
-        };
-
-        _mockOrderService.Setup(s => s.CreateOrder(clientId, request)).Returns(response);
+        var order = CreateTestOrder(clientId);
+        _mockOrderService.Setup(s => s.CreateOrder(clientId, request)).Returns(order);
 
         var result = _controller.CreateOrder(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
@@ -94,16 +75,15 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Prepare(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Prepare(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
@@ -111,26 +91,23 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Prepare(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Prepare(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
     public void UpdateStatus_Preparado_AsCliente_ReturnsForbid()
     {
         SetCallerContext(Guid.NewGuid(), "Cliente");
-        var orderId = Guid.NewGuid();
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Preparado" }) as ForbidResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Preparado" }) as ForbidResult;
 
         Assert.IsNotNull(result);
     }
@@ -140,26 +117,23 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Delay(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Delay(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
     public void UpdateStatus_Demorado_AsAdministrativo_ReturnsForbid()
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");
-        var orderId = Guid.NewGuid();
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
 
         Assert.IsNotNull(result);
     }
@@ -168,10 +142,8 @@ public class OrdersControllerTests
     public void UpdateStatus_Demorado_AsCliente_ReturnsForbid()
     {
         SetCallerContext(Guid.NewGuid(), "Cliente");
-        var orderId = Guid.NewGuid();
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Demorado" }) as ForbidResult;
 
         Assert.IsNotNull(result);
     }
@@ -181,26 +153,23 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Cancel(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Cancelado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Cancelado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Cancel(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
     public void UpdateStatus_Cancelado_AsPreparador_ReturnsForbid()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
-        var orderId = Guid.NewGuid();
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Cancelado" }) as ForbidResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Cancelado" }) as ForbidResult;
 
         Assert.IsNotNull(result);
     }
@@ -210,26 +179,23 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Ship(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "EnCamino" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "EnCamino" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Ship(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
     }
 
     [TestMethod]
     public void UpdateStatus_EnCamino_AsAdministrativo_ReturnsForbid()
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");
-        var orderId = Guid.NewGuid();
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "EnCamino" }) as ForbidResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "EnCamino" }) as ForbidResult;
 
         Assert.IsNotNull(result);
     }
@@ -239,16 +205,25 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.Deliver(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Entregado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "Entregado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.Deliver(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateStatus_Entregado_AsAdministrativo_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Entregado" }) as ForbidResult;
+
+        Assert.IsNotNull(result);
     }
 
     [TestMethod]
@@ -256,17 +231,25 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
         var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
+        var order = CreateTestOrder();
 
         _mockOrderService.Setup(s => s.NotDelivered(orderId));
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
 
-        var result =
-            _controller.UpdateStatus(orderId,
-                new OrderStatusUpdateRequest { Status = "NoEntregado" }) as OkObjectResult;
+        var result = _controller.UpdateStatus(orderId, new OrderStatusUpdateRequest { Status = "NoEntregado" }) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockOrderService.Verify(s => s.NotDelivered(orderId), Times.Once);
+        _mockOrderService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateStatus_NoEntregado_AsAdministrativo_ReturnsForbid()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "NoEntregado" }) as ForbidResult;
+
+        Assert.IsNotNull(result);
     }
 
     [TestMethod]
@@ -274,9 +257,7 @@ public class OrdersControllerTests
     {
         SetCallerContext(Guid.NewGuid(), "Administrativo");
 
-        var result =
-            _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "EstadoInvalido" }) as
-                BadRequestObjectResult;
+        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "EstadoInvalido" }) as BadRequestObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
@@ -321,7 +302,6 @@ public class OrdersControllerTests
     public void GetOrders_AsPreparador_WithDates_ReturnsAllOrders()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
-
         var from = DateTime.Now.AddDays(-7);
         var to = DateTime.Now;
 
@@ -370,7 +350,6 @@ public class OrdersControllerTests
     public void GetOrders_AsPreparador_WithFilters_PassesFiltersToService()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
-
         var from = DateTime.Now.AddDays(-7);
         var to = DateTime.Now;
 
@@ -380,10 +359,7 @@ public class OrdersControllerTests
         };
 
         _mockOrderService.Setup(s => s.GetOrdersByStatus(It.Is<OrderFilter>(f =>
-            f.From == from &&
-            f.To == to &&
-            f.State == "Pending" &&
-            f.Address == "Rivera"))).Returns(orders);
+            f.From == from && f.To == to && f.State == "Pending" && f.Address == "Rivera"))).Returns(orders);
 
         var result = _controller.GetOrders(from, to, "Pending", "Rivera") as OkObjectResult;
 
@@ -392,56 +368,12 @@ public class OrdersControllerTests
     }
 
     [TestMethod]
-    public void GetOrderDetail_AsPreparador_Exists_ReturnsOk()
-    {
-        SetCallerContext(Guid.NewGuid(), "Preparador");
-        var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
-
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
-
-        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void GetOrderDetail_AsAdministrativo_Exists_ReturnsOk()
-    {
-        SetCallerContext(Guid.NewGuid(), "Administrativo");
-        var orderId = Guid.NewGuid();
-        OrderDetailResponse detailResponse = BuildDetailResponse();
-
-        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(detailResponse);
-
-        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-    }
-
-    [TestMethod]
-    public void UpdateStatus_Entregado_AsAdministrativo_ReturnsForbid()
-    {
-        SetCallerContext(Guid.NewGuid(), "Administrativo");
-        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "Entregado" }) as ForbidResult;
-        Assert.IsNotNull(result);
-    }
-
-    [TestMethod]
-    public void UpdateStatus_NoEntregado_AsAdministrativo_ReturnsForbid()
-    {
-        SetCallerContext(Guid.NewGuid(), "Administrativo");
-        var result = _controller.UpdateStatus(Guid.NewGuid(), new OrderStatusUpdateRequest { Status = "NoEntregado" }) as ForbidResult;
-        Assert.IsNotNull(result);
-    }
-
-    [TestMethod]
     public void GetOrders_AsPreparador_OnlyFromDate_ReturnsBadRequest()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
+
         var result = _controller.GetOrders(DateTime.Now, null, null, null) as BadRequestObjectResult;
+
         Assert.IsNotNull(result);
     }
 
@@ -449,7 +381,41 @@ public class OrdersControllerTests
     public void GetOrders_AsPreparador_OnlyToDate_ReturnsBadRequest()
     {
         SetCallerContext(Guid.NewGuid(), "Preparador");
+
         var result = _controller.GetOrders(null, DateTime.Now, null, null) as BadRequestObjectResult;
+
         Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public void GetOrderDetail_AsPreparador_Exists_ReturnsOk()
+    {
+        SetCallerContext(Guid.NewGuid(), "Preparador");
+        var orderId = Guid.NewGuid();
+        var order = CreateTestOrder();
+
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
+
+        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+        _mockOrderService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void GetOrderDetail_AsAdministrativo_Exists_ReturnsOk()
+    {
+        SetCallerContext(Guid.NewGuid(), "Administrativo");
+        var orderId = Guid.NewGuid();
+        var order = CreateTestOrder();
+
+        _mockOrderService.Setup(s => s.GetOrderById(orderId)).Returns(order);
+
+        var result = _controller.GetOrderDetail(orderId) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
+        _mockOrderService.VerifyAll();
     }
 }

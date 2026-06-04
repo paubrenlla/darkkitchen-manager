@@ -1,11 +1,12 @@
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.IBusinessLogic;
 
 public interface IOrderService
 {
-    OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request);
-    OrderDetailResponse GetOrderById(Guid orderId);
+    Order CreateOrder(Guid clientId, OrderCreateRequest request);
+    Order GetOrderById(Guid orderId);
     IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter);
     IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter);
     void Prepare(Guid orderId);
