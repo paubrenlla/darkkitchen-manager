@@ -92,7 +92,7 @@ public class PromotionServiceTests
         Assert.AreEqual("Promo Verano", result.Name);
         Assert.AreEqual(20, result.DiscountPercentage);
         Assert.AreEqual(1, result.Products.Count);
-        Assert.IsTrue(result.Products.Contains("BURG01"));
+        Assert.IsTrue(result.Products.Any(p => p.Code == "BURG01"));
         _mockProductRepository.VerifyAll();
         _mockPromotionRepository.VerifyAll();
         _mockPublisher.VerifyAll();
@@ -252,7 +252,7 @@ public class PromotionServiceTests
         var result = _promotionService.GetPromotions(null, null, "BURG01").ToList();
 
         Assert.AreEqual(1, result.Count);
-        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+        Assert.IsTrue(result[0].Products.Any(p => p.Code == "BURG01"));
         _mockPromotionRepository.VerifyAll();
     }
 
@@ -275,7 +275,7 @@ public class PromotionServiceTests
         var result = _promotionService.GetPromotions(DateTime.Now, "Combo burgers", "BURG01").ToList();
 
         Assert.AreEqual(1, result.Count);
-        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+        Assert.IsTrue(result[0].Products.Any(p => p.Code == "BURG01"));
         _mockPromotionRepository.VerifyAll();
     }
 
@@ -299,7 +299,7 @@ public class PromotionServiceTests
         var result = _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com");
 
         Assert.AreEqual("Black Friday Actualizado", result.Name);
-        Assert.IsTrue(result.Products.Contains("BURG02"));
+        Assert.IsTrue(result.Products.Any(p => p.Code == "BURG02"));
         _mockPromotionRepository.VerifyAll();
         _mockProductRepository.VerifyAll();
         _mockPublisher.VerifyAll();

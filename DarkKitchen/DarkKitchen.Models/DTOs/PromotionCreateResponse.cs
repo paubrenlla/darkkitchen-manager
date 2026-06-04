@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using DarkKitchen.Domain.Promotions;
+
 namespace DarkKitchen.Models.DTOs;
 
 public class PromotionCreateResponse
@@ -8,4 +11,17 @@ public class PromotionCreateResponse
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public List<string> Products { get; set; } = [];
+
+    public PromotionCreateResponse() { }
+
+    [SetsRequiredMembers]
+    public PromotionCreateResponse(Promotion promotion)
+    {
+        Id = promotion.Id;
+        Name = promotion.Name;
+        DiscountPercentage = promotion.DiscountPercentage;
+        StartDate = promotion.StartDate;
+        EndDate = promotion.EndDate;
+        Products = promotion.Products.Select(p => p.Code).ToList();
+    }
 }
