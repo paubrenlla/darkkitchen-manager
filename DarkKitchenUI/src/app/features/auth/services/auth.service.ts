@@ -1,32 +1,56 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { parseJwt } from '../../../utils/jwt-parser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-
   private apiUrl = 'https://localhost:7180/api/auth';
 
-  private tokenSignal = signal<string | null>(localStorage.getItem('dk_token'));
-  public isAuthenticated = computed(() => !!this.tokenSignal());
+  userRole = signal<string | null>(null);
+  currentUserEmail = signal<string | null>(null);
+
+  constructor(private http: HttpClient) {
+    this.refreshSession();
+  }
+
   login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials);
   }
 
-  getToken(): string | null {
-    return this.tokenSignal();
+  saveToken(token: string): void {
+    localStorage.setItem('token', token);
+    this.refreshSession();
   }
 
-  saveToken(token: string): void {
-    localStorage.setItem('dk_token', token);
-    this.tokenSignal.set(token);
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 
   logout(): void {
-    localStorage.removeItem('dk_token');
-    this.tokenSignal.set(null);
+    localStorage.removeItem('token');
+    this.userRole.set(null);
+    this.currentUserEmail.set(null);
+  }
+
+  isAuthenticated(): boolean {
+    return this.getToken() !== null;
+  }
+
+  private refreshSession(): void {
+    const token = this.getToken();
+
+    if (token) {
+      const session = parseJwt(token);
+      if (session) {
+        this.userRole.set(session.role);
+        this.currentUserEmail.set(session.email);
+        return;
+      }
+    }
+
+    this.logout();
   }
 }

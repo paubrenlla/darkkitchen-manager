@@ -12,7 +12,7 @@ export function parseBackendErrors(err: HttpErrorResponse): ParsedErrors {
   };
 
   if (err.status === 0) {
-    result.global = 'No se pudo conectar con el servidor. ¿Está el backend encendido?';
+    result.global = 'No se pudo conectar con el servidor.';
     return result;
   }
 
