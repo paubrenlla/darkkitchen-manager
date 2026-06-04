@@ -1,4 +1,5 @@
 using DarkKitchen.IBusinessLogic;
+using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,9 @@ public class AuditsController(IAuditService auditService) : ControllerBase
             return BadRequest("Los filtros 'from' y 'to' son obligatorios.");
         }
 
-        var audits = _auditService.GetAudits(from.Value, to.Value, entityName, entityId);
+        var audits = _auditService.GetAudits(from.Value, to.Value, entityName, entityId)
+            .Select(a => new AuditLogResponse(a))
+            .ToList();
         return Ok(audits);
     }
 }

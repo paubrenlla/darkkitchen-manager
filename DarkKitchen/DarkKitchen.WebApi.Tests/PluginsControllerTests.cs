@@ -11,15 +11,13 @@ public class PluginsControllerTests
     [TestMethod]
     public void GetImporters_ShouldReturnOkWithImporterNames()
     {
-        var mockImporter1 = new Mock<IProductImporter>();
+        var mockImporter1 = new Mock<IProductImporter>(MockBehavior.Strict);
         mockImporter1.Setup(i => i.Name).Returns("Importer 1");
 
-        var mockImporter2 = new Mock<IProductImporter>();
+        var mockImporter2 = new Mock<IProductImporter>(MockBehavior.Strict);
         mockImporter2.Setup(i => i.Name).Returns("Importer 2");
 
-        var importers = new List<IProductImporter> { mockImporter1.Object, mockImporter2.Object };
-
-        var controller = new PluginsController(importers);
+        var controller = new PluginsController([mockImporter1.Object, mockImporter2.Object]);
 
         var result = controller.GetImporters() as OkObjectResult;
 
@@ -29,5 +27,7 @@ public class PluginsControllerTests
         Assert.AreEqual(2, resultValue.Count);
         Assert.AreEqual("Importer 1", resultValue[0]);
         Assert.AreEqual("Importer 2", resultValue[1]);
+        mockImporter1.VerifyAll();
+        mockImporter2.VerifyAll();
     }
 }
