@@ -1,0 +1,49 @@
+<mat-sidenav-container
+  style="
+    --bg-container: #f8fafc;
+    --bg-sidenav: #ffffff;
+    --bg-main-content: #f8fafc80;
+    --border-sidenav: #e2e8f0;
+    --border-header: #f1f5f9;
+    --text-brand: #4f46e5;
+    --text-role-badge: #94a3b8;
+    --text-item-default: #475569;
+    --text-icon-default: #94a3b8;
+    --bg-item-active: #e0e7ff;
+    --text-item-active: #4f46e5;
+  "
+  class="h-screen w-full font-sans !bg-[var(--bg-container)]">
+
+  <mat-sidenav mode="side" opened
+               class="w-48 !bg-[var(--bg-sidenav)] border-r border-[var(--border-sidenav)] flex flex-col h-full transition-all duration-200">
+
+    <div class="p-5 text-center border-b border-[var(--border-header)] h-16 flex flex-col justify-center">
+      <h2 class="m-0 text-lg font-bold tracking-tight text-[var(--text-brand)] leading-none">Dark Kitchen</h2>
+      <span class="text-[10px] font-semibold text-[var(--text-role-badge)] block mt-1 uppercase tracking-wider leading-none">
+        Panel de {{ currentUserRole() }}
+      </span>
+    </div>
+
+    <mat-nav-list class="pt-2 px-2">
+      @for (item of menuItems(); track item.route) {
+        <a mat-list-item
+           [routerLink]="[item.route]"
+           routerLinkActive="!bg-[var(--bg-item-active)] !text-[var(--text-item-active)] font-semibold shadow-sm"
+           class="my-0.5 rounded-md overflow-hidden transition-all duration-150 text-[var(--text-item-default)] block">
+          <mat-icon matListItemIcon class="!text-[var(--text-icon-default)] transition-colors">{{ item.icon }}</mat-icon>
+          <span matListItemTitle class="text-xs tracking-wide">{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="flex flex-col h-full overflow-hidden">
+
+    <app-navbar></app-navbar>
+
+    <main class="p-6 overflow-y-auto flex-1 !bg-[var(--bg-main-content)]">
+      <router-outlet></router-outlet>
+    </main>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

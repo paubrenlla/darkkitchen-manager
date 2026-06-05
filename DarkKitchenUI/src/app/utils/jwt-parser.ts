@@ -1,6 +1,7 @@
 export interface UserSession {
   role: string | null;
   email: string | null;
+  name: string | null;
 }
 
 export function parseJwt(token: string): UserSession | null {
@@ -22,10 +23,17 @@ export function parseJwt(token: string): UserSession | null {
       payload['sub'] ||
       payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
 
+    const name = payload['unique_name'] ||
+      payload['name'] ||
+      payload['given_name'] ||
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+
     return {
       role: role || null,
-      email: email || null
+      email: email || null,
+      name: name || null
     };
+
   } catch (error) {
     console.error('Error crítico analizando el formato del JWT:', error);
     return null;

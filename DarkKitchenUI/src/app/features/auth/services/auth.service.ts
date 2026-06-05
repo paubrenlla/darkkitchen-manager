@@ -11,6 +11,7 @@ export class AuthService {
 
   userRole = signal<string | null>(null);
   currentUserEmail = signal<string | null>(null);
+  currentUserName = signal<string | null>(null);
 
   constructor(private http: HttpClient) {
     this.refreshSession();
@@ -33,6 +34,7 @@ export class AuthService {
     localStorage.removeItem('token');
     this.userRole.set(null);
     this.currentUserEmail.set(null);
+    this.currentUserName.set(null);
   }
 
   isAuthenticated(): boolean {
@@ -47,6 +49,7 @@ export class AuthService {
       if (session) {
         this.userRole.set(session.role);
         this.currentUserEmail.set(session.email);
+        this.currentUserName.set(session.name);
         return;
       }
     }
