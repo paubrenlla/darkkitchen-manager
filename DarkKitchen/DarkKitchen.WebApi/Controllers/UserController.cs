@@ -26,16 +26,17 @@ public class UserController(IUserService userService) : ControllerBase
             }
         }
 
-        return StatusCode(StatusCodes.Status201Created, _userService.CreateUser(request));
+        var user = _userService.CreateUser(request);
+        return StatusCode(StatusCodes.Status201Created, new UserCreateResponse(user));
     }
 
     [HttpGet]
     [Authorize(Roles = "Administrativo")]
-    public IActionResult GetUsers(
-        [FromQuery] string? name,
-        [FromQuery] string? surname)
+    public IActionResult GetUsers([FromQuery] string? name, [FromQuery] string? surname)
     {
-        var users = _userService.GetUsers(name, surname).ToList();
+        var users = _userService.GetUsers(name, surname)
+            .Select(u => new UserCreateResponse(u))
+            .ToList();
         return users.Any() ? Ok(users) : NoContent();
     }
 
@@ -44,7 +45,8 @@ public class UserController(IUserService userService) : ControllerBase
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request)
     {
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        return Ok(_userService.UpdateUser(callerId, id, request));
+        var user = _userService.UpdateUser(callerId, id, request);
+        return Ok(new UserCreateResponse(user));
     }
 
     [HttpDelete("{id}")]
@@ -52,6 +54,7 @@ public class UserController(IUserService userService) : ControllerBase
     public IActionResult DeleteUser(Guid id)
     {
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        return Ok(_userService.DeleteUser(callerId, id));
+        _userService.DeleteUser(callerId, id);
+        return NoContent();
     }
 }

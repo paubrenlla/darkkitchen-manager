@@ -1,3 +1,5 @@
+using DarkKitchen.Domain.Orders;
+
 namespace DarkKitchen.Models.DTOs;
 
 public class OrderCreateResponse
@@ -8,4 +10,18 @@ public class OrderCreateResponse
     public decimal Subtotal { get; set; }
     public decimal ShippingCost { get; set; }
     public decimal Total { get; set; }
+
+    public OrderCreateResponse()
+    {
+    }
+
+    public OrderCreateResponse(Order order)
+    {
+        Id = order.Id;
+        ClientId = order.ClientId;
+        OrderNumber = order.OrderNumber ?? 0;
+        Subtotal = order.Subtotal;
+        ShippingCost = order.ShippingCost;
+        Total = order.Total;
+    }
 }

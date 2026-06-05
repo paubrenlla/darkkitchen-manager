@@ -1,11 +1,12 @@
-﻿using DarkKitchen.Models.DTOs;
+﻿using DarkKitchen.Domain.Orders.Delivery;
+using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.IBusinessLogic;
 
 public interface IShippingTypeService
 {
-    IEnumerable<ShippingTypeResponse> GetAll();
-    ShippingTypeResponse Create(ShippingTypeRequest request);
-    ShippingTypeResponse Update(Guid id, ShippingTypeRequest request);
+    IEnumerable<ShippingType> GetAll();
+    ShippingType Create(ShippingTypeRequest request);
+    ShippingType Update(Guid id, ShippingTypeRequest request);
     void Delete(Guid id);
 }

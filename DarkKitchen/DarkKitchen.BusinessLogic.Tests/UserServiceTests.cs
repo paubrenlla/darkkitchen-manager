@@ -123,9 +123,10 @@ public class UserServiceTests
         var users = new List<User> { CreateTestUser() };
         _userRepositoryMock.Setup(r => r.GetByNameAndSurname("Juan", "Perez")).Returns(users);
 
-        var result = _userService.GetUsers("Juan", "Perez");
+        var result = _userService.GetUsers("Juan", "Perez").ToList();
 
-        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Juan", result[0].Name);
         _userRepositoryMock.VerifyAll();
     }
 
@@ -241,7 +242,7 @@ public class UserServiceTests
         var result = _userService.CreateUser(request);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual("Administrativo", result.Role);
+        Assert.AreEqual(Role.Administrativo, result.Role);
         _userRepositoryMock.VerifyAll();
         _strategyFactoryMock.VerifyAll();
     }
@@ -267,7 +268,7 @@ public class UserServiceTests
         var result = _userService.CreateUser(request);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual("Preparador", result.Role);
+        Assert.AreEqual(Role.Preparador, result.Role);
         _userRepositoryMock.VerifyAll();
         _strategyFactoryMock.VerifyAll();
     }
@@ -293,7 +294,7 @@ public class UserServiceTests
         var result = _userService.CreateUser(request);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual("Cliente", result.Role);
+        Assert.AreEqual(Role.Cliente, result.Role);
         _userRepositoryMock.VerifyAll();
         _strategyFactoryMock.VerifyAll();
     }

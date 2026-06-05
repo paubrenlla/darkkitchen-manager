@@ -4,7 +4,6 @@ using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -16,14 +15,14 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private static readonly IReadOnlyList<string> AllowedAdminRoles = ["Administrativo", "Preparador"];
 
-    public UserCreateResponse CreateUser(UserCreateRequest request)
+    public User CreateUser(UserCreateRequest request)
     {
         Role role = ParseRole(request.Role);
         EnsureEmailNotTaken(request.Email);
         var validPhone = CreateValidPhone(request.CountryPrefix, request.PhoneNumber);
         var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
         _userRepository.Add(user);
-        return Converter.ToUserCreateResponse(user);
+        return user;
     }
 
     private Role ParseRole(string? roleName)
@@ -55,12 +54,12 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         return Domain.Users.PhoneNumber.Create(prefix, number, strategy);
     }
 
-    public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
+    public IEnumerable<User> GetUsers(string? name, string? surname)
     {
-        return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
+        return _userRepository.GetByNameAndSurname(name, surname);
     }
 
-    public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    public User UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
     {
         ValidateSelfModification(adminId, userId);
 
@@ -74,7 +73,7 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
 
         existingUser.UpdateDetails(request.Name, request.Surname, request.Email, validPhone, role);
         _userRepository.Update(userId, existingUser);
-        return Converter.ToUserCreateResponse(existingUser);
+        return existingUser;
     }
 
     private void ValidateSelfModification(Guid adminId, Guid userId)
@@ -94,17 +93,16 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
         }
     }
 
-    public UserCreateResponse DeleteUser(Guid adminId, Guid userId)
+    public void DeleteUser(Guid adminId, Guid userId)
     {
         if(adminId == userId)
         {
             throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
         }
 
-        User user = _userRepository.GetById(userId)
-                    ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        _ = _userRepository.GetById(userId)
+                   ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
 
         _userRepository.Delete(userId);
-        return Converter.ToUserCreateResponse(user);
     }
 }

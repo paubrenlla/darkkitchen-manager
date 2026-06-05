@@ -18,7 +18,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     public IActionResult CreateOrder([FromBody] OrderCreateRequest request)
     {
         var clientId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        return StatusCode(StatusCodes.Status201Created, _orderService.CreateOrder(clientId, request));
+        var order = _orderService.CreateOrder(clientId, request);
+        return StatusCode(StatusCodes.Status201Created, new OrderCreateResponse(order));
     }
 
     [HttpPatch("{id}/status")]
@@ -86,7 +87,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
                 return BadRequest(new { error = $"Estado '{request.Status}' no válido." });
         }
 
-        return Ok(_orderService.GetOrderById(id));
+        var order = _orderService.GetOrderById(id);
+        return Ok(new OrderDetailResponse(order));
     }
 
     [HttpGet]
@@ -120,7 +122,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     [Authorize(Roles = "Preparador,Administrativo")]
     public IActionResult GetOrderDetail(Guid id)
     {
-        OrderDetailResponse response = _orderService.GetOrderById(id);
-        return Ok(response);
+        var order = _orderService.GetOrderById(id);
+        return Ok(new OrderDetailResponse(order));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -17,7 +18,7 @@ public class ShippingTypesControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _serviceMock = new Mock<IShippingTypeService>();
+        _serviceMock = new Mock<IShippingTypeService>(MockBehavior.Strict);
         _controller = new ShippingTypesController(_serviceMock.Object);
         SetCallerContext(Guid.NewGuid(), "Administrativo");
     }
@@ -26,8 +27,8 @@ public class ShippingTypesControllerTests
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, callerId.ToString()),
-            new Claim(ClaimTypes.Role, role),
+            new(ClaimTypes.NameIdentifier, callerId.ToString()),
+            new(ClaimTypes.Role, role),
         };
 
         var identity = new ClaimsIdentity(claims, "Test");
@@ -42,10 +43,10 @@ public class ShippingTypesControllerTests
     [TestMethod]
     public void GetAll_ShouldReturnOkWithList()
     {
-        var types = new List<ShippingTypeResponse>
+        var types = new List<ShippingType>
         {
-            new ShippingTypeResponse { Id = Guid.NewGuid(), Name = "Express", Cost = 150m },
-            new ShippingTypeResponse { Id = Guid.NewGuid(), Name = "Dia siguiente", Cost = 80m },
+            new ShippingType("Express", 150m),
+            new ShippingType("Dia siguiente", 80m),
         };
         _serviceMock.Setup(s => s.GetAll()).Returns(types);
 
@@ -53,6 +54,7 @@ public class ShippingTypesControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -63,19 +65,21 @@ public class ShippingTypesControllerTests
         var result = _controller.GetAll();
 
         Assert.IsInstanceOfType(result, typeof(NoContentResult));
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
     public void Create_ValidRequest_ShouldReturn201()
     {
         var request = new ShippingTypeRequest { Name = "Express", Cost = 150m };
-        var response = new ShippingTypeResponse { Id = Guid.NewGuid(), Name = "Express", Cost = 150m };
-        _serviceMock.Setup(s => s.Create(request)).Returns(response);
+        var shippingType = new ShippingType("Express", 150m);
+        _serviceMock.Setup(s => s.Create(request)).Returns(shippingType);
 
         var result = _controller.Create(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -89,6 +93,7 @@ public class ShippingTypesControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -96,13 +101,14 @@ public class ShippingTypesControllerTests
     {
         var id = Guid.NewGuid();
         var request = new ShippingTypeRequest { Name = "Express Premium", Cost = 250m };
-        var response = new ShippingTypeResponse { Id = id, Name = "Express Premium", Cost = 250m };
-        _serviceMock.Setup(s => s.Update(id, request)).Returns(response);
+        var shippingType = new ShippingType("Express Premium", 250m);
+        _serviceMock.Setup(s => s.Update(id, request)).Returns(shippingType);
 
         var result = _controller.Update(id, request) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -117,18 +123,20 @@ public class ShippingTypesControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
     public void Delete_ExistingId_ShouldReturnNoContent()
     {
         var id = Guid.NewGuid();
+        _serviceMock.Setup(s => s.Delete(id));
 
         var result = _controller.Delete(id) as NoContentResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
-        _serviceMock.Verify(s => s.Delete(id), Times.Once);
+        _serviceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -142,5 +150,6 @@ public class ShippingTypesControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(404, result.StatusCode);
+        _serviceMock.VerifyAll();
     }
 }

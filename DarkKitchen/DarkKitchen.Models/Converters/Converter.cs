@@ -31,7 +31,7 @@ public static class Converter
         };
     }
 
-    public static UserCreateResponse ToUserCreateResponse(User user)
+    /*public static UserCreateResponse ToUserCreateResponse(User user)
     {
         return new UserCreateResponse
         {
@@ -42,7 +42,7 @@ public static class Converter
             Phone = $"{user.Phone.CountryPrefix}{user.Phone.Number}",
             Role = user.Role.ToString()
         };
-    }
+    }*/
 
     public static OrderCreateResponse ToOrderCreateResponse(Order order)
     {

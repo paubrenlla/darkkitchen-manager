@@ -239,7 +239,7 @@ public class OrderServiceTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(orderId, result.Id);
-        Assert.AreEqual("Pending", result.Status);
+        Assert.AreEqual(OrderState.Pending, result.State);
         _orderRepositoryMock.VerifyAll();
     }
 

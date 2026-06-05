@@ -18,7 +18,7 @@ public class ProductService(
     private readonly IDomainEventPublisher _eventPublisher = eventPublisher;
     private readonly IEnumerable<IProductImporter> _importers = importers;
 
-    public IEnumerable<ProductResponse> GetProducts(string? name, string? line, string? category)
+    public IEnumerable<Product> GetProducts(string? name, string? line, string? category)
     {
         IEnumerable<Product> products = _productRepository.GetAll();
 
@@ -37,10 +37,10 @@ public class ProductService(
             products = products.Where(p => p.Category.Name.Equals(category, StringComparison.OrdinalIgnoreCase));
         }
 
-        return products.Select(Converter.ToProductResponse);
+        return products;
     }
 
-    public ProductResponse CreateProduct(ProductCreateRequest request, string currentUser)
+    public Product CreateProduct(ProductCreateRequest request, string currentUser)
     {
         if(_productRepository.GetAll().Any(p => p.Code == request.Code))
         {
@@ -58,13 +58,13 @@ public class ProductService(
             ResponsibleUser = currentUser,
             NewState = product
         });
-        return Converter.ToProductResponse(product);
+        return product;
     }
 
-    public ProductResponse UpdateProduct(Guid id, ProductUpdateRequest request, string currentUser)
+    public Product UpdateProduct(Guid id, ProductUpdateRequest request, string currentUser)
     {
         Product product = _productRepository.GetById(id)
-            ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
+                          ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
         Product oldProduct = product.Clone();
         var images = BuildImages(request.Images);
@@ -76,7 +76,7 @@ public class ProductService(
         PublishModifiedEvent(id, oldProduct, product, currentUser);
         PublishActivationEvents(id, oldProduct, product, currentUser);
 
-        return Converter.ToProductResponse(product);
+        return product;
     }
 
     private static List<ProductImage> BuildImages(IEnumerable<ProductImageDto> imageDtos)

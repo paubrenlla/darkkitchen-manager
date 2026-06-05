@@ -17,7 +17,7 @@ public class ReportsControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _mockReportService = new Mock<IReportService>();
+        _mockReportService = new Mock<IReportService>(MockBehavior.Strict);
         _controller = new ReportsController(_mockReportService.Object);
 
         List<Claim> claims = [new Claim(ClaimTypes.Role, "Administrativo")];
@@ -53,6 +53,7 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -67,6 +68,7 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -105,6 +107,7 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -118,5 +121,6 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 }

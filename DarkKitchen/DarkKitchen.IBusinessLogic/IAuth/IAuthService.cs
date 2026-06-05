@@ -1,8 +1,8 @@
-using DarkKitchen.Models.DTOs;
+using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.IBusinessLogic.IAuth;
 
 public interface IAuthService
 {
-    LoginResponse Login(string email, string password);
+    LoginResult Login(string email, string password);
 }

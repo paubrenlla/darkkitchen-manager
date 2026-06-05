@@ -1,7 +1,6 @@
 ﻿using DarkKitchen.Domain.Orders;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -13,15 +12,34 @@ public class OrderEnricher(IUserRepository userRepository, IProductRepository pr
 
     public OrderListResponse EnrichForClient(Order order)
     {
-        var clientName = ResolveClientName(order.ClientId);
-        return Converter.ToOrderListResponse(order, clientName);
+        return new OrderListResponse
+        {
+            Id = order.Id,
+            OrderNumber = order.OrderNumber,
+            ClientId = order.ClientId,
+            ClientName = ResolveClientName(order.ClientId),
+            CreatedAt = order.CreatedAt,
+            Status = order.State.ToString(),
+            Total = order.Total,
+            ProductCount = order.Items.Sum(i => i.Quantity),
+            Items = []
+        };
     }
 
     public OrderListResponse EnrichForPreparador(Order order)
     {
-        var clientName = ResolveClientName(order.ClientId);
-        var items = order.Items.Select(BuildItemSummary).ToList();
-        return Converter.ToOrderListResponse(order, clientName, items);
+        return new OrderListResponse
+        {
+            Id = order.Id,
+            OrderNumber = order.OrderNumber,
+            ClientId = order.ClientId,
+            ClientName = ResolveClientName(order.ClientId),
+            CreatedAt = order.CreatedAt,
+            Status = order.State.ToString(),
+            Total = order.Total,
+            ProductCount = order.Items.Sum(i => i.Quantity),
+            Items = order.Items.Select(BuildItemSummary).ToList()
+        };
     }
 
     private string ResolveClientName(Guid clientId)
@@ -40,7 +58,7 @@ public class OrderEnricher(IUserRepository userRepository, IProductRepository pr
             ProductName = product?.Name ?? string.Empty,
             Quantity = item.Quantity,
             Price = item.Price,
-            ItemTotal = item.CalculateItemTotal(),
+            ItemTotal = item.CalculateItemTotal()
         };
     }
 }

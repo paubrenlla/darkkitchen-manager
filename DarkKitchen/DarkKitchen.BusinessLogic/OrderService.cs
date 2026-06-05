@@ -4,7 +4,6 @@ using DarkKitchen.Domain.Orders.States;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -22,7 +21,7 @@ public class OrderService(
     private readonly IShippingCostCalculator _shippingCalculator = shippingCalculator;
     private readonly IOrderEnricher _orderEnricher = orderEnricher;
 
-    public OrderCreateResponse CreateOrder(Guid clientId, OrderCreateRequest request)
+    public Order CreateOrder(Guid clientId, OrderCreateRequest request)
     {
         if(string.IsNullOrWhiteSpace(request.DeliveryType))
         {
@@ -35,7 +34,7 @@ public class OrderService(
         var order = new Order(clientId, address, request.DeliveryType, orderItems, shippingCost);
 
         _orderRepository.Add(order);
-        return Converter.ToOrderCreateResponse(order);
+        return order;
     }
 
     private Address BuildAddress(OrderAddressDto dto)
@@ -71,9 +70,9 @@ public class OrderService(
         return product;
     }
 
-    public OrderDetailResponse GetOrderById(Guid orderId)
+    public Order GetOrderById(Guid orderId)
     {
-        return Converter.ToOrderDetailResponse(GetOrderOrThrow(orderId));
+        return GetOrderOrThrow(orderId);
     }
 
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter)

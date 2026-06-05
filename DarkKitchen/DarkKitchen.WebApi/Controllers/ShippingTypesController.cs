@@ -15,7 +15,9 @@ public class ShippingTypesController(IShippingTypeService shippingTypeService) :
     [HttpGet]
     public IActionResult GetAll()
     {
-        var types = _shippingTypeService.GetAll().ToList();
+        var types = _shippingTypeService.GetAll()
+            .Select(s => new ShippingTypeResponse(s))
+            .ToList();
         return types.Any() ? Ok(types) : NoContent();
     }
 
@@ -25,8 +27,8 @@ public class ShippingTypesController(IShippingTypeService shippingTypeService) :
     {
         try
         {
-            var response = _shippingTypeService.Create(request);
-            return StatusCode(StatusCodes.Status201Created, response);
+            var shippingType = _shippingTypeService.Create(request);
+            return StatusCode(StatusCodes.Status201Created, new ShippingTypeResponse(shippingType));
         }
         catch(ArgumentException ex)
         {
@@ -40,8 +42,8 @@ public class ShippingTypesController(IShippingTypeService shippingTypeService) :
     {
         try
         {
-            var response = _shippingTypeService.Update(id, request);
-            return Ok(response);
+            var shippingType = _shippingTypeService.Update(id, request);
+            return Ok(new ShippingTypeResponse(shippingType));
         }
         catch(KeyNotFoundException ex)
         {
