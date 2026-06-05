@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, LoginResponse } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatCardModule } from '@angular/material/card';
@@ -52,10 +52,10 @@ export class LoginComponent {
     this.fieldErrors.set({});
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (response: any) => {
+      next: (response: LoginResponse) => {
         this.isLoading.set(false);
 
-        const token = response.token || response;
+        const token = typeof response === 'string' ? response : response.token;
 
         if (token) {
           this.authService.saveToken(token);

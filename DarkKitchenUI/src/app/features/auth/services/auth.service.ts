@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { parseJwt } from '../../../utils/jwt-parser';
 
+export type LoginResponse = { token: string } | string;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,8 +19,8 @@ export class AuthService {
     this.refreshSession();
   }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials);
+  login(credentials: { email: string; password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
   }
 
   saveToken(token: string): void {
