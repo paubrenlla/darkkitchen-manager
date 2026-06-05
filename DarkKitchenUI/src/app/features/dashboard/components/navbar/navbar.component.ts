@@ -22,7 +22,7 @@ export class NavbarComponent {
   private router = inject(Router);
 
   displayName = computed(() => {
-    return this.authService.currentUserName() || 'Usuario';
+    return this.authService.currentUserEmail();
   });
 
   logout(): void {

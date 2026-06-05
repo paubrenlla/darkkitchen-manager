@@ -3,7 +3,7 @@
 
   <div class="flex items-center gap-4">
     <span [class]="welcomeTextClasses">
-      ¡Bienvenido/a, {{ displayName() }}!
+      {{ displayName() }}
     </span>
 
     <button mat-icon-button (click)="logout()" title="Cerrar sesión" [class]="logoutButtonClasses">
