@@ -75,14 +75,14 @@ public class ProductsControllerTests
     }
 
     [TestMethod]
-    public void GetProducts_NoResults_ShouldReturn204()
+    public void GetProducts_NoResults_ShouldReturn200WithEmptyList()
     {
         _mockService.Setup(s => s.GetProducts("Pizza", null, null)).Returns([]);
 
-        var result = _controller.GetProducts("Pizza", null, null) as NoContentResult;
+        var result = _controller.GetProducts("Pizza", null, null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
         _mockService.VerifyAll();
     }
 

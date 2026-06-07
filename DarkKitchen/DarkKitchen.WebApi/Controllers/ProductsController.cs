@@ -21,7 +21,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         var products = _productService.GetProducts(name, line, category)
             .Select(p => new ProductResponse(p))
             .ToList();
-        return products.Any() ? Ok(products) : NoContent();
+        return Ok(products);
     }
 
     [HttpPost]
