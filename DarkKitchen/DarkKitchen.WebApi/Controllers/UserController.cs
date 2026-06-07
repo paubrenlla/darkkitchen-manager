@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,17 +16,9 @@ public class UserController(IUserService userService) : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
+    [AuthorizationFilter]
     public IActionResult CreateUser([FromBody] UserCreateRequest request)
     {
-        if(request.Role != null)
-        {
-            var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            if(callerRole != "Administrativo")
-            {
-                return Forbid();
-            }
-        }
-
         var user = _userService.CreateUser(request);
         return StatusCode(StatusCodes.Status201Created, new UserCreateResponse(user));
     }
@@ -37,7 +30,7 @@ public class UserController(IUserService userService) : ControllerBase
         var users = _userService.GetUsers(name, surname)
             .Select(u => new UserCreateResponse(u))
             .ToList();
-        return users.Any() ? Ok(users) : NoContent();
+        return Ok(users);
     }
 
     [HttpPut("{id}")]

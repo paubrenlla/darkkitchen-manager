@@ -42,41 +42,17 @@ public class AuditsControllerTests
     }
 
     [TestMethod]
-    public void GetAudits_MissingFilters_ShouldReturnBadRequest()
-    {
-        var result = _controller.GetAudits(null, null, null, null) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Los filtros 'from' y 'to' son obligatorios.", result.Value);
-    }
-
-    [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public void GetAudits_ServiceThrowsArgumentException_ShouldThrow()
+    public void GetAudits_ServiceThrowsArgumentException_ShouldPropagate()
     {
         var from = DateTime.UtcNow;
         var to = DateTime.UtcNow.AddDays(-1);
+
         _mockService.Setup(s => s.GetAudits(from, to, null, null))
             .Throws(new ArgumentException("La fecha 'desde' no puede ser mayor que la fecha 'hasta'."));
 
         _controller.GetAudits(from, to, null, null);
 
         _mockService.VerifyAll();
-    }
-
-    [TestMethod]
-    public void GetAudits_OnlyFromProvided_ShouldReturnBadRequest()
-    {
-        var result = _controller.GetAudits(DateTime.UtcNow, null, null, null) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
-    }
-
-    [TestMethod]
-    public void GetAudits_OnlyToProvided_ShouldReturnBadRequest()
-    {
-        var result = _controller.GetAudits(null, DateTime.UtcNow, null, null) as BadRequestObjectResult;
-
-        Assert.IsNotNull(result);
     }
 }

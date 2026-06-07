@@ -22,7 +22,7 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         var promotions = _promotionService.GetPromotions(date, line, productCode)
             .Select(p => new PromotionCreateResponse(p))
             .ToList();
-        return promotions.Any() ? Ok(promotions) : NoContent();
+        return Ok(promotions);
     }
 
     [HttpPost]

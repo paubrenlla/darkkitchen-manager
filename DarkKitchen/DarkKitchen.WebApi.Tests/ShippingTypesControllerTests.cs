@@ -58,13 +58,14 @@ public class ShippingTypesControllerTests
     }
 
     [TestMethod]
-    public void GetAll_EmptyList_ShouldReturnNoContent()
+    public void GetAll_EmptyList_ShouldReturnOkWithEmptyList()
     {
         _serviceMock.Setup(s => s.GetAll()).Returns([]);
 
-        var result = _controller.GetAll();
+        var result = _controller.GetAll() as OkObjectResult;
 
-        Assert.IsInstanceOfType(result, typeof(NoContentResult));
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
         _serviceMock.VerifyAll();
     }
 
@@ -83,16 +84,15 @@ public class ShippingTypesControllerTests
     }
 
     [TestMethod]
-    public void Create_InvalidRequest_ShouldReturnBadRequest()
+    [ExpectedException(typeof(ArgumentException))]
+    public void Create_InvalidRequest_ShouldPropagateException()
     {
         var request = new ShippingTypeRequest { Name = string.Empty, Cost = 150m };
         _serviceMock.Setup(s => s.Create(request))
             .Throws(new ArgumentException("El nombre es obligatorio."));
 
-        var result = _controller.Create(request) as BadRequestObjectResult;
+        _controller.Create(request);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
         _serviceMock.VerifyAll();
     }
 
@@ -112,17 +112,16 @@ public class ShippingTypesControllerTests
     }
 
     [TestMethod]
-    public void Update_NotFound_ShouldReturnNotFound()
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Update_NotFound_ShouldPropagateException()
     {
         var id = Guid.NewGuid();
         var request = new ShippingTypeRequest { Name = "Express", Cost = 150m };
         _serviceMock.Setup(s => s.Update(id, request))
             .Throws(new KeyNotFoundException("Tipo de envío no encontrado."));
 
-        var result = _controller.Update(id, request) as NotFoundObjectResult;
+        _controller.Update(id, request);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
         _serviceMock.VerifyAll();
     }
 
@@ -140,16 +139,15 @@ public class ShippingTypesControllerTests
     }
 
     [TestMethod]
-    public void Delete_NotFound_ShouldReturnNotFound()
+    [ExpectedException(typeof(KeyNotFoundException))]
+    public void Delete_NotFound_ShouldPropagateException()
     {
         var id = Guid.NewGuid();
         _serviceMock.Setup(s => s.Delete(id))
             .Throws(new KeyNotFoundException("Tipo de envío no encontrado."));
 
-        var result = _controller.Delete(id) as NotFoundObjectResult;
+        _controller.Delete(id);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(404, result.StatusCode);
         _serviceMock.VerifyAll();
     }
 }

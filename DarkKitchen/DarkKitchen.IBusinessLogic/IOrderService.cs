@@ -7,6 +7,8 @@ public interface IOrderService
 {
     Order CreateOrder(Guid clientId, OrderCreateRequest request);
     Order GetOrderById(Guid orderId);
+    void UpdateOrderStatus(Guid orderId, string status);
+    IEnumerable<OrderListResponse> GetOrders(Guid callerId, string? callerRole, OrderFilter filter);
     IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter);
     IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter);
     void Prepare(Guid orderId);

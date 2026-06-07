@@ -77,14 +77,14 @@ public class PromotionsControllerTests
     }
 
     [TestMethod]
-    public void GetPromotions_NoResults_ShouldReturnNoContent()
+    public void GetPromotions_NoResults_ShouldReturnOkWithEmptyList()
     {
         _mockService.Setup(s => s.GetPromotions(null, "Desayunos", null)).Returns([]);
 
-        var result = _controller.GetPromotions(null, "Desayunos", null) as NoContentResult;
+        var result = _controller.GetPromotions(null, "Desayunos", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
         _mockService.VerifyAll();
     }
 
@@ -138,6 +138,49 @@ public class PromotionsControllerTests
         Assert.IsNotNull(body);
         Assert.AreEqual("Promo Actualizada", body.Name);
         Assert.AreEqual(25, body.DiscountPercentage);
+        _mockService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void CreatePromotion_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var promotion = CreateTestPromotion("Promo Verano", 20);
+        _mockService.Setup(s => s.CreatePromotion(request, "Unknown")).Returns(promotion);
+
+        _controller.CreatePromotion(request);
+
+        _mockService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var id = Guid.NewGuid();
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Actualizada",
+            DiscountPercentage = 25,
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var promotion = CreateTestPromotion("Promo Actualizada", 25);
+        _mockService.Setup(s => s.UpdatePromotion(id, request, "Unknown")).Returns(promotion);
+
+        _controller.UpdatePromotion(id, request);
+
         _mockService.VerifyAll();
     }
 }
