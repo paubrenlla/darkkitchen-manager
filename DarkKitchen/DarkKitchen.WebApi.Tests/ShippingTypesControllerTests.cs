@@ -58,13 +58,14 @@ public class ShippingTypesControllerTests
     }
 
     [TestMethod]
-    public void GetAll_EmptyList_ShouldReturnNoContent()
+    public void GetAll_EmptyList_ShouldReturnOkWithEmptyList()
     {
         _serviceMock.Setup(s => s.GetAll()).Returns([]);
 
-        var result = _controller.GetAll();
+        var result = _controller.GetAll() as OkObjectResult;
 
-        Assert.IsInstanceOfType(result, typeof(NoContentResult));
+        Assert.IsNotNull(result);
+        Assert.AreEqual(200, result.StatusCode);
         _serviceMock.VerifyAll();
     }
 

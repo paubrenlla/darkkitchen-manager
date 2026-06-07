@@ -18,7 +18,7 @@ public class ShippingTypesController(IShippingTypeService shippingTypeService) :
         var types = _shippingTypeService.GetAll()
             .Select(s => new ShippingTypeResponse(s))
             .ToList();
-        return types.Any() ? Ok(types) : NoContent();
+        return Ok(types);
     }
 
     [HttpPost]
