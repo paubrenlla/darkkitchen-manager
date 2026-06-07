@@ -301,4 +301,150 @@ public class OrderServiceTests
             500m,
             images);
     }
+
+    [TestMethod]
+    public void UpdateOrderStatus_Preparado_ShouldCallPrepare()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "Preparado");
+
+        Assert.AreEqual(OrderState.Prepared, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateOrderStatus_EnCamino_ShouldCallShip()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        order.TransitionTo(OrderState.Prepared);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "EnCamino");
+
+        Assert.AreEqual(OrderState.Shipping, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateOrderStatus_Entregado_ShouldCallDeliver()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        order.TransitionTo(OrderState.Prepared);
+        order.TransitionTo(OrderState.Shipping);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "Entregado");
+
+        Assert.AreEqual(OrderState.Delivered, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateOrderStatus_NoEntregado_ShouldCallNotDelivered()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        order.TransitionTo(OrderState.Prepared);
+        order.TransitionTo(OrderState.Shipping);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "NoEntregado");
+
+        Assert.AreEqual(OrderState.NotDelivered, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateOrderStatus_Demorado_ShouldCallDelay()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "Demorado");
+
+        Assert.AreEqual(OrderState.Delayed, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdateOrderStatus_Cancelado_ShouldCallCancel()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order(_clientId, _address, "Express", _items, 0m);
+        _orderRepositoryMock.Setup(r => r.GetById(orderId)).Returns(order);
+        _orderRepositoryMock.Setup(r => r.Update(order));
+
+        _orderService.UpdateOrderStatus(orderId, "Cancelado");
+
+        Assert.AreEqual(OrderState.Cancelled, order.State);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void UpdateOrderStatus_InvalidStatus_ShouldThrowArgumentException()
+    {
+        _orderService.UpdateOrderStatus(Guid.NewGuid(), "EstadoInvalido");
+    }
+
+    [TestMethod]
+    public void GetOrders_AsCliente_ShouldCallGetOrdersByClient()
+    {
+        var clientId = Guid.NewGuid();
+        var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
+        var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+        var filter = new OrderFilter();
+
+        _orderRepositoryMock
+            .Setup(r => r.GetByClient(clientId, null, null, null))
+            .Returns(orders);
+        _orderEnricherMock.Setup(e => e.EnrichForClient(It.IsAny<Order>())).Returns(expectedResponse);
+
+        var result = _orderService.GetOrders(clientId, "Cliente", filter).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        _orderRepositoryMock.VerifyAll();
+        _orderEnricherMock.VerifyAll();
+    }
+
+    [TestMethod]
+    public void GetOrders_AsPreparador_WithDates_ShouldCallGetOrdersByStatus()
+    {
+        var from = DateTime.Now.AddDays(-7);
+        var to = DateTime.Now;
+        var orders = new List<Order> { new(_clientId, _address, "Express", _items, 0m) };
+        var expectedResponse = new OrderListResponse { Status = "Pending", ClientName = "Juan Sosa" };
+        var filter = new OrderFilter { From = from, To = to };
+
+        _orderRepositoryMock
+            .Setup(r => r.GetByStatus(from, to, null, null))
+            .Returns(orders);
+        _orderEnricherMock.Setup(e => e.EnrichForPreparador(It.IsAny<Order>())).Returns(expectedResponse);
+
+        var result = _orderService.GetOrders(Guid.NewGuid(), "Preparador", filter).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        _orderRepositoryMock.VerifyAll();
+        _orderEnricherMock.VerifyAll();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void GetOrders_AsPreparador_WithoutDates_ShouldThrowArgumentException()
+    {
+        var filter = new OrderFilter { From = null, To = null };
+
+        _orderService.GetOrders(Guid.NewGuid(), "Preparador", filter);
+    }
 }

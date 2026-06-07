@@ -5,7 +5,9 @@ namespace DarkKitchen.WebApi.Filters;
 
 public class EmptyCollectionFilter : IActionFilter
 {
-    public void OnActionExecuting(ActionExecutingContext context) { }
+    public void OnActionExecuting(ActionExecutingContext context)
+    {
+    }
 
     public void OnActionExecuted(ActionExecutedContext context)
     {

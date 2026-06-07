@@ -39,7 +39,7 @@ public class ExceptionFilter : IExceptionFilter
         else
         {
             context.Result = new ObjectResult(new { error = "Ocurrió un error inesperado." })
-                { StatusCode = (int)HttpStatusCode.InternalServerError };
+            { StatusCode = (int)HttpStatusCode.InternalServerError };
         }
 
         context.ExceptionHandled = true;

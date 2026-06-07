@@ -134,4 +134,34 @@ public class OrderService(
         return _orderRepository.GetById(orderId)
             ?? throw new KeyNotFoundException($"Pedido {orderId} no encontrado.");
     }
+
+    public void UpdateOrderStatus(Guid orderId, string status)
+    {
+        switch(status.ToLower())
+        {
+            case "preparado": Prepare(orderId); break;
+            case "demorado": Delay(orderId); break;
+            case "cancelado": Cancel(orderId); break;
+            case "encamino": Ship(orderId); break;
+            case "entregado": Deliver(orderId); break;
+            case "noentregado": NotDelivered(orderId); break;
+            default:
+                throw new ArgumentException($"Estado '{status}' no válido.");
+        }
+    }
+
+    public IEnumerable<OrderListResponse> GetOrders(Guid callerId, string? callerRole, OrderFilter filter)
+    {
+        if(callerRole == "Preparador")
+        {
+            if(filter.From == null || filter.To == null)
+            {
+                throw new ArgumentException("El rango de fechas es obligatorio para el preparador.");
+            }
+
+            return GetOrdersByStatus(filter);
+        }
+
+        return GetOrdersByClient(callerId, filter);
+    }
 }
