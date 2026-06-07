@@ -77,14 +77,14 @@ public class PromotionsControllerTests
     }
 
     [TestMethod]
-    public void GetPromotions_NoResults_ShouldReturnNoContent()
+    public void GetPromotions_NoResults_ShouldReturnOkWithEmptyList()
     {
         _mockService.Setup(s => s.GetPromotions(null, "Desayunos", null)).Returns([]);
 
-        var result = _controller.GetPromotions(null, "Desayunos", null) as NoContentResult;
+        var result = _controller.GetPromotions(null, "Desayunos", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
         _mockService.VerifyAll();
     }
 
