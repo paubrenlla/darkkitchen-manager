@@ -72,15 +72,18 @@ public class ReportsControllerTests
     }
 
     [TestMethod]
-    public void GetTopProducts_FromAfterTo_ReturnsBadRequest()
+    [ExpectedException(typeof(ArgumentException))]
+    public void GetTopProducts_FromAfterTo_ShouldPropagateException()
     {
         DateTime from = DateTime.Now;
         DateTime to = DateTime.Now.AddDays(-30);
 
-        var result = _controller.GetTopProducts(from, to) as BadRequestObjectResult;
+        _mockReportService.Setup(s => s.GetTopProducts(from, to))
+            .Throws(new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin."));
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
+        _controller.GetTopProducts(from, to);
+
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]

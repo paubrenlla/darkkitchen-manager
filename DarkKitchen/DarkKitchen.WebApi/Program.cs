@@ -31,6 +31,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<ExceptionFilter>();
     options.Filters.Add<EmptyCollectionFilter>();
 });
 WebApplication app = builder.Build();

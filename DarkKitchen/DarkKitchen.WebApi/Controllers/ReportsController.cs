@@ -16,11 +16,6 @@ public class ReportsController(IReportService reportService) : ControllerBase
         [FromQuery] DateTime fromDate,
         [FromQuery] DateTime toDate)
     {
-        if(fromDate > toDate)
-        {
-            return BadRequest(new { error = "La fecha de inicio no puede ser posterior a la fecha de fin." });
-        }
-
         return Ok(_reportService.GetTopProducts(fromDate, toDate));
     }
 

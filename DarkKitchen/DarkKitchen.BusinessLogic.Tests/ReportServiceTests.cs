@@ -387,4 +387,14 @@ public class ReportServiceTests
         _orderRepositoryMock.VerifyAll();
         _userRepositoryMock.VerifyAll();
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void GetTopProducts_FromAfterTo_ShouldThrowArgumentException()
+    {
+        DateTime from = DateTime.Now;
+        DateTime to = DateTime.Now.AddDays(-1);
+
+        _reportService.GetTopProducts(from, to);
+    }
 }
