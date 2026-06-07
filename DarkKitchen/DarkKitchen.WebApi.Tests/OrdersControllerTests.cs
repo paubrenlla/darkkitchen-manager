@@ -172,4 +172,28 @@ public class OrdersControllerTests
         Assert.AreEqual(200, result.StatusCode);
         _mockOrderService.VerifyAll();
     }
+
+    [TestMethod]
+    public void GetOrders_WithNoRoleClaim_ShouldCallGetOrdersAsClient()
+    {
+        var callerId = Guid.NewGuid();
+        var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, callerId.ToString()) };
+        var identity = new ClaimsIdentity(claims, "Test");
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity) }
+        };
+
+        var orders = new List<OrderListResponse>
+        {
+            new() { Id = Guid.NewGuid(), Status = "Pending", Total = 100m }
+        };
+
+        _mockOrderService.Setup(s => s.GetOrders(callerId, null, It.IsAny<OrderFilter>())).Returns(orders);
+
+        var result = _controller.GetOrders(null, null, null, null) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        _mockOrderService.VerifyAll();
+    }
 }

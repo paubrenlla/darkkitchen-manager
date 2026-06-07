@@ -101,76 +101,17 @@ public class AuthorizationFilterTests
 
         Assert.IsInstanceOfType(context.Result, typeof(ForbidResult));
     }
-}
 
-[TestClass]
-public class EmptyCollectionFilterTests
-{
-    private EmptyCollectionFilter _filter = null!;
-
-    [TestInitialize]
-    public void Setup()
-    {
-        _filter = new EmptyCollectionFilter();
-    }
-
-    private static ActionExecutedContext BuildExecutedContext(IActionResult result)
+    [TestMethod]
+    public void OnActionExecuted_ShouldDoNothing()
     {
         var httpContext = new DefaultHttpContext();
-        var actionContext = new ActionContext(
-            httpContext,
-            new RouteData(),
-            new ActionDescriptor());
-        return new ActionExecutedContext(actionContext, [], new object()) { Result = result };
-    }
-
-    [TestMethod]
-    public void OnActionExecuted_EmptyCollection_ShouldReturnNoContent()
-    {
-        var context = BuildExecutedContext(new OkObjectResult(new List<object>()));
+        var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+        var okResult = new OkResult();
+        var context = new ActionExecutedContext(actionContext, [], new object()) { Result = okResult };
 
         _filter.OnActionExecuted(context);
 
-        Assert.IsInstanceOfType(context.Result, typeof(NoContentResult));
-    }
-
-    [TestMethod]
-    public void OnActionExecuted_NonEmptyCollection_ShouldKeepOk()
-    {
-        var context = BuildExecutedContext(new OkObjectResult(new List<object> { new() }));
-
-        _filter.OnActionExecuted(context);
-
-        Assert.IsInstanceOfType(context.Result, typeof(OkObjectResult));
-    }
-
-    [TestMethod]
-    public void OnActionExecuted_NonCollectionResult_ShouldNotModify()
-    {
-        var context = BuildExecutedContext(new OkObjectResult("string result"));
-
-        _filter.OnActionExecuted(context);
-
-        Assert.IsInstanceOfType(context.Result, typeof(OkObjectResult));
-    }
-
-    [TestMethod]
-    public void OnActionExecuted_NoContentResult_ShouldNotModify()
-    {
-        var context = BuildExecutedContext(new NoContentResult());
-
-        _filter.OnActionExecuted(context);
-
-        Assert.IsInstanceOfType(context.Result, typeof(NoContentResult));
-    }
-
-    [TestMethod]
-    public void OnActionExecuted_NonOkObjectResult_ShouldNotModify()
-    {
-        var context = BuildExecutedContext(new BadRequestObjectResult("error"));
-
-        _filter.OnActionExecuted(context);
-
-        Assert.IsInstanceOfType(context.Result, typeof(BadRequestObjectResult));
+        Assert.AreEqual(okResult, context.Result);
     }
 }

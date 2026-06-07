@@ -212,4 +212,27 @@ public class ProductsControllerTests
 
         _mockService.VerifyAll();
     }
+
+    [TestMethod]
+    public void UpdateProduct_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var productId = Guid.NewGuid();
+        var request = new ProductUpdateRequest
+        {
+            Name = "Hamburguesa Actualizada",
+            Description = "Descripcion actualizada del producto de prueba",
+            Line = "Desayunos",
+            Category = "Bebidas",
+            Price = 200m,
+            Images = [new ProductImageDto { Url = "https://example.com/new.jpg", SizeInBytes = 50000 }]
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var product = CreateTestProduct("BURG01", "Hamburguesa Actualizada");
+        _mockService.Setup(s => s.UpdateProduct(productId, request, "Unknown")).Returns(product);
+
+        _controller.UpdateProduct(productId, request);
+
+        _mockService.VerifyAll();
+    }
 }
