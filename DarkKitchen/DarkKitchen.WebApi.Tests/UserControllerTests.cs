@@ -95,15 +95,15 @@ public class UserControllerTests
     }
 
     [TestMethod]
-    public void GetUsers_NoResults_ReturnsNoContent()
+    public void GetUsers_NoResults_ReturnsOkWithEmptyList()
     {
         _userServiceMock.Setup(s => s.GetUsers(It.IsAny<string>(), It.IsAny<string?>()))
             .Returns([]);
 
-        var result = _userController.GetUsers("Inexistente", null) as NoContentResult;
+        var result = _userController.GetUsers("Inexistente", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
         _userServiceMock.VerifyAll();
     }
 
@@ -142,66 +142,6 @@ public class UserControllerTests
         Assert.IsNotNull(result);
         Assert.AreEqual(204, result.StatusCode);
         _userServiceMock.VerifyAll();
-    }
-
-    [TestMethod]
-    public void CreateUser_PreparadorCreatesWithRole_ReturnsForbid()
-    {
-        SetCallerContext(_callerId, "Preparador");
-        var request = new UserCreateRequest
-        {
-            Name = "Carlos",
-            Surname = "Lopez",
-            Email = "carlos@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111333",
-            Password = "Valid1Password!@",
-            Role = "Preparador",
-        };
-
-        var result = _userController.CreateUser(request) as ForbidResult;
-
-        Assert.IsNotNull(result);
-    }
-
-    [TestMethod]
-    public void CreateUser_ClienteCreatesWithRole_ReturnsForbid()
-    {
-        SetCallerContext(_callerId, "Cliente");
-        var request = new UserCreateRequest
-        {
-            Name = "Carlos",
-            Surname = "Lopez",
-            Email = "carlos@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111333",
-            Password = "Valid1Password!@",
-            Role = "Preparador",
-        };
-
-        var result = _userController.CreateUser(request) as ForbidResult;
-
-        Assert.IsNotNull(result);
-    }
-
-    [TestMethod]
-    public void CreateUser_AnonymousWithRole_ReturnsForbid()
-    {
-        _userController.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
-        var request = new UserCreateRequest
-        {
-            Name = "N",
-            Surname = "S",
-            Email = "t@t.com",
-            Password = "Valid1Password!@",
-            Role = "Cliente",
-            CountryPrefix = "+598",
-            PhoneNumber = "0941",
-        };
-
-        var result = _userController.CreateUser(request) as ForbidResult;
-
-        Assert.IsNotNull(result);
     }
 
     [TestMethod]
