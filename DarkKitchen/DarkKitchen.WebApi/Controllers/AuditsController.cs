@@ -14,17 +14,12 @@ public class AuditsController(IAuditService auditService) : ControllerBase
 
     [HttpGet]
     public IActionResult GetAudits(
-        [FromQuery] DateTime? from,
-        [FromQuery] DateTime? to,
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to,
         [FromQuery] string? entityName,
         [FromQuery] Guid? entityId)
     {
-        if(!from.HasValue || !to.HasValue)
-        {
-            return BadRequest("Los filtros 'from' y 'to' son obligatorios.");
-        }
-
-        var audits = _auditService.GetAudits(from.Value, to.Value, entityName, entityId)
+        var audits = _auditService.GetAudits(from, to, entityName, entityId)
             .Select(a => new AuditLogResponse(a))
             .ToList();
         return Ok(audits);
