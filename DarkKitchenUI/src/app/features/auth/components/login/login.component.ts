@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,7 +18,6 @@ import { parseBackendErrors } from '../../../../core/utils/error-parser';
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
     FormsModule,
     MatCardModule,
