@@ -1,5 +1,4 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -10,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, MatToolbarModule, MatIconModule, MatButtonModule],
+  imports: [MatToolbarModule, MatIconModule, MatButtonModule],
   templateUrl: './navbar.component.html'
 })
 export class NavbarComponent {
@@ -22,7 +21,9 @@ export class NavbarComponent {
   private router = inject(Router);
 
   displayName = computed(() => {
-    return this.authService.currentUserEmail();
+    const name = this.authService.currentUserName();
+    const email = this.authService.currentUserEmail();
+    return name ?? email ?? 'Usuario';
   });
 
   logout(): void {

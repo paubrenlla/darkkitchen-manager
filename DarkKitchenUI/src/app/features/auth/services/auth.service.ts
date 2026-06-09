@@ -1,16 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { parseJwt } from '../../../utils/jwt-parser';
-
-export type LoginResponse = { token: string } | string;
+import { parseJwt } from '../../../core/utils/jwt-parser';
+import { environment } from '../../../../environments/environment';
+import { LoginRequest, LoginResponse } from '../models/auth.models';
+import { tap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7180/api/auth';
-
+  private apiUrl = `${environment.apiUrl}/auth`;
   userRole = signal<string | null>(null);
   currentUserEmail = signal<string | null>(null);
   currentUserName = signal<string | null>(null);
@@ -19,17 +19,27 @@ export class AuthService {
     this.refreshSession();
   }
 
-  login(credentials: { email: string; password: string }): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
-  }
+  login(credentials: LoginRequest): Observable<void> {
+  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    tap(response => {
+      localStorage.setItem('token', response.token);
+      this.refreshSession();
+    }),
+    map(() => void 0)
+  );
+}
 
-  saveToken(token: string): void {
+  private saveToken(token: string): void {
     localStorage.setItem('token', token);
     this.refreshSession();
   }
 
-  getToken(): string | null {
+  private getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  getAuthToken(): string | null {
+    return this.getToken();
   }
 
   logout(): void {
