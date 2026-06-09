@@ -43,36 +43,26 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit(): void {
-    if (!this.email || !this.password) {
-      this.errorMessage.set('Por favor, completa todos los campos.');
-      return;
-    }
-
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-    this.fieldErrors.set({});
-
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (response: LoginResponse) => {
-        this.isLoading.set(false);
-
-        const token = typeof response === 'string' ? response : response.token;
-
-        if (token) {
-          this.authService.saveToken(token);
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.errorMessage.set('No se recibió un token válido del servidor.');
-        }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isLoading.set(false);
-
-        const parsed = parseBackendErrors(err);
-
-        this.errorMessage.set(parsed.global);
-        this.fieldErrors.set(parsed.fields);
-      }
-    });
+  if(!this.email || !this.password) {
+    this.errorMessage.set('Por favor, completa todos los campos.');
+    return;
   }
+
+  this.isLoading.set(true);
+  this.errorMessage.set(null);
+  this.fieldErrors.set({});
+
+  this.authService.login({ email: this.email, password: this.password }).subscribe({
+    next: () => {
+      this.isLoading.set(false);
+      this.router.navigate(['/dashboard']);
+    },
+    error: (err: HttpErrorResponse) => {
+      this.isLoading.set(false);
+      const parsed = parseBackendErrors(err);
+      this.errorMessage.set(parsed.global);
+      this.fieldErrors.set(parsed.fields);
+    }
+  });
+}
 }
