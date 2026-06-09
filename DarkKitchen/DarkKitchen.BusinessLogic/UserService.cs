@@ -4,7 +4,6 @@ using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IBusinessLogic.IPhoneNumber;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -16,82 +15,94 @@ public class UserService(IUserRepository userRepository, IPhoneStrategyFactory s
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private static readonly IReadOnlyList<string> AllowedAdminRoles = ["Administrativo", "Preparador"];
 
-    public UserCreateResponse CreateUser(UserCreateRequest request)
+    public User CreateUser(UserCreateRequest request)
     {
-        Role role;
+        Role role = ParseRole(request.Role);
+        EnsureEmailNotTaken(request.Email);
+        var validPhone = CreateValidPhone(request.CountryPrefix, request.PhoneNumber);
+        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
+        _userRepository.Add(user);
+        return user;
+    }
 
-        if(request.Role == null)
+    private Role ParseRole(string? roleName)
+    {
+        if(roleName == null)
         {
-            role = Role.Cliente;
+            return Role.Cliente;
         }
-        else if(!AllowedAdminRoles.Contains(request.Role))
+
+        if(!AllowedAdminRoles.Contains(roleName))
         {
             throw new ArgumentException($"Rol inválido. Los roles permitidos son: {string.Join(", ", AllowedAdminRoles)}.");
         }
-        else
-        {
-            role = Enum.Parse<Role>(request.Role);
-        }
 
-        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
-        var existingUser = _userRepository.GetUserByEmail(request.Email);
-        if(existingUser != null)
-        {
-            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
-        }
-
-        var user = new User(request.Name, request.Surname, request.Email, validPhone, request.Password, role, _passwordHasher);
-        _userRepository.Add(user);
-        return Converter.ToUserCreateResponse(user);
+        return Enum.Parse<Role>(roleName);
     }
 
-    public IEnumerable<UserCreateResponse> GetUsers(string? name, string? surname)
+    private void EnsureEmailNotTaken(string email)
     {
-        return _userRepository.GetByNameAndSurname(name, surname).Select(Converter.ToUserCreateResponse);
+        if(_userRepository.GetUserByEmail(email) != null)
+        {
+            throw new InvalidOperationException($"El email {email} ya está en uso.");
+        }
     }
 
-    public UserCreateResponse UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    private Domain.Users.PhoneNumber CreateValidPhone(string prefix, string number)
+    {
+        IPhoneValidationStrategy strategy = _strategyFactory.GetStrategy(prefix);
+        return Domain.Users.PhoneNumber.Create(prefix, number, strategy);
+    }
+
+    public IEnumerable<User> GetUsers(string? name, string? surname)
+    {
+        return _userRepository.GetByNameAndSurname(name, surname);
+    }
+
+    public User UpdateUser(Guid adminId, Guid userId, UserUpdateRequest request)
+    {
+        ValidateSelfModification(adminId, userId);
+
+        User existingUser = _userRepository.GetById(userId)
+                            ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+
+        ValidateEmailNotTaken(request.Email, userId);
+
+        var validPhone = CreateValidPhone(request.CountryPrefix, request.PhoneNumber);
+        Role role = Enum.Parse<Role>(request.Role);
+
+        existingUser.UpdateDetails(request.Name, request.Surname, request.Email, validPhone, role);
+        _userRepository.Update(userId, existingUser);
+        return existingUser;
+    }
+
+    private void ValidateSelfModification(Guid adminId, Guid userId)
     {
         if(adminId == userId)
         {
             throw new InvalidOperationException("Un usuario no puede modificarse a sí mismo.");
         }
-
-        User existingUser = _userRepository.GetById(userId)
-                            ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
-
-        IPhoneValidationStrategy currentStrategy = _strategyFactory.GetStrategy(request.CountryPrefix);
-        var validPhone = Domain.Users.PhoneNumber.Create(request.CountryPrefix, request.PhoneNumber, currentStrategy);
-        Role role = Enum.Parse<Role>(request.Role);
-
-        existingUser.UpdateDetails(
-            request.Name,
-            request.Surname,
-            request.Email,
-            validPhone,
-            role);
-        User userWithEmail = _userRepository.GetUserByEmail(request.Email);
-        if(userWithEmail != null && userWithEmail.Id != userId)
-        {
-            throw new InvalidOperationException($"El email {request.Email} ya está en uso.");
-        }
-
-        _userRepository.Update(userId, existingUser);
-        return Converter.ToUserCreateResponse(existingUser);
     }
 
-    public UserCreateResponse DeleteUser(Guid adminId, Guid userId)
+    private void ValidateEmailNotTaken(string email, Guid excludeUserId)
+    {
+        var userWithEmail = _userRepository.GetUserByEmail(email);
+        if(userWithEmail != null && userWithEmail.Id != excludeUserId)
+        {
+            throw new InvalidOperationException($"El email {email} ya está en uso.");
+        }
+    }
+
+    public void DeleteUser(Guid adminId, Guid userId)
     {
         if(adminId == userId)
         {
             throw new InvalidOperationException("Un usuario no puede eliminarse a sí mismo.");
         }
 
-        User user = _userRepository.GetById(userId)
-                    ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        _ = _userRepository.GetById(userId)
+                   ?? throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
 
         _userRepository.Delete(userId);
-        return Converter.ToUserCreateResponse(user);
     }
 }

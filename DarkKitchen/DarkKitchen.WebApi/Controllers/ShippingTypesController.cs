@@ -15,56 +15,33 @@ public class ShippingTypesController(IShippingTypeService shippingTypeService) :
     [HttpGet]
     public IActionResult GetAll()
     {
-        var types = _shippingTypeService.GetAll().ToList();
-        return types.Any() ? Ok(types) : NoContent();
+        var types = _shippingTypeService.GetAll()
+            .Select(s => new ShippingTypeResponse(s))
+            .ToList();
+        return Ok(types);
     }
 
     [HttpPost]
     [Authorize(Roles = "Administrativo")]
     public IActionResult Create([FromBody] ShippingTypeRequest request)
     {
-        try
-        {
-            var response = _shippingTypeService.Create(request);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var shippingType = _shippingTypeService.Create(request);
+        return StatusCode(StatusCodes.Status201Created, new ShippingTypeResponse(shippingType));
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult Update(Guid id, [FromBody] ShippingTypeRequest request)
     {
-        try
-        {
-            var response = _shippingTypeService.Update(id, request);
-            return Ok(response);
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var shippingType = _shippingTypeService.Update(id, request);
+        return Ok(new ShippingTypeResponse(shippingType));
     }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult Delete(Guid id)
     {
-        try
-        {
-            _shippingTypeService.Delete(id);
-            return NoContent();
-        }
-        catch(KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
+        _shippingTypeService.Delete(id);
+        return NoContent();
     }
 }

@@ -13,7 +13,7 @@ public class AuditServiceTests
     [TestInitialize]
     public void Setup()
     {
-        _mockRepository = new Mock<IAuditRepository>();
+        _mockRepository = new Mock<IAuditRepository>(MockBehavior.Strict);
         _service = new AuditService(_mockRepository.Object);
     }
 
@@ -42,6 +42,6 @@ public class AuditServiceTests
         var result = _service.GetAudits(from, to, null, null);
 
         Assert.AreEqual(1, result.Count());
-        _mockRepository.Verify(r => r.GetAudits(from, to, null, null), Times.Once);
+        _mockRepository.VerifyAll();
     }
 }

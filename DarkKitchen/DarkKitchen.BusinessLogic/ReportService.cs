@@ -17,6 +17,11 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
 
     public IEnumerable<TopProductResponse> GetTopProducts(DateTime from, DateTime to)
     {
+        if(from > to)
+        {
+            throw new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        }
+
         IEnumerable<Order> orders = _orderRepository
             .GetByStatus(from, to)
             .Where(o => o.State != OrderState.Cancelled);

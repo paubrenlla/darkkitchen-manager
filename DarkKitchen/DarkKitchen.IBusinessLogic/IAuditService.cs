@@ -1,8 +1,8 @@
-using DarkKitchen.Models.DTOs;
+using DarkKitchen.Domain.Audit;
 
 namespace DarkKitchen.IBusinessLogic;
 
 public interface IAuditService
 {
-    IEnumerable<AuditLogResponse> GetAudits(DateTime from, DateTime to, string? entityName, Guid? entityId);
+    IEnumerable<AuditLog> GetAudits(DateTime from, DateTime to, string? entityName, Guid? entityId);
 }

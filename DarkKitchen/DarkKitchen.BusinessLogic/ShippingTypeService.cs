@@ -1,7 +1,6 @@
 ﻿using DarkKitchen.Domain.Orders.Delivery;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -10,26 +9,26 @@ public class ShippingTypeService(IShippingTypeRepository shippingTypeRepository)
 {
     private readonly IShippingTypeRepository _shippingTypeRepository = shippingTypeRepository;
 
-    public IEnumerable<ShippingTypeResponse> GetAll()
+    public IEnumerable<ShippingType> GetAll()
     {
-        return _shippingTypeRepository.GetAll().Select(Converter.ToShippingTypeResponse);
+        return _shippingTypeRepository.GetAll();
     }
 
-    public ShippingTypeResponse Create(ShippingTypeRequest request)
+    public ShippingType Create(ShippingTypeRequest request)
     {
         var shippingType = new ShippingType(request.Name, request.Cost);
         _shippingTypeRepository.Add(shippingType);
-        return Converter.ToShippingTypeResponse(shippingType);
+        return shippingType;
     }
 
-    public ShippingTypeResponse Update(Guid id, ShippingTypeRequest request)
+    public ShippingType Update(Guid id, ShippingTypeRequest request)
     {
         var existing = _shippingTypeRepository.GetById(id)
                        ?? throw new KeyNotFoundException($"Tipo de envío {id} no encontrado.");
 
         existing.UpdateDetails(request.Name, request.Cost);
         _shippingTypeRepository.Update(existing);
-        return Converter.ToShippingTypeResponse(existing);
+        return existing;
     }
 
     public void Delete(Guid id)

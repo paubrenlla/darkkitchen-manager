@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using DarkKitchen.Domain.Orders;
+
 namespace DarkKitchen.Models.DTOs;
 
 public class OrderDetailResponse
@@ -9,6 +12,29 @@ public class OrderDetailResponse
     public required string Status { get; set; }
     public required List<OrderItemDetailDto> Items { get; set; }
     public decimal Total { get; set; }
+
+    public OrderDetailResponse()
+    {
+    }
+
+    [SetsRequiredMembers]
+    public OrderDetailResponse(Order order)
+    {
+        Id = order.Id;
+        OrderNumber = order.OrderNumber;
+        ClientId = order.ClientId;
+        CreatedAt = order.CreatedAt;
+        Status = order.State.ToString();
+        Items = order.Items.Select(i => new OrderItemDetailDto
+        {
+            ProductId = i.ProductId,
+            Quantity = i.Quantity,
+            Price = i.Price,
+            AppliedPromotion = i.AppliedPromotionName,
+            ItemTotal = i.CalculateItemTotal()
+        }).ToList();
+        Total = order.Total;
+    }
 }
 
 public class OrderItemDetailDto

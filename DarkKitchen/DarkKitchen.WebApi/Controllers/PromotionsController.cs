@@ -19,12 +19,9 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
-        var promotions = _promotionService.GetPromotions(date, line, productCode);
-        if(!promotions.Any())
-        {
-            return NoContent();
-        }
-
+        var promotions = _promotionService.GetPromotions(date, line, productCode)
+            .Select(p => new PromotionCreateResponse(p))
+            .ToList();
         return Ok(promotions);
     }
 
@@ -33,7 +30,8 @@ public class PromotionsController(IPromotionService promotionService) : Controll
     public IActionResult CreatePromotion([FromBody] PromotionCreateRequest request)
     {
         var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
-        return StatusCode(StatusCodes.Status201Created, _promotionService.CreatePromotion(request, currentUser));
+        var promotion = _promotionService.CreatePromotion(request, currentUser);
+        return StatusCode(StatusCodes.Status201Created, new PromotionCreateResponse(promotion));
     }
 
     [HttpPut("{id}")]
@@ -41,6 +39,7 @@ public class PromotionsController(IPromotionService promotionService) : Controll
     public IActionResult UpdatePromotion(Guid id, [FromBody] PromotionCreateRequest request)
     {
         var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
-        return Ok(_promotionService.UpdatePromotion(id, request, currentUser));
+        var promotion = _promotionService.UpdatePromotion(id, request, currentUser);
+        return Ok(new PromotionCreateResponse(promotion));
     }
 }

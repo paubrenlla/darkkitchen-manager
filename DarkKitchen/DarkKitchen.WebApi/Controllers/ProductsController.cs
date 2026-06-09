@@ -18,8 +18,10 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromQuery] string? line,
         [FromQuery] string? category)
     {
-        IEnumerable<ProductResponse> products = _productService.GetProducts(name, line, category);
-        return products.Any() ? Ok(products) : NoContent();
+        var products = _productService.GetProducts(name, line, category)
+            .Select(p => new ProductResponse(p))
+            .ToList();
+        return Ok(products);
     }
 
     [HttpPost]
@@ -27,7 +29,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
     {
         var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
-        return StatusCode(StatusCodes.Status201Created, _productService.CreateProduct(request, currentUser));
+        var product = _productService.CreateProduct(request, currentUser);
+        return StatusCode(StatusCodes.Status201Created, new ProductResponse(product));
     }
 
     [HttpPut("{id}")]
@@ -35,7 +38,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
     {
         var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
-        return Ok(_productService.UpdateProduct(id, request, currentUser));
+        var product = _productService.UpdateProduct(id, request, currentUser);
+        return Ok(new ProductResponse(product));
     }
 
     [HttpPost("import")]

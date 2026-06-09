@@ -3,7 +3,6 @@ using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 
 namespace DarkKitchen.BusinessLogic;
@@ -17,12 +16,10 @@ public class PromotionService(
     private readonly IPromotionRepository _promotionRepository = promotionRepository;
     private readonly IDomainEventPublisher _publisher = publisher;
 
-    public IEnumerable<PromotionCreateResponse> GetPromotions(DateTime? date, string? line, string? productCode)
+    public IEnumerable<Promotion> GetPromotions(DateTime? date, string? line, string? productCode)
     {
         IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
-
         DateTime dateToFilter = date ?? DateTime.Now;
-
         IEnumerable<Promotion> filtered = promotions.Where(p => p.IsVigente(dateToFilter));
 
         if(!string.IsNullOrWhiteSpace(line))
@@ -37,30 +34,15 @@ public class PromotionService(
                 prod.Code.Equals(productCode, StringComparison.OrdinalIgnoreCase)));
         }
 
-        return filtered.Select(Converter.ToPromotionCreateResponse);
+        return filtered;
     }
 
-    public PromotionCreateResponse CreatePromotion(PromotionCreateRequest request, string responsibleUser)
+    public Promotion CreatePromotion(PromotionCreateRequest request, string responsibleUser)
     {
-        IEnumerable<Product> allProducts = _productRepository.GetAll();
-        var selectedProducts = allProducts
-            .Where(p => request.ProductCodes.Contains(p.Code))
-            .ToList();
-
-        if(selectedProducts.Count != request.ProductCodes.Count)
-        {
-            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
-        }
-
-        var promotion = new Promotion(
-            request.Name,
-            request.DiscountPercentage,
-            request.StartDate,
-            request.EndDate,
-            selectedProducts);
+        var selectedProducts = GetValidatedProducts(request.ProductCodes);
+        var promotion = new Promotion(request.Name, request.DiscountPercentage, request.StartDate, request.EndDate, selectedProducts);
 
         _promotionRepository.Add(promotion);
-
         _publisher.Publish(new EntityCreatedEvent<Promotion>
         {
             EntityId = promotion.Id,
@@ -69,32 +51,18 @@ public class PromotionService(
             NewState = promotion
         });
 
-        return Converter.ToPromotionCreateResponse(promotion);
+        return promotion;
     }
 
-    public PromotionCreateResponse UpdatePromotion(Guid id, PromotionCreateRequest request, string responsibleUser)
+    public Promotion UpdatePromotion(Guid id, PromotionCreateRequest request, string responsibleUser)
     {
         Promotion existingPromo = _promotionRepository.GetById(id)
                                   ?? throw new KeyNotFoundException("La promoción no existe.");
 
-        var selectedProducts = _productRepository.GetAll()
-            .Where(p => request.ProductCodes.Contains(p.Code))
-            .ToList();
-
-        if(selectedProducts.Count != request.ProductCodes.Count)
-        {
-            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
-        }
-
+        var selectedProducts = GetValidatedProducts(request.ProductCodes);
         var oldState = existingPromo.Clone();
 
-        existingPromo.Update(
-            request.Name,
-            request.DiscountPercentage,
-            request.StartDate,
-            request.EndDate,
-            selectedProducts);
-
+        existingPromo.Update(request.Name, request.DiscountPercentage, request.StartDate, request.EndDate, selectedProducts);
         _promotionRepository.Update(existingPromo);
 
         _publisher.Publish(new EntityModifiedEvent<Promotion>
@@ -106,7 +74,22 @@ public class PromotionService(
             NewState = existingPromo
         });
 
-        return Converter.ToPromotionCreateResponse(existingPromo);
+        return existingPromo;
+    }
+
+    private List<Product> GetValidatedProducts(IEnumerable<string> productCodes)
+    {
+        var codes = productCodes.ToList();
+        var selectedProducts = _productRepository.GetAll()
+            .Where(p => codes.Contains(p.Code))
+            .ToList();
+
+        if(selectedProducts.Count != codes.Count)
+        {
+            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
+        }
+
+        return selectedProducts;
     }
 
     public (string? PromotionName, decimal Discount) GetBestPromotionForProduct(Guid productId, DateTime date)

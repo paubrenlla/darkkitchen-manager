@@ -22,8 +22,8 @@ public class OrderEnricherTests
     [TestInitialize]
     public void Setup()
     {
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _productRepositoryMock = new Mock<IProductRepository>();
+        _userRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+        _productRepositoryMock = new Mock<IProductRepository>(MockBehavior.Strict);
         _enricher = new OrderEnricher(_userRepositoryMock.Object, _productRepositoryMock.Object);
 
         _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
@@ -48,6 +48,7 @@ public class OrderEnricherTests
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual("Juan Sosa", result.ClientName);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -59,6 +60,7 @@ public class OrderEnricherTests
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(string.Empty, result.ClientName);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -70,6 +72,7 @@ public class OrderEnricherTests
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(0, result.Items.Count);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -86,6 +89,7 @@ public class OrderEnricherTests
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(5, result.ProductCount);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -98,6 +102,8 @@ public class OrderEnricherTests
         var result = _enricher.EnrichForPreparador(order);
 
         Assert.AreEqual("Juan Sosa", result.ClientName);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -113,6 +119,8 @@ public class OrderEnricherTests
         Assert.AreEqual("BURG01", result.Items[0].ProductCode);
         Assert.AreEqual("Hamburguesa Clasica", result.Items[0].ProductName);
         Assert.AreEqual(2, result.Items[0].Quantity);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -128,5 +136,7 @@ public class OrderEnricherTests
         Assert.AreEqual(1, result.Items.Count);
         Assert.AreEqual(string.Empty, result.Items[0].ProductCode);
         Assert.AreEqual(string.Empty, result.Items[0].ProductName);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 }
