@@ -9,10 +9,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ExceptionFilter>();
+    options.Filters.Add<EmptyCollectionFilter>();
 });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProjectServices(builder.Configuration);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
@@ -38,11 +41,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<ExceptionFilter>();
-    options.Filters.Add<EmptyCollectionFilter>();
-});
 WebApplication app = builder.Build();
 
 if(app.Environment.IsDevelopment())

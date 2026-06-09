@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { parseJwt } from '../../../utils/jwt-parser';
+import { environment } from '../../../../environments/environment';
 
 export type LoginResponse = { token: string } | string;
 
@@ -9,8 +10,7 @@ export type LoginResponse = { token: string } | string;
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7180/api/auth';
-
+  private apiUrl = `${environment.apiUrl}/auth`;
   userRole = signal<string | null>(null);
   currentUserEmail = signal<string | null>(null);
   currentUserName = signal<string | null>(null);
