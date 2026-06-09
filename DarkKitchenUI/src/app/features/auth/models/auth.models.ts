@@ -3,13 +3,7 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface UserDto {
-  id: string;
-  email: string;
-  role: string;
-}
-
 export interface LoginResponse {
   token: string;
-  user: UserDto;
+  role: string;
 }

@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { parseJwt } from '../../../core/utils/jwt-parser';
 import { environment } from '../../../../environments/environment';
-
-export type LoginResponse = { token: string } | string;
+import { LoginRequest, LoginResponse } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -19,8 +18,8 @@ export class AuthService {
     this.refreshSession();
   }
 
-  login(credentials: { email: string; password: string }): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
   }
 
   saveToken(token: string): void {
