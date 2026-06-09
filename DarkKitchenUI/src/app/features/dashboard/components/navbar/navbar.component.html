@@ -1,0 +1,13 @@
+<mat-toolbar color="primary" [class]="toolbarClasses">
+  <span class="tracking-wide text-lg font-medium">Dashboard</span>
+
+  <div class="flex items-center gap-4">
+    <span [class]="welcomeTextClasses">
+      {{ displayName() }}
+    </span>
+
+    <button mat-icon-button (click)="logout()" title="Cerrar sesión" [class]="logoutButtonClasses">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
