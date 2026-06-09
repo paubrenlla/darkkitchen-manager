@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { parseBackendErrors } from '../../../../utils/error-parser';
+import { parseBackendErrors } from '../../../../core/utils/error-parser';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +39,7 @@ export class LoginComponent {
   hidePassword = signal(true);
   fieldErrors = signal<Record<string, string>>({});
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit(): void {
     if (!this.email || !this.password) {

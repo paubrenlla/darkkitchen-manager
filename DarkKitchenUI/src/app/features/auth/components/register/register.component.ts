@@ -10,10 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { UserService } from '../../../../services/user.service';
-import { RegisterRequest } from '../../../../models/user.models';
+import { UserService } from '../../../users/services/user.service';
+import { RegisterRequest } from '../../../users/models/user.models';
 
-import { parseBackendErrors } from '../../../../utils/error-parser';
+import { parseBackendErrors } from '../../../../core/utils/error-parser';
 
 @Component({
   selector: 'app-register',
@@ -43,7 +43,7 @@ export class RegisterComponent {
   errorMessage = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router) { }
 
   onSubmit(): void {
     if (!this.name || !this.surname || !this.email || !this.phone || !this.password) {

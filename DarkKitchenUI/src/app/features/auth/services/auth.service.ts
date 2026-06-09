@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { parseJwt } from '../../../utils/jwt-parser';
+import { parseJwt } from '../../../core/utils/jwt-parser';
 import { environment } from '../../../../environments/environment';
 
 export type LoginResponse = { token: string } | string;
