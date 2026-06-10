@@ -27,8 +27,13 @@ public class ExceptionFilterTests
             []);
     }
 
+    private string? GetErrorMessage() =>
+        _context.Result is ObjectResult result
+            ? result.Value?.GetType().GetProperty("error")?.GetValue(result.Value) as string
+            : null;
+
     [TestMethod]
-    public void OnException_ArgumentException_ShouldReturn400()
+    public void OnException_ArgumentException_ShouldReturn400WithMessage()
     {
         _context.Exception = new ArgumentException("argumento inválido");
 
@@ -37,24 +42,26 @@ public class ExceptionFilterTests
         var result = _context.Result as ObjectResult;
         Assert.IsNotNull(result);
         Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.AreEqual("argumento inválido", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
 
     [TestMethod]
-    public void OnException_KeyNotFoundException_ShouldReturn404()
+    public void OnException_KeyNotFoundException_ShouldReturn404WithMessage()
     {
-        _context.Exception = new KeyNotFoundException("no encontrado");
+        _context.Exception = new KeyNotFoundException("recurso no encontrado");
 
         _filter.OnException(_context);
 
         var result = _context.Result as ObjectResult;
         Assert.IsNotNull(result);
         Assert.AreEqual((int)HttpStatusCode.NotFound, result.StatusCode);
+        Assert.AreEqual("recurso no encontrado", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
 
     [TestMethod]
-    public void OnException_InvalidOperationException_ShouldReturn409()
+    public void OnException_InvalidOperationException_ShouldReturn409WithMessage()
     {
         _context.Exception = new InvalidOperationException("operación inválida");
 
@@ -63,11 +70,12 @@ public class ExceptionFilterTests
         var result = _context.Result as ObjectResult;
         Assert.IsNotNull(result);
         Assert.AreEqual((int)HttpStatusCode.Conflict, result.StatusCode);
+        Assert.AreEqual("operación inválida", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
 
     [TestMethod]
-    public void OnException_UnauthorizedAccessException_ShouldReturn401()
+    public void OnException_UnauthorizedAccessException_ShouldReturn401WithMessage()
     {
         _context.Exception = new UnauthorizedAccessException("no autorizado");
 
@@ -76,19 +84,21 @@ public class ExceptionFilterTests
         var result = _context.Result as ObjectResult;
         Assert.IsNotNull(result);
         Assert.AreEqual((int)HttpStatusCode.Unauthorized, result.StatusCode);
+        Assert.AreEqual("no autorizado", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
 
     [TestMethod]
-    public void OnException_UnknownException_ShouldReturn500()
+    public void OnException_UnknownException_ShouldReturn500WithGenericMessage()
     {
-        _context.Exception = new Exception("error inesperado");
+        _context.Exception = new Exception("error interno detallado");
 
         _filter.OnException(_context);
 
         var result = _context.Result as ObjectResult;
         Assert.IsNotNull(result);
         Assert.AreEqual((int)HttpStatusCode.InternalServerError, result.StatusCode);
+        Assert.AreEqual("Ocurrió un error inesperado.", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
 }
