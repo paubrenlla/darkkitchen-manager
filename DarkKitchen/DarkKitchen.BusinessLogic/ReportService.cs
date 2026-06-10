@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
@@ -17,6 +17,11 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
 
     public IEnumerable<TopProductResponse> GetTopProducts(DateTime from, DateTime to)
     {
+        if (to.TimeOfDay == TimeSpan.Zero)
+        {
+            to = to.Date.AddDays(1).AddSeconds(-1);
+        }
+
         if(from > to)
         {
             throw new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin.");

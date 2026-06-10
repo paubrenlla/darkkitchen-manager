@@ -16,11 +16,6 @@ public class ReportsController(IReportService reportService) : ControllerBase
         [FromQuery] DateTime fromDate,
         [FromQuery] DateTime toDate)
     {
-        if (toDate.TimeOfDay == TimeSpan.Zero)
-        {
-            toDate = toDate.Date.AddDays(1).AddSeconds(-1);
-        }
-
         return Ok(_reportService.GetTopProducts(fromDate, toDate));
     }
 
