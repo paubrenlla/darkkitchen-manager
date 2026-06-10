@@ -183,4 +183,18 @@ public class PromotionsControllerTests
 
         _mockService.VerifyAll();
     }
+
+    [TestMethod]
+    public void GetPromotions_DateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var date = new DateTime(2024, 5, 15);
+        var expectedDate = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _mockService.Setup(s => s.GetPromotions(expectedDate, null, null)).Returns([]);
+
+        var result = _controller.GetPromotions(date, null, null) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        _mockService.VerifyAll();
+    }
 }
