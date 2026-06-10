@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,11 +25,27 @@ export class AuditLogListComponent implements OnInit {
   entityName = signal('');
   entityId = signal('');
 
+  isDateRangeInvalid = computed(() => {
+    const from = this.fromDateTime();
+    const to = this.toDateTime();
+
+    if (!from || !to) {
+      return false;
+    }
+
+    return new Date(from).getTime() > new Date(to).getTime();
+  });
+
   ngOnInit(): void {
     this.loadAudits();
   }
 
   onFilter(): void {
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+      return;
+    }
+
     this.loadAudits();
   }
 
@@ -43,10 +59,26 @@ export class AuditLogListComponent implements OnInit {
 
   onFromDateTimeChange(value: string): void {
     this.fromDateTime.set(value);
+
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+    } else if (
+      this.errorMessage() === 'El rango es inválido: "Desde" no puede ser mayor que "Hasta".'
+    ) {
+      this.errorMessage.set(null);
+    }
   }
 
   onToDateTimeChange(value: string): void {
     this.toDateTime.set(value);
+
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+    } else if (
+      this.errorMessage() === 'El rango es inválido: "Desde" no puede ser mayor que "Hasta".'
+    ) {
+      this.errorMessage.set(null);
+    }
   }
 
   onEntityNameChange(value: string): void {
@@ -62,6 +94,11 @@ export class AuditLogListComponent implements OnInit {
   }
 
   private loadAudits(): void {
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
