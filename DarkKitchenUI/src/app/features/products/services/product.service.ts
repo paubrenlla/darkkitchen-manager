@@ -31,4 +31,17 @@ export class ProductService {
   update(id: string, request: ProductUpdateRequest): Observable<ProductResponse> {
     return this.http.put<ProductResponse>(`${this.apiUrl}/${id}`, request);
   }
+
+  toggleActive(product: ProductResponse): Observable<ProductResponse> {
+    const request: ProductUpdateRequest = {
+      name: product.name,
+      description: product.description,
+      line: product.line,
+      category: product.category,
+      price: product.price,
+      images: product.images.map(url => ({ url, sizeInBytes: 0 })),
+      isActive: !product.isActive
+    };
+    return this.update(product.id, request);
+  }
 }

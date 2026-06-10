@@ -18,9 +18,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
-  templateUrl: './product-list.component.html'
+  templateUrl: './product-list.component.html',
 })
 export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
@@ -47,7 +47,20 @@ export class ProductListComponent implements OnInit {
       error: () => {
         this.errorMessage.set('No se pudieron cargar los productos.');
         this.isLoading.set(false);
-      }
+      },
+    });
+  }
+
+  onToggleActive(product: ProductResponse): void {
+    this.productService.toggleActive(product).subscribe({
+      next: (updated) => {
+        this.productService.products.update((list) =>
+          list.map((p) => (p.id === updated.id ? updated : p)),
+        );
+      },
+      error: () => {
+        this.errorMessage.set('No se pudo cambiar el estado del producto.');
+      },
     });
   }
 }
