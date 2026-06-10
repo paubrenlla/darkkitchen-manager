@@ -463,4 +463,33 @@ public class OrderServiceTests
         Assert.IsNotNull(result);
         _orderRepositoryMock.VerifyAll();
     }
+
+    [TestMethod]
+    public void GetOrdersByStatus_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var filter = new OrderFilter { From = new DateTime(2024, 5, 10), To = new DateTime(2024, 5, 15) };
+        var expectedToDate = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _orderRepositoryMock.Setup(r => r.GetByStatus(filter.From.Value, expectedToDate, null, null))
+            .Returns([]);
+
+        var result = _orderService.GetOrdersByStatus(filter);
+
+        Assert.IsNotNull(result);
+        _orderRepositoryMock.VerifyAll();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreateOrder_WithoutDeliveryType_ShouldThrowArgumentException()
+    {
+        var request = new OrderCreateRequest
+        {
+            DeliveryType = string.Empty,
+            Address = new OrderAddressDto { Street = "Av. Rivera", Number = "1234", City = "Montevideo", Country = "Uruguay" },
+            Items = [new OrderItemDto { ProductId = Guid.NewGuid(), Quantity = 2 }]
+        };
+
+        _orderService.CreateOrder(_clientId, request);
+    }
 }
