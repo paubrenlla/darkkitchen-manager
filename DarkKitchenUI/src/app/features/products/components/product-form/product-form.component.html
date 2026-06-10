@@ -1,0 +1,111 @@
+<div class="w-[560px]">
+  <h2 mat-dialog-title class="text-lg font-bold text-slate-800 px-6 pt-6 pb-0">
+    {{ isEditMode ? 'Editar producto' : 'Nuevo producto' }}
+  </h2>
+
+  <mat-dialog-content class="!px-6 !pt-4 !pb-2 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+    @if (errorMessage()) {
+      <div
+        class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium"
+      >
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="grid grid-cols-2 gap-3">
+      <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+        <mat-label>Código *</mat-label>
+        <input matInput [(ngModel)]="code" placeholder="BURG01" [disabled]="isEditMode" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+        <mat-label>Precio *</mat-label>
+        <input matInput type="number" [(ngModel)]="price" placeholder="150" min="0" />
+        <span matPrefix class="text-slate-400 text-sm mr-1">$</span>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full minimal-input" subscriptSizing="dynamic">
+      <mat-label>Nombre *</mat-label>
+      <input matInput [(ngModel)]="name" placeholder="Hamburguesa Clásica" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full minimal-input" subscriptSizing="dynamic">
+      <mat-label>Descripción *</mat-label>
+      <textarea
+        matInput
+        [(ngModel)]="description"
+        rows="3"
+        placeholder="Descripción detallada del producto..."
+      ></textarea>
+    </mat-form-field>
+
+    <div class="grid grid-cols-2 gap-3">
+      <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+        <mat-label>Línea *</mat-label>
+        <input matInput [(ngModel)]="line" placeholder="Combo burgers" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+        <mat-label>Categoría *</mat-label>
+        <input matInput [(ngModel)]="category" placeholder="Parrilla" />
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-slate-600">Imágenes *</span>
+        <button mat-button type="button" (click)="addImage()" class="text-indigo-600 text-xs">
+          <mat-icon class="text-sm scale-75">add</mat-icon>
+          Agregar imagen
+        </button>
+      </div>
+
+      @for (img of images; track $index) {
+        <div class="flex gap-2 items-start">
+          <mat-form-field
+            appearance="outline"
+            class="flex-1 minimal-input"
+            subscriptSizing="dynamic"
+          >
+            <mat-label>URL</mat-label>
+            <input matInput [(ngModel)]="img.url" placeholder="https://ejemplo.com/foto.jpg" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-36 minimal-input" subscriptSizing="dynamic">
+            <mat-label>Tamaño (bytes)</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="img.sizeInBytes"
+              placeholder="50000"
+              min="1"
+            />
+          </mat-form-field>
+
+          <button
+            mat-icon-button
+            type="button"
+            (click)="removeImage($index)"
+            [disabled]="images.length === 1"
+            class="text-slate-400 mt-1"
+          >
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="!px-6 !pb-5 !pt-4 gap-2">
+    <button mat-button (click)="onCancel()" class="text-slate-500">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <mat-spinner diameter="16" class="mr-2"></mat-spinner>
+        Guardando...
+      } @else {
+        {{ isEditMode ? 'Guardar cambios' : 'Crear producto' }}
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

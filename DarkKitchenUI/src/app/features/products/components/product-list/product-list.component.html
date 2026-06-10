@@ -4,7 +4,7 @@
       <h2 class="text-xl font-bold text-slate-800">Productos</h2>
       <p class="text-sm text-slate-400 mt-0.5">Gestión del catálogo de productos</p>
     </div>
-    <button mat-flat-button color="primary" class="gap-2">
+    <button mat-flat-button color="primary" (click)="openCreateDialog()" class="gap-2">
       <mat-icon>add</mat-icon>
       Nuevo producto
     </button>
@@ -114,6 +114,7 @@
               <button
                 mat-icon-button
                 matTooltip="Editar"
+                (click)="openEditDialog(p)"
                 class="text-slate-400 hover:text-indigo-500"
               >
                 <mat-icon class="text-lg">edit</mat-icon>
