@@ -17,7 +17,7 @@ public class ReportService(IOrderRepository orderRepository, IProductRepository 
 
     public IEnumerable<TopProductResponse> GetTopProducts(DateTime from, DateTime to)
     {
-        if (to.TimeOfDay == TimeSpan.Zero)
+        if(to.TimeOfDay == TimeSpan.Zero)
         {
             to = to.Date.AddDays(1).AddSeconds(-1);
         }

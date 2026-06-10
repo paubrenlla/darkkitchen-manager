@@ -18,7 +18,7 @@ public class PromotionService(
 
     public IEnumerable<Promotion> GetPromotions(DateTime? date, string? line, string? productCode)
     {
-        if (date.HasValue && date.Value.TimeOfDay == TimeSpan.Zero)
+        if(date.HasValue && date.Value.TimeOfDay == TimeSpan.Zero)
         {
             date = date.Value.Date.AddDays(1).AddSeconds(-1);
         }

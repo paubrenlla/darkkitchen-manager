@@ -10,7 +10,7 @@ public class AuditService(IAuditRepository auditRepository) : IAuditService
 
     public IEnumerable<AuditLog> GetAudits(DateTime from, DateTime to, string? entityName, Guid? entityId)
     {
-        if (to.TimeOfDay == TimeSpan.Zero)
+        if(to.TimeOfDay == TimeSpan.Zero)
         {
             to = to.Date.AddDays(1).AddSeconds(-1);
         }

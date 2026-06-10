@@ -78,7 +78,7 @@ public class OrderService(
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter)
     {
         var toDate = filter.To;
-        if (toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
+        if(toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
         {
             toDate = toDate.Value.Date.AddDays(1).AddSeconds(-1);
         }
@@ -90,7 +90,7 @@ public class OrderService(
     public IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter)
     {
         var toDate = filter.To;
-        if (toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
+        if(toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
         {
             toDate = toDate.Value.Date.AddDays(1).AddSeconds(-1);
         }
