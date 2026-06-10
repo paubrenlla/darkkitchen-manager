@@ -20,7 +20,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/components/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
-
+  {
+    path: 'products',
+    canActivate: [roleGuard(['Administrativo'])],
+    loadComponent: () =>
+      import('./features/products/components/product-list/product-list.component').then(m => m.ProductListComponent)
+  },
   {
     path: '',
     redirectTo: 'login',
