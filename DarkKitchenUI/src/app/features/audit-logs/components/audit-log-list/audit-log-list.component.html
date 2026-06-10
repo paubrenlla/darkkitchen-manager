@@ -1,0 +1,107 @@
+<div class="p-2">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Auditoría</h2>
+      <p class="text-sm text-slate-400 mt-0.5">Trazabilidad de cambios del sistema</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Desde (fecha y hora)</label>
+        <input
+          type="datetime-local"
+          [value]="fromDateTime()"
+          (change)="onFromDateTimeChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Hasta (fecha y hora)</label>
+        <input
+          type="datetime-local"
+          [value]="toDateTime()"
+          (change)="onToDateTimeChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Entidad</label>
+        <input
+          type="text"
+          placeholder="Product, Promotion..."
+          [value]="entityName()"
+          (input)="onEntityNameChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Entity Id</label>
+        <input
+          type="text"
+          placeholder="GUID"
+          [value]="entityId()"
+          (input)="onEntityIdChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <button mat-flat-button color="primary" class="gap-2" (click)="onFilter()">
+        <mat-icon>search</mat-icon>
+        Filtrar
+      </button>
+      <button mat-stroked-button class="gap-2" (click)="onClearFilters()">
+        <mat-icon>clear</mat-icon>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+      {{ errorMessage() }}
+    </div>
+  } @else {
+    <div class="rounded-xl border border-slate-200 overflow-x-auto bg-white shadow-sm">
+      <table class="w-full min-w-[800px]">
+        <thead>
+          <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-500 uppercase">
+            <th class="px-4 py-3">Fecha</th>
+            <th class="px-4 py-3">Entidad</th>
+            <th class="px-4 py-3">Entity Id</th>
+            <th class="px-4 py-3">Usuario</th>
+            <th class="px-4 py-3">Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of auditLogs(); track log.id) {
+            <tr class="border-t border-slate-100 text-sm text-slate-700 align-top">
+              <td class="px-4 py-3 whitespace-nowrap">{{ formatTimestamp(log.timestamp) }}</td>
+              <td class="px-4 py-3">{{ log.entityName }}</td>
+              <td class="px-4 py-3 font-mono text-xs">{{ log.entityId }}</td>
+              <td class="px-4 py-3">{{ log.responsibleUser }}</td>
+              <td class="px-4 py-3">{{ log.changeDescription }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (auditLogs().length === 0) {
+        <div class="text-center py-14 text-slate-400">
+          <mat-icon class="text-4xl mb-2">fact_check</mat-icon>
+          <p class="text-sm">No hay registros de auditoría para los filtros seleccionados.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
