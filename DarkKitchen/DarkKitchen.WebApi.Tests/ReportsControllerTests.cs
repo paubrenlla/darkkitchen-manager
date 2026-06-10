@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -124,6 +124,21 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void GetTopProducts_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var from = DateTime.Now.AddDays(-30);
+        var to = new DateTime(2024, 5, 15);
+        var expectedTo = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _mockReportService.Setup(s => s.GetTopProducts(from, expectedTo)).Returns([]);
+
+        var result = _controller.GetTopProducts(from, to) as OkObjectResult;
+
+        Assert.IsNotNull(result);
         _mockReportService.VerifyAll();
     }
 }
