@@ -494,4 +494,16 @@ public class PromotionServiceTests
         Assert.AreEqual(40m, discount);
         _mockPromotionRepository.VerifyAll();
     }
+
+    [TestMethod]
+    public void GetPromotions_DateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var date = new DateTime(2024, 5, 15);
+        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59), []);
+        SetupPromotionGetAll([promo]);
+
+        var result = _promotionService.GetPromotions(date, null, null);
+
+        Assert.AreEqual(1, result.Count());
+    }
 }
