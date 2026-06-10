@@ -13,10 +13,6 @@ public class OrderDetailResponse
     public required List<OrderItemDetailDto> Items { get; set; }
     public decimal Total { get; set; }
 
-    public OrderDetailResponse()
-    {
-    }
-
     [SetsRequiredMembers]
     public OrderDetailResponse(Order order)
     {

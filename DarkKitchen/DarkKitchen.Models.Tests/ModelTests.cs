@@ -5,7 +5,6 @@ using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.Domain.Users.PhoneValidations;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 using Moq;
 
@@ -14,24 +13,6 @@ namespace DarkKitchen.Models.Tests;
 [TestClass]
 public class ModelTests
 {
-    /*[TestMethod]
-    public void Converter_ToUserCreateResponse_MapsCorrectData()
-    {
-        var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var hasher = new Mock<IPasswordHasher>();
-        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
-
-        var result = Converter.ToUserCreateResponse(user);
-
-        Assert.AreEqual(user.Id, result.Id);
-        Assert.AreEqual("Juan", result.Name);
-        Assert.AreEqual("Perez", result.Surname);
-        Assert.AreEqual("juan@test.com", result.Email);
-        Assert.AreEqual("+598094111222", result.Phone);
-        Assert.AreEqual("Cliente", result.Role);
-    }*/
-
     [TestMethod]
     public void UserCreateRequest_MissingName_ReturnsValidationErrors()
     {
@@ -84,29 +65,30 @@ public class ModelTests
     }
 
     [TestMethod]
-    public void ToLoginResponse_ShouldMapCorrectly()
+    public void LoginResponse_Constructor_MapsCorrectly()
     {
         var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
         var hasher = new Mock<IPasswordHasher>();
         hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
         var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
+        var loginResult = new LoginResult("my.jwt.token", user);
 
-        var result = Converter.ToLoginResponse("my.jwt.token", user);
+        var result = new LoginResponse(loginResult);
 
         Assert.AreEqual("my.jwt.token", result.Token);
         Assert.AreEqual("Cliente", result.Role);
     }
 
     [TestMethod]
-    public void ToProductResponse_ShouldMapCorrectly()
+    public void ProductResponse_Constructor_MapsCorrectly()
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
+        var images = new List<ProductImage> { new("photo.jpg", 100000) };
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar",
+            line, category, 150m, images);
 
-        List<ProductImage> images = [new("photo.jpg", 100000)];
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m, images);
-        var result = Converter.ToProductResponse(product);
+        var result = new ProductResponse(product);
 
         Assert.AreEqual("BURG01", result.Code);
         Assert.AreEqual("Hamburguesa Clasica", result.Name);
@@ -114,35 +96,20 @@ public class ModelTests
         Assert.AreEqual(150m, result.Price);
         Assert.AreEqual("Combo burgers", result.Line);
         Assert.AreEqual("Parrilla", result.Category);
+        Assert.AreEqual(1, result.Images.Count);
+        Assert.AreEqual("photo.jpg", result.Images[0].Url);
+        Assert.AreEqual(100000, result.Images[0].SizeInBytes);
     }
 
-    /*[TestMethod]
-    public void ToUserCreateResponse_ShouldMapCorrectly()
-    {
-        var phone = PhoneNumber.Create("+598", "094111222", new UruguayPhoneValidationStrategy());
-        var hasher = new Mock<IPasswordHasher>();
-        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
-        var user = new User("Juan", "Perez", "juan@test.com", phone, "Valid1Password!@", Role.Cliente, hasher.Object);
-
-        var result = Converter.ToUserCreateResponse(user);
-
-        Assert.AreEqual(user.Id, result.Id);
-        Assert.AreEqual("Juan", result.Name);
-        Assert.AreEqual("Perez", result.Surname);
-        Assert.AreEqual("juan@test.com", result.Email);
-        Assert.AreEqual("+598094111222", result.Phone);
-        Assert.AreEqual("Cliente", result.Role);
-    }*/
-
     [TestMethod]
-    public void ToOrderCreateResponse_ShouldMapCorrectly()
+    public void OrderCreateResponse_Constructor_MapsCorrectly()
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m) };
         var order = new Order(Guid.NewGuid(), address, "Express", items, 0m);
         order.AssignOrderNumber(42);
 
-        var result = Converter.ToOrderCreateResponse(order);
+        var result = new OrderCreateResponse(order);
 
         Assert.AreEqual(order.ClientId, result.ClientId);
         Assert.AreEqual(42, result.OrderNumber);
@@ -151,20 +118,7 @@ public class ModelTests
     }
 
     [TestMethod]
-    public void ToOrderStatusResponse_ShouldMapCorrectly()
-    {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        var order = new Order(Guid.NewGuid(), address, "Express", items, 0m);
-
-        var result = Converter.ToOrderStatusResponse(order);
-
-        Assert.AreEqual("Pending", result.Status);
-        Assert.AreEqual(order.LastTransitionDate, result.LastTransitionDate);
-    }
-
-    [TestMethod]
-    public void ToOrderDetailResponse_ShouldMapCorrectly()
+    public void OrderDetailResponse_Constructor_MapsCorrectly()
     {
         var productId = Guid.NewGuid();
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
@@ -173,7 +127,7 @@ public class ModelTests
         var order = new Order(clientId, address, "Express", items, 0m);
         order.AssignOrderNumber(10);
 
-        var result = Converter.ToOrderDetailResponse(order);
+        var result = new OrderDetailResponse(order);
 
         Assert.AreEqual(10, result.OrderNumber);
         Assert.AreEqual(clientId, result.ClientId);
@@ -187,25 +141,7 @@ public class ModelTests
     }
 
     [TestMethod]
-    public void ToOrderListResponse_ShouldMapCorrectly()
-    {
-        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
-        var items = new List<OrderItem> { new(Guid.NewGuid(), 2, 100m), new(Guid.NewGuid(), 3, 50m) };
-        var clientId = Guid.NewGuid();
-        var order = new Order(clientId, address, "Express", items, 0m);
-        order.AssignOrderNumber(5);
-
-        var result = Converter.ToOrderListResponse(order);
-
-        Assert.AreEqual(5, result.OrderNumber);
-        Assert.AreEqual(clientId, result.ClientId);
-        Assert.AreEqual("Pending", result.Status);
-        Assert.AreEqual(order.Total, result.Total);
-        Assert.AreEqual(5, result.ProductCount);
-    }
-
-    [TestMethod]
-    public void ToPromotionCreateResponse_ShouldMapCorrectly()
+    public void PromotionCreateResponse_Constructor_MapsCorrectly()
     {
         var start = new DateTime(2025, 1, 1);
         var end = new DateTime(2025, 1, 31);
@@ -220,7 +156,7 @@ public class ModelTests
         };
         var promotion = new Promotion("Promo Verano", 20, start, end, products);
 
-        var result = Converter.ToPromotionCreateResponse(promotion);
+        var result = new PromotionCreateResponse(promotion);
 
         Assert.AreEqual("Promo Verano", result.Name);
         Assert.AreEqual(20, result.DiscountPercentage);

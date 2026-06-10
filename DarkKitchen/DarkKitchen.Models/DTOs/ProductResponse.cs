@@ -3,6 +3,12 @@ using DarkKitchen.Domain.Products;
 
 namespace DarkKitchen.Models.DTOs;
 
+public class ProductImageResponse
+{
+    public string Url { get; set; } = string.Empty;
+    public long SizeInBytes { get; set; }
+}
+
 public class ProductResponse
 {
     public Guid Id { get; set; }
@@ -12,12 +18,8 @@ public class ProductResponse
     public decimal Price { get; set; }
     public required string Line { get; set; }
     public required string Category { get; set; }
-    public required List<string> Images { get; set; }
+    public required List<ProductImageResponse> Images { get; set; }
     public bool IsActive { get; set; }
-
-    public ProductResponse()
-    {
-    }
 
     [SetsRequiredMembers]
     public ProductResponse(Product product)
@@ -29,7 +31,11 @@ public class ProductResponse
         Price = product.Price;
         Line = product.Line.Name;
         Category = product.Category.Name;
-        Images = product.Images.Select(i => i.Url).ToList();
+        Images = product.Images.Select(i => new ProductImageResponse
+        {
+            Url = i.Url,
+            SizeInBytes = i.SizeInBytes
+        }).ToList();
         IsActive = product.IsActive;
     }
 }
