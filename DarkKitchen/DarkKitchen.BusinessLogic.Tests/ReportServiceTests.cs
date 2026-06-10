@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Orders;
+using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Users;
 using DarkKitchen.Domain.Users.Encryptor;
@@ -396,5 +396,20 @@ public class ReportServiceTests
         DateTime to = DateTime.Now.AddDays(-1);
 
         _reportService.GetTopProducts(from, to);
+    }
+
+    [TestMethod]
+    public void GetTopProducts_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var from = new DateTime(2024, 5, 10);
+        var to = new DateTime(2024, 5, 15);
+        var expectedTo = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        SetupOrderGetByStatus(from, expectedTo, []);
+
+        var result = _reportService.GetTopProducts(from, to);
+
+        Assert.IsNotNull(result);
+        _orderRepositoryMock.VerifyAll();
     }
 }
