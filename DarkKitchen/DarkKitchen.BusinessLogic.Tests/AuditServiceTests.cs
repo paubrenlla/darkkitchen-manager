@@ -32,16 +32,32 @@ public class AuditServiceTests
     {
         var from = new DateTime(2026, 5, 1);
         var to = new DateTime(2026, 5, 2);
+        var expectedTo = new DateTime(2026, 5, 2, 23, 59, 59);
         var logs = new List<AuditLog>
         {
             new AuditLog { EntityName = "Product" }
         };
 
-        _mockRepository.Setup(r => r.GetAudits(from, to, null, null)).Returns(logs);
+        _mockRepository.Setup(r => r.GetAudits(from, expectedTo, null, null)).Returns(logs);
 
         var result = _service.GetAudits(from, to, null, null);
 
         Assert.AreEqual(1, result.Count());
+        _mockRepository.VerifyAll();
+    }
+
+    [TestMethod]
+    public void GetAudits_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var from = new DateTime(2024, 5, 10);
+        var to = new DateTime(2024, 5, 15);
+        var expectedTo = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _mockRepository.Setup(r => r.GetAudits(from, expectedTo, null, null)).Returns([]);
+
+        var result = _service.GetAudits(from, to, null, null);
+
+        Assert.IsNotNull(result);
         _mockRepository.VerifyAll();
     }
 }

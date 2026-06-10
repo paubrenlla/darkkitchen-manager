@@ -1,4 +1,4 @@
-﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IBusinessLogic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
