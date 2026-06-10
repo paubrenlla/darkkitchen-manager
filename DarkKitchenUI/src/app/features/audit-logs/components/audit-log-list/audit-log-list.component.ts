@@ -4,8 +4,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { AuditLogResponse } from '../../models/audit-log.models';
 import { AuditLogService } from '../../services/audit-log.service';
+
+type SortableColumn = 'timestamp' | 'entityName' | 'responsibleUser';
+type SortDirection = 'asc' | 'desc';
 
 @Component({
   selector: 'app-audit-log-list',
@@ -26,6 +28,52 @@ export class AuditLogListComponent implements OnInit {
   toDateTime = signal(this.buildDateTimeOffset(0));
   entityName = signal('');
   entityId = signal('');
+
+  // Paginado
+  page = signal(1);
+  pageSize = signal(20);
+  readonly pageSizeOptions = [10, 20, 50, 100];
+
+  // Ordenado
+  sortBy = signal<SortableColumn>('timestamp');
+  sortDir = signal<SortDirection>('desc');
+
+  // Logs ordenados (client-side)
+  sortedLogs = computed(() => {
+    const logs = [...this.auditLogs()];
+    const col = this.sortBy();
+    const dir = this.sortDir();
+
+    return logs.sort((a, b) => {
+      let valA: string | number;
+      let valB: string | number;
+
+      if (col === 'timestamp') {
+        valA = new Date(a.timestamp).getTime();
+        valB = new Date(b.timestamp).getTime();
+      } else {
+        valA = a[col].toLowerCase();
+        valB = b[col].toLowerCase();
+      }
+
+      if (valA < valB) return dir === 'asc' ? -1 : 1;
+      if (valA > valB) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  });
+
+  // Slice de la página actual
+  pagedLogs = computed(() => {
+    const start = (this.page() - 1) * this.pageSize();
+    return this.sortedLogs().slice(start, start + this.pageSize());
+  });
+
+  totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.auditLogs().length / this.pageSize()))
+  );
+
+  canGoPrev = computed(() => this.page() > 1);
+  canGoNext = computed(() => this.page() < this.totalPages());
 
   isDateRangeInvalid = computed(() => {
     const from = this.fromDateTime();
@@ -69,6 +117,7 @@ export class AuditLogListComponent implements OnInit {
       return;
     }
 
+    this.page.set(1);
     this.loadAudits();
   }
 
@@ -77,6 +126,7 @@ export class AuditLogListComponent implements OnInit {
     this.toDateTime.set(this.buildDateTimeOffset(0));
     this.entityName.set('');
     this.entityId.set('');
+    this.page.set(1);
     this.loadAudits();
   }
 
@@ -96,6 +146,33 @@ export class AuditLogListComponent implements OnInit {
 
   onEntityIdChange(value: string): void {
     this.entityId.set(value);
+  }
+
+  onSort(column: SortableColumn): void {
+    if (this.sortBy() === column) {
+      this.sortDir.update(d => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      this.sortBy.set(column);
+      this.sortDir.set('asc');
+    }
+    this.page.set(1);
+  }
+
+  onPrevPage(): void {
+    if (this.canGoPrev()) {
+      this.page.update(p => p - 1);
+    }
+  }
+
+  onNextPage(): void {
+    if (this.canGoNext()) {
+      this.page.update(p => p + 1);
+    }
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.page.set(1);
   }
 
   formatTimestamp(timestamp: string): string {

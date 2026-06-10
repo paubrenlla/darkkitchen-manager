@@ -6,6 +6,7 @@
     </div>
   </div>
 
+  <!-- Filtros -->
   <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-4 mb-4">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <div>
@@ -88,15 +89,67 @@
       <table class="w-full min-w-[800px]">
         <thead>
           <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-500 uppercase">
-            <th class="px-4 py-3">Fecha</th>
-            <th class="px-4 py-3">Entidad</th>
+
+            <!-- Fecha — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('timestamp')"
+            >
+              <span class="flex items-center gap-1">
+                Fecha
+                @if (sortBy() === 'timestamp') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Entidad — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('entityName')"
+            >
+              <span class="flex items-center gap-1">
+                Entidad
+                @if (sortBy() === 'entityName') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Entity Id — no ordenable -->
             <th class="px-4 py-3">Entity Id</th>
-            <th class="px-4 py-3">Usuario</th>
+
+            <!-- Usuario — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('responsibleUser')"
+            >
+              <span class="flex items-center gap-1">
+                Usuario
+                @if (sortBy() === 'responsibleUser') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Descripción — no ordenable -->
             <th class="px-4 py-3">Descripción</th>
           </tr>
         </thead>
         <tbody>
-          @for (log of auditLogs(); track log.id) {
+          @for (log of pagedLogs(); track log.id) {
             <tr class="border-t border-slate-100 text-sm text-slate-700 align-top">
               <td class="px-4 py-3 whitespace-nowrap">{{ formatTimestamp(log.timestamp) }}</td>
               <td class="px-4 py-3">{{ log.entityName }}</td>
@@ -115,5 +168,54 @@
         </div>
       }
     </div>
+
+    <!-- Barra de paginación -->
+    @if (auditLogs().length > 0) {
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-600">
+
+        <!-- Selector de filas por página -->
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 text-xs">Filas por página:</span>
+          @for (size of pageSizeOptions; track size) {
+            <button
+              class="px-2.5 py-1 rounded-md text-xs border transition-colors"
+              [class]="pageSize() === size
+                ? 'bg-blue-500 border-blue-500 text-white font-semibold'
+                : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
+              (click)="onPageSizeChange(size)"
+            >
+              {{ size }}
+            </button>
+          }
+        </div>
+
+        <!-- Navegación entre páginas -->
+        <div class="flex items-center gap-1">
+          <span class="text-slate-400 text-xs mr-2">{{ auditLogs().length }} registros</span>
+
+          <button
+            mat-icon-button
+            [disabled]="!canGoPrev()"
+            (click)="onPrevPage()"
+            title="Página anterior"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <span class="px-3 py-1 rounded-md bg-slate-100 text-xs font-medium min-w-[100px] text-center">
+            Página {{ page() }} de {{ totalPages() }}
+          </span>
+
+          <button
+            mat-icon-button
+            [disabled]="!canGoNext()"
+            (click)="onNextPage()"
+            title="Página siguiente"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
   }
 </div>
