@@ -1,3 +1,8 @@
+export interface ProductImageResponse {
+  url: string;
+  sizeInBytes: number;
+}
+
 export interface ProductResponse {
   id: string;
   code: string;
@@ -6,7 +11,7 @@ export interface ProductResponse {
   price: number;
   line: string;
   category: string;
-  images: string[];
+  images: ProductImageResponse[];
   isActive: boolean;
 }
 

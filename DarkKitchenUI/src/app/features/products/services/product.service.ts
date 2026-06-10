@@ -2,10 +2,14 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ProductResponse, ProductCreateRequest, ProductUpdateRequest } from '../models/product.models';
+import {
+  ProductResponse,
+  ProductCreateRequest,
+  ProductUpdateRequest,
+} from '../models/product.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService {
   private apiUrl = `${environment.apiUrl}/products`;
@@ -17,9 +21,9 @@ export class ProductService {
 
   getAll(name?: string, line?: string, category?: string): Observable<ProductResponse[]> {
     let params = new HttpParams();
-    if(name) params = params.set('name', name);
-    if(line) params = params.set('line', line);
-    if(category) params = params.set('category', category);
+    if (name) params = params.set('name', name);
+    if (line) params = params.set('line', line);
+    if (category) params = params.set('category', category);
 
     return this.http.get<ProductResponse[]>(this.apiUrl, { params });
   }
@@ -39,8 +43,11 @@ export class ProductService {
       line: product.line,
       category: product.category,
       price: product.price,
-      images: product.images.map(url => ({ url, sizeInBytes: 0 })),
-      isActive: !product.isActive
+      images: product.images.map((img) => ({
+        url: img.url,
+        sizeInBytes: img.sizeInBytes,
+      })),
+      isActive: !product.isActive,
     };
     return this.update(product.id, request);
   }

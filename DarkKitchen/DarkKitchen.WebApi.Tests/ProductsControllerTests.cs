@@ -174,10 +174,19 @@ public class ProductsControllerTests
             [
                 new ProductResponse
                 {
-                    Code = "IMP01", Name = "Producto Importado Test",
+                    Code = "IMP01",
+                    Name = "Producto Importado Test",
                     Description = "Descripcion del producto importado de prueba",
-                    Line = "Desayunos", Category = "Bebidas",
-                    Price = 250m, Images = ["https://img.darkkitchen.com/imported.jpg"]
+                    Line = "Desayunos",
+                    Category = "Bebidas",
+                    Price = 250m,
+                    Images = [new ProductImageResponse
+                    {
+                        Url = "https://img.darkkitchen.com/imported.jpg",
+                        SizeInBytes = 15000
+                    }
+
+                    ]
                 },
             ],
         };
