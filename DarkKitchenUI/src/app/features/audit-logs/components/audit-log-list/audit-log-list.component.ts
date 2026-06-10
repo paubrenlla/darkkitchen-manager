@@ -15,6 +15,8 @@ import { AuditLogService } from '../../services/audit-log.service';
 })
 export class AuditLogListComponent implements OnInit {
   private auditLogService = inject(AuditLogService);
+  private missingDateRangeMessage = 'Debes indicar tanto "Desde" como "Hasta".';
+  private invalidDateRangeMessage = 'El rango es inválido: "Desde" no puede ser mayor que "Hasta".';
 
   auditLogs = this.auditLogService.auditLogs;
   isLoading = this.auditLogService.isLoading;
@@ -36,13 +38,34 @@ export class AuditLogListComponent implements OnInit {
     return new Date(from).getTime() > new Date(to).getTime();
   });
 
+  isDateRangeMissing = computed(() => {
+    const from = this.fromDateTime().trim();
+    const to = this.toDateTime().trim();
+    return !from || !to;
+  });
+
+  validationMessage = computed(() => {
+    if (this.isDateRangeMissing()) {
+      return this.missingDateRangeMessage;
+    }
+
+    if (this.isDateRangeInvalid()) {
+      return this.invalidDateRangeMessage;
+    }
+
+    return null;
+  });
+
+  isFilterDisabled = computed(() => this.isLoading() || this.validationMessage() !== null);
+
   ngOnInit(): void {
     this.loadAudits();
   }
 
   onFilter(): void {
-    if (this.isDateRangeInvalid()) {
-      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+    const validationError = this.validationMessage();
+    if (validationError) {
+      this.errorMessage.set(validationError);
       return;
     }
 
@@ -59,26 +82,12 @@ export class AuditLogListComponent implements OnInit {
 
   onFromDateTimeChange(value: string): void {
     this.fromDateTime.set(value);
-
-    if (this.isDateRangeInvalid()) {
-      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
-    } else if (
-      this.errorMessage() === 'El rango es inválido: "Desde" no puede ser mayor que "Hasta".'
-    ) {
-      this.errorMessage.set(null);
-    }
+    this.syncValidationErrorMessage();
   }
 
   onToDateTimeChange(value: string): void {
     this.toDateTime.set(value);
-
-    if (this.isDateRangeInvalid()) {
-      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
-    } else if (
-      this.errorMessage() === 'El rango es inválido: "Desde" no puede ser mayor que "Hasta".'
-    ) {
-      this.errorMessage.set(null);
-    }
+    this.syncValidationErrorMessage();
   }
 
   onEntityNameChange(value: string): void {
@@ -94,8 +103,9 @@ export class AuditLogListComponent implements OnInit {
   }
 
   private loadAudits(): void {
-    if (this.isDateRangeInvalid()) {
-      this.errorMessage.set('El rango es inválido: "Desde" no puede ser mayor que "Hasta".');
+    const validationError = this.validationMessage();
+    if (validationError) {
+      this.errorMessage.set(validationError);
       return;
     }
 
@@ -139,5 +149,22 @@ export class AuditLogListComponent implements OnInit {
 
   private toIsoDateTime(localDateTime: string): string {
     return new Date(localDateTime).toISOString();
+  }
+
+  private syncValidationErrorMessage(): void {
+    const validationError = this.validationMessage();
+
+    if (validationError) {
+      this.errorMessage.set(validationError);
+      return;
+    }
+
+    const currentError = this.errorMessage();
+    if (
+      currentError === this.missingDateRangeMessage ||
+      currentError === this.invalidDateRangeMessage
+    ) {
+      this.errorMessage.set(null);
+    }
   }
 }
