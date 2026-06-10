@@ -55,4 +55,19 @@ public class AuditsControllerTests
 
         _mockService.VerifyAll();
     }
+
+    [TestMethod]
+    public void GetAudits_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var from = DateTime.UtcNow.AddDays(-1);
+        var to = new DateTime(2024, 5, 15);
+        var expectedTo = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _mockService.Setup(s => s.GetAudits(from, expectedTo, null, null)).Returns([]);
+
+        var result = _controller.GetAudits(from, to, null, null) as OkObjectResult;
+
+        Assert.IsNotNull(result);
+        _mockService.VerifyAll();
+    }
 }
