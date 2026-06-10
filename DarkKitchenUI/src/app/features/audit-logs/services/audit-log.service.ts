@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { AuditLogFilters, AuditLogResponse } from '../models/audit-log.models';
 
@@ -25,6 +26,9 @@ export class AuditLogService {
       params = params.set('entityId', filters.entityId);
     }
 
-    return this.http.get<AuditLogResponse[]>(this.apiUrl, { params });
+    return this.http.get<AuditLogResponse[]>(this.apiUrl, { params }).pipe(
+      map(result => result ?? []) // 204 No Content → null → []
+    );
   }
 }
+
