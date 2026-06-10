@@ -19,12 +19,12 @@ public class ExceptionFilter : IExceptionFilter
         if(_statusCodeMap.TryGetValue(context.Exception.GetType(), out var statusCode))
         {
             context.Result = new ObjectResult(new { error = context.Exception.Message })
-                { StatusCode = (int)statusCode };
+            { StatusCode = (int)statusCode };
         }
         else
         {
             context.Result = new ObjectResult(new { error = "Ocurrió un error inesperado." })
-                { StatusCode = (int)HttpStatusCode.InternalServerError };
+            { StatusCode = (int)HttpStatusCode.InternalServerError };
         }
 
         context.ExceptionHandled = true;
