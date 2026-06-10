@@ -447,4 +447,20 @@ public class OrderServiceTests
 
         _orderService.GetOrders(Guid.NewGuid(), "Preparador", filter);
     }
+
+    [TestMethod]
+    public void GetOrdersByClient_ToDateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var clientId = Guid.NewGuid();
+        var filter = new OrderFilter { From = new DateTime(2024, 5, 10), To = new DateTime(2024, 5, 15) };
+        var expectedToDate = new DateTime(2024, 5, 15, 23, 59, 59);
+
+        _orderRepositoryMock.Setup(r => r.GetByClient(clientId, filter.From, expectedToDate, null))
+            .Returns([]);
+
+        var result = _orderService.GetOrdersByClient(clientId, filter);
+
+        Assert.IsNotNull(result);
+        _orderRepositoryMock.VerifyAll();
+    }
 }

@@ -39,11 +39,6 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         [FromQuery] string? status,
         [FromQuery] string? address)
     {
-        if (toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
-        {
-            toDate = toDate.Value.Date.AddDays(1).AddSeconds(-1);
-        }
-
         var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var filter = new OrderFilter { From = fromDate, To = toDate, State = status, Address = address };

@@ -77,13 +77,25 @@ public class OrderService(
 
     public IEnumerable<OrderListResponse> GetOrdersByClient(Guid clientId, OrderFilter filter)
     {
-        return _orderRepository.GetByClient(clientId, filter.From, filter.To, filter.State)
+        var toDate = filter.To;
+        if (toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
+        {
+            toDate = toDate.Value.Date.AddDays(1).AddSeconds(-1);
+        }
+
+        return _orderRepository.GetByClient(clientId, filter.From, toDate, filter.State)
             .Select(_orderEnricher.EnrichForClient);
     }
 
     public IEnumerable<OrderListResponse> GetOrdersByStatus(OrderFilter filter)
     {
-        return _orderRepository.GetByStatus(filter.From!.Value, filter.To!.Value, filter.State, filter.Address)
+        var toDate = filter.To;
+        if (toDate.HasValue && toDate.Value.TimeOfDay == TimeSpan.Zero)
+        {
+            toDate = toDate.Value.Date.AddDays(1).AddSeconds(-1);
+        }
+
+        return _orderRepository.GetByStatus(filter.From!.Value, toDate!.Value, filter.State, filter.Address)
             .Select(_orderEnricher.EnrichForPreparador);
     }
 

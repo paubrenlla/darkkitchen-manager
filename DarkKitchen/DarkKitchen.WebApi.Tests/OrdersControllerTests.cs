@@ -196,25 +196,4 @@ public class OrdersControllerTests
         Assert.IsNotNull(result);
         _mockOrderService.VerifyAll();
     }
-
-    [TestMethod]
-    public void GetOrders_ToDateWithoutTime_ShouldAdjustToEndOfDay()
-    {
-        var callerId = Guid.NewGuid();
-        SetCallerContext(callerId, "Cliente");
-
-        var fromDate = new DateTime(2024, 5, 10);
-        var toDate = new DateTime(2024, 5, 15);
-        var expectedToDate = new DateTime(2024, 5, 15, 23, 59, 59);
-
-        var orders = new List<OrderListResponse>();
-
-        _mockOrderService.Setup(s => s.GetOrders(callerId, "Cliente", It.Is<OrderFilter>(f => f.To == expectedToDate)))
-            .Returns(orders);
-
-        var result = _controller.GetOrders(fromDate, toDate, null, null) as OkObjectResult;
-
-        Assert.IsNotNull(result);
-        _mockOrderService.VerifyAll();
-    }
 }
