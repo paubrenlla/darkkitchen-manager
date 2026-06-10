@@ -2,22 +2,12 @@ using DarkKitchen.Domain.Audit;
 
 namespace DarkKitchen.Models.DTOs;
 
-public class AuditLogResponse
+public class AuditLogResponse(AuditLog log)
 {
-    public Guid Id { get; set; }
-    public DateTime Timestamp { get; set; }
-    public string EntityName { get; set; } = string.Empty;
-    public Guid EntityId { get; set; }
-    public string ChangeDescription { get; set; } = string.Empty;
-    public string ResponsibleUser { get; set; } = string.Empty;
-
-    public AuditLogResponse(AuditLog log)
-    {
-        Id = log.Id;
-        Timestamp = log.Timestamp;
-        EntityName = log.EntityName;
-        EntityId = log.EntityId;
-        ChangeDescription = log.ChangeDescription;
-        ResponsibleUser = log.ResponsibleUser;
-    }
+    public Guid Id { get; set; } = log.Id;
+    public DateTime Timestamp { get; set; } = log.Timestamp;
+    public string EntityName { get; set; } = log.EntityName;
+    public Guid EntityId { get; set; } = log.EntityId;
+    public string ChangeDescription { get; set; } = log.ChangeDescription;
+    public string ResponsibleUser { get; set; } = log.ResponsibleUser;
 }

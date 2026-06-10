@@ -3,23 +3,13 @@ using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.Models.DTOs;
 
-public class UserCreateResponse
+[method: SetsRequiredMembers]
+public class UserCreateResponse(User user)
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Surname { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Role { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-
-    [SetsRequiredMembers]
-    public UserCreateResponse(User user)
-    {
-        Id = user.Id;
-        Name = user.Name;
-        Surname = user.Surname;
-        Email = user.Email;
-        Role = user.Role.ToString();
-        PhoneNumber = user.Phone.Number;
-    }
+    public Guid Id { get; set; } = user.Id;
+    public string Name { get; set; } = user.Name;
+    public string Surname { get; set; } = user.Surname;
+    public string Email { get; set; } = user.Email;
+    public string Role { get; set; } = user.Role.ToString();
+    public string PhoneNumber { get; set; } = user.Phone.Number;
 }

@@ -3,17 +3,10 @@ using DarkKitchen.Domain.Orders.Delivery;
 
 namespace DarkKitchen.Models.DTOs;
 
-public class ShippingTypeResponse
+[method: SetsRequiredMembers]
+public class ShippingTypeResponse(ShippingType shippingType)
 {
-    public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public decimal Cost { get; set; }
-
-    [SetsRequiredMembers]
-    public ShippingTypeResponse(ShippingType shippingType)
-    {
-        Id = shippingType.Id;
-        Name = shippingType.Name;
-        Cost = shippingType.Cost;
-    }
+    public Guid Id { get; set; } = shippingType.Id;
+    public required string Name { get; set; } = shippingType.Name;
+    public decimal Cost { get; set; } = shippingType.Cost;
 }

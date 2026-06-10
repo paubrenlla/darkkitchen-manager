@@ -3,7 +3,6 @@ using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users;
-using DarkKitchen.Domain.Users;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.Models.DTOs;

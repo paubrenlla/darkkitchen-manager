@@ -3,15 +3,9 @@ using DarkKitchen.Domain.Users;
 
 namespace DarkKitchen.Models.DTOs;
 
-public class LoginResponse
+[method: SetsRequiredMembers]
+public class LoginResponse(LoginResult result)
 {
-    public required string Token { get; set; }
-    public required string Role { get; set; }
-
-    [SetsRequiredMembers]
-    public LoginResponse(LoginResult result)
-    {
-        Token = result.Token;
-        Role = result.User.Role.ToString();
-    }
+    public required string Token { get; set; } = result.Token;
+    public required string Role { get; set; } = result.User.Role.ToString();
 }
