@@ -19,6 +19,11 @@ public class PromotionsController(IPromotionService promotionService) : Controll
         [FromQuery] string? line,
         [FromQuery] string? productCode)
     {
+        if (date.HasValue && date.Value.TimeOfDay == TimeSpan.Zero)
+        {
+            date = date.Value.Date.AddDays(1).AddSeconds(-1);
+        }
+
         var promotions = _promotionService.GetPromotions(date, line, productCode)
             .Select(p => new PromotionCreateResponse(p))
             .ToList();
