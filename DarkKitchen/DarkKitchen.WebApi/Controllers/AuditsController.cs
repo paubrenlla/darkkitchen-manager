@@ -19,11 +19,6 @@ public class AuditsController(IAuditService auditService) : ControllerBase
         [FromQuery] string? entityName,
         [FromQuery] Guid? entityId)
     {
-        if (to.TimeOfDay == TimeSpan.Zero)
-        {
-            to = to.Date.AddDays(1).AddSeconds(-1);
-        }
-
         var audits = _auditService.GetAudits(from, to, entityName, entityId)
             .Select(a => new AuditLogResponse(a))
             .ToList();
