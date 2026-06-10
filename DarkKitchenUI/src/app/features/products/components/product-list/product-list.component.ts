@@ -21,9 +21,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
   ],
-  templateUrl: './product-list.component.html'
+  templateUrl: './product-list.component.html',
 })
 export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
@@ -41,26 +41,36 @@ export class ProductListComponent implements OnInit {
 
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(ProductFormComponent, {
-      disableClose: true
+      disableClose: true,
+      data: null,
     });
 
-    dialogRef.afterClosed().subscribe(created => {
-      if(created) {
-        this.loadProducts();
-      }
+    dialogRef.afterClosed().subscribe((created) => {
+      if (created) this.loadProducts();
+    });
+  }
+
+  openEditDialog(product: ProductResponse): void {
+    const dialogRef = this.dialog.open(ProductFormComponent, {
+      disableClose: true,
+      data: product,
+    });
+
+    dialogRef.afterClosed().subscribe((updated) => {
+      if (updated) this.loadProducts();
     });
   }
 
   onToggleActive(product: ProductResponse): void {
     this.productService.toggleActive(product).subscribe({
       next: (updated) => {
-        this.productService.products.update(list =>
-          list.map(p => p.id === updated.id ? updated : p)
+        this.productService.products.update((list) =>
+          list.map((p) => (p.id === updated.id ? updated : p)),
         );
       },
       error: () => {
         this.errorMessage.set('No se pudo cambiar el estado del producto.');
-      }
+      },
     });
   }
 
@@ -76,7 +86,7 @@ export class ProductListComponent implements OnInit {
       error: () => {
         this.errorMessage.set('No se pudieron cargar los productos.');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 }
