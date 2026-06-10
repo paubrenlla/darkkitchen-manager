@@ -166,29 +166,18 @@ public class ProductsControllerTests
             FilePath = "/data/products.json"
         };
 
+        var line = new ProductLine("Desayunos");
+        var category = new ProductCategory("Bebidas");
+        var images = new List<ProductImage> { new("https://img.darkkitchen.com/imported.jpg", 15000) };
+        var product = new Product("IMP01", "Producto Importado Test",
+            "Descripcion del producto importado de prueba",
+            line, category, 250m, images);
+
         var importResponse = new ProductImportResponse
         {
             TotalProcessed = 1,
             Successful = 1,
-            ImportedProducts =
-            [
-                new ProductResponse
-                {
-                    Code = "IMP01",
-                    Name = "Producto Importado Test",
-                    Description = "Descripcion del producto importado de prueba",
-                    Line = "Desayunos",
-                    Category = "Bebidas",
-                    Price = 250m,
-                    Images = [new ProductImageResponse
-                    {
-                        Url = "https://img.darkkitchen.com/imported.jpg",
-                        SizeInBytes = 15000
-                    }
-
-                    ]
-                },
-            ],
+            ImportedProducts = [new ProductResponse(product)]
         };
 
         _mockService.Setup(s => s.ImportProducts("JSON Importer", "/data/products.json", "admin@darkkitchen.com"))

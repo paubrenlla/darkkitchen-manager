@@ -21,8 +21,6 @@ public class ProductResponse
     public required List<ProductImageResponse> Images { get; set; }
     public bool IsActive { get; set; }
 
-    public ProductResponse() { }
-
     [SetsRequiredMembers]
     public ProductResponse(Product product)
     {

@@ -12,10 +12,6 @@ public class UserCreateResponse
     public string Role { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
 
-    public UserCreateResponse()
-    {
-    }
-
     [SetsRequiredMembers]
     public UserCreateResponse(User user)
     {

@@ -2,7 +2,6 @@ using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.IDataAccess;
-using DarkKitchen.Models.Converters;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.Plugin.Contracts;
 
@@ -207,7 +206,7 @@ public class ProductService(
                 };
                 _eventPublisher.Publish(domainEvent);
 
-                response.ImportedProducts.Add(Converter.ToProductResponse(product));
+                response.ImportedProducts.Add(new ProductResponse(product));
                 response.Successful++;
             }
             catch(Exception ex)

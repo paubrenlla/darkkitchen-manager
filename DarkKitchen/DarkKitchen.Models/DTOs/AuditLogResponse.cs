@@ -11,10 +11,6 @@ public class AuditLogResponse
     public string ChangeDescription { get; set; } = string.Empty;
     public string ResponsibleUser { get; set; } = string.Empty;
 
-    public AuditLogResponse()
-    {
-    }
-
     public AuditLogResponse(AuditLog log)
     {
         Id = log.Id;

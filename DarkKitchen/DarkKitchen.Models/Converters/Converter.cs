@@ -1,3 +1,4 @@
+/*
 using DarkKitchen.Domain.Audit;
 using DarkKitchen.Domain.Orders;
 using DarkKitchen.Domain.Orders.Delivery;
@@ -15,7 +16,7 @@ public static class Converter
         return new LoginResponse { Token = token, Role = user.Role.ToString() };
     }
 
-    public static ProductResponse ToProductResponse(Product product)
+    /*public static ProductResponse ToProductResponse(Product product)
     {
         return new ProductResponse
         {
@@ -29,7 +30,7 @@ public static class Converter
             Images = product.Images.Select(i => i.Url).ToList(),
             IsActive = product.IsActive
         };
-    }
+    }#1#
 
     /*public static UserCreateResponse ToUserCreateResponse(User user)
     {
@@ -42,7 +43,7 @@ public static class Converter
             Phone = $"{user.Phone.CountryPrefix}{user.Phone.Number}",
             Role = user.Role.ToString()
         };
-    }*/
+    }#1#
 
     public static OrderCreateResponse ToOrderCreateResponse(Order order)
     {
@@ -142,3 +143,4 @@ public static class Converter
         };
     }
 }
+*/
