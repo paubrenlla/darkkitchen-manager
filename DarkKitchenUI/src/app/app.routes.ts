@@ -30,6 +30,13 @@ export const routes: Routes = [
             .then(m => m.ProductListComponent)
       },
       {
+        path: 'admin-orders',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/orders/components/admin-orders/admin-orders.component')
+            .then(m => m.AdminOrdersComponent)
+      },
+      {
         path: 'audit-logs',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
@@ -51,4 +58,3 @@ export const routes: Routes = [
     pathMatch: 'full'
   }
 ];
-
