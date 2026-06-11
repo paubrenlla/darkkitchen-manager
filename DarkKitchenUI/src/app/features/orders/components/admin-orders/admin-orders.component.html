@@ -76,8 +76,15 @@
         @for (item of order()!.items; track item.productId) {
           <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-sm">
             <div class="flex flex-col">
-              <span class="font-medium text-slate-800">{{ item.productName }}</span>
-              <span class="text-xs text-slate-400">x{{ item.quantity }} · ${{ item.price }} c/u</span>
+              <span class="font-medium text-slate-800">
+                {{ item.productName ?? ('Producto ' + item.productId.substring(0, 8)) }}
+              </span>
+              <span class="text-xs text-slate-400">
+                x{{ item.quantity }} · ${{ item.price }} c/u
+                @if (item.appliedPromotion) {
+                  · <span class="text-emerald-600 font-medium">{{ item.appliedPromotion }}</span>
+                }
+              </span>
             </div>
             <span class="font-semibold text-slate-700">${{ item.itemTotal }}</span>
           </div>
@@ -91,13 +98,15 @@
           <span class="text-slate-500">Subtotal</span>
           <span class="text-slate-700">${{ order()!.subtotal }}</span>
         </div>
-        @if (order()!.discount > 0) {
-          <div class="flex justify-between w-48">
-            <span class="text-emerald-600">Descuento</span>
-            <span class="text-emerald-600">-${{ order()!.discount }}</span>
-          </div>
-        }
-        <div class="flex justify-between w-48 font-bold text-base">
+        <div class="flex justify-between w-48">
+          <span class="text-slate-500">IVA (22%)</span>
+          <span class="text-slate-700">${{ order()!.tax }}</span>
+        </div>
+        <div class="flex justify-between w-48">
+          <span class="text-slate-500">Envío</span>
+          <span class="text-slate-700">${{ order()!.shippingCost }}</span>
+        </div>
+        <div class="flex justify-between w-48 font-bold text-base mt-1 pt-2 border-t border-slate-200">
           <span class="text-slate-800">Total</span>
           <span class="text-slate-800">${{ order()!.total }}</span>
         </div>
