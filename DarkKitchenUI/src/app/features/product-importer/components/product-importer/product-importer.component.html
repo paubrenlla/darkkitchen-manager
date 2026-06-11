@@ -66,11 +66,11 @@
               [disabled]="isLoading() || !selectedImporter() || !filePath()">
               @if (isLoading()) {
                 <mat-spinner diameter="20" class="mr-2 inline-block"></mat-spinner>
-                Procesando...
-              } @else {
-                <mat-icon>cloud_upload</mat-icon>
-                Importar Productos
               }
+              @if (!isLoading()) {
+                <mat-icon>cloud_upload</mat-icon>
+              }
+              <span>{{ isLoading() ? 'Procesando...' : 'Importar Productos' }}</span>
             </button>
           </div>
 
