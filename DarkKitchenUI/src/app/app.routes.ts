@@ -23,11 +23,6 @@ export const routes: Routes = [
         .then(m => m.DashboardComponent),
     children: [
       {
-        path: '',
-        redirectTo: 'products',
-        pathMatch: 'full'
-      },
-      {
         path: 'products',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
@@ -49,3 +44,4 @@ export const routes: Routes = [
     pathMatch: 'full'
   }
 ];
+
