@@ -35,6 +35,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/audit-logs/components/audit-log-list/audit-log-list.component')
             .then(m => m.AuditLogListComponent)
+      },
+      {
+        path: 'product-importer',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/product-importer/components/product-importer/product-importer.component')
+            .then(m => m.ProductImporterComponent)
       }
     ]
   },

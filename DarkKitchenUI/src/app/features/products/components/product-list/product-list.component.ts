@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, input, computed, output } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/product.models';
@@ -29,14 +29,29 @@ export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
   private dialog = inject(MatDialog);
 
-  products = this.productService.products;
+  // Reusability inputs
+  customProducts = input<ProductResponse[] | undefined>(undefined);
+  hideHeader = input<boolean>(false);
+  hideEditButton = input<boolean>(false);
+  
+  // Emit changes when a product is modified from a custom list
+  productModified = output<ProductResponse>();
+
+  // If customProducts is provided, use it. Otherwise, use the global service products.
+  products = computed(() => {
+    const custom = this.customProducts();
+    return custom ? custom : this.productService.products();
+  });
+
   isLoading = this.productService.isLoading;
   errorMessage = signal<string | null>(null);
 
   displayedColumns = ['code', 'name', 'line', 'category', 'price', 'status', 'actions'];
 
   ngOnInit(): void {
-    this.loadProducts();
+    if (!this.customProducts()) {
+      this.loadProducts();
+    }
   }
 
   openCreateDialog(): void {
@@ -57,7 +72,13 @@ export class ProductListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((updated) => {
-      if (updated) this.loadProducts();
+      if (updated) {
+        if (this.customProducts()) {
+          this.productModified.emit(updated);
+        } else {
+          this.loadProducts();
+        }
+      }
     });
   }
 
@@ -67,6 +88,9 @@ export class ProductListComponent implements OnInit {
         this.productService.products.update((list) =>
           list.map((p) => (p.id === updated.id ? updated : p)),
         );
+        if (this.customProducts()) {
+          this.productModified.emit(updated);
+        }
       },
       error: () => {
         this.errorMessage.set('No se pudo cambiar el estado del producto.');
