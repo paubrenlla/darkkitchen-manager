@@ -1,5 +1,4 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -19,7 +18,6 @@ interface NavItem {
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -33,6 +31,23 @@ interface NavItem {
 export class DashboardComponent {
   private authService = inject(AuthService);
   currentUserRole = this.authService.userRole;
+  currentUserName = this.authService.currentUserName;
+
+  greeting = computed(() => {
+    const name = this.currentUserName();
+    const hour = new Date().getHours();
+    const saludo = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+    return name ? `${saludo}, ${name}` : saludo;
+  });
+
+  currentDate = computed(() =>
+    new Date().toLocaleDateString('es-UY', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  );
 
   menuItems = computed<NavItem[]>(() => {
     const role = this.currentUserRole();
