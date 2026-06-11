@@ -33,6 +33,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/products/components/product-list/product-list.component')
             .then(m => m.ProductListComponent)
+      },
+      {
+        path: 'audit-logs',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/audit-logs/components/audit-log-list/audit-log-list.component')
+            .then(m => m.AuditLogListComponent)
       }
     ]
   },

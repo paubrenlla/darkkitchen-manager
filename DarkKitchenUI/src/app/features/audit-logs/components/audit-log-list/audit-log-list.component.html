@@ -1,0 +1,221 @@
+<div class="p-2">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Auditoría</h2>
+      <p class="text-sm text-slate-400 mt-0.5">Trazabilidad de cambios del sistema</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Desde (fecha y hora)</label>
+        <input
+          type="datetime-local"
+          [value]="fromDateTime()"
+          (change)="onFromDateTimeChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Hasta (fecha y hora)</label>
+        <input
+          type="datetime-local"
+          [value]="toDateTime()"
+          (change)="onToDateTimeChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Entidad</label>
+        <input
+          type="text"
+          placeholder="Product, Promotion..."
+          [value]="entityName()"
+          (input)="onEntityNameChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Entity Id</label>
+        <input
+          type="text"
+          placeholder="GUID"
+          [value]="entityId()"
+          (input)="onEntityIdChange($any($event.target).value)"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+        />
+      </div>
+    </div>
+
+    @if (validationMessage()) {
+      <p class="mt-3 text-sm text-rose-600">
+        {{ validationMessage() }}
+      </p>
+    }
+
+    <div class="mt-4 flex gap-2">
+      <button
+        mat-flat-button
+        color="primary"
+        class="gap-2"
+        (click)="onFilter()"
+        [disabled]="isFilterDisabled()"
+      >
+        <mat-icon>search</mat-icon>
+        Filtrar
+      </button>
+      <button mat-stroked-button class="gap-2" (click)="onClearFilters()">
+        <mat-icon>clear</mat-icon>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+      {{ errorMessage() }}
+    </div>
+  } @else {
+    <div class="rounded-xl border border-slate-200 overflow-x-auto bg-white shadow-sm">
+      <table class="w-full min-w-[800px]">
+        <thead>
+          <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-500 uppercase">
+
+            <!-- Fecha — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('timestamp')"
+            >
+              <span class="flex items-center gap-1">
+                Fecha
+                @if (sortBy() === 'timestamp') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Entidad — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('entityName')"
+            >
+              <span class="flex items-center gap-1">
+                Entidad
+                @if (sortBy() === 'entityName') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Entity Id — no ordenable -->
+            <th class="px-4 py-3">Entity Id</th>
+
+            <!-- Usuario — ordenable -->
+            <th
+              class="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+              (click)="onSort('responsibleUser')"
+            >
+              <span class="flex items-center gap-1">
+                Usuario
+                @if (sortBy() === 'responsibleUser') {
+                  <mat-icon class="!text-base !w-4 !h-4 text-blue-500">
+                    {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                  </mat-icon>
+                } @else {
+                  <mat-icon class="!text-base !w-4 !h-4 text-slate-300">unfold_more</mat-icon>
+                }
+              </span>
+            </th>
+
+            <!-- Descripción — no ordenable -->
+            <th class="px-4 py-3">Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of pagedLogs(); track log.id) {
+            <tr class="border-t border-slate-100 text-sm text-slate-700 align-top">
+              <td class="px-4 py-3 whitespace-nowrap">{{ formatTimestamp(log.timestamp) }}</td>
+              <td class="px-4 py-3">{{ log.entityName }}</td>
+              <td class="px-4 py-3 font-mono text-xs">{{ log.entityId }}</td>
+              <td class="px-4 py-3">{{ log.responsibleUser }}</td>
+              <td class="px-4 py-3">{{ log.changeDescription }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (auditLogs().length === 0) {
+        <div class="text-center py-14 text-slate-400">
+          <mat-icon class="text-4xl mb-2">fact_check</mat-icon>
+          <p class="text-sm">No hay registros de auditoría para los filtros seleccionados.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Barra de paginación -->
+    @if (auditLogs().length > 0) {
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-600">
+
+        <!-- Selector de filas por página -->
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 text-xs">Filas por página:</span>
+          @for (size of pageSizeOptions; track size) {
+            <button
+              class="px-2.5 py-1 rounded-md text-xs border transition-colors"
+              [class]="pageSize() === size
+                ? 'bg-blue-500 border-blue-500 text-white font-semibold'
+                : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
+              (click)="onPageSizeChange(size)"
+            >
+              {{ size }}
+            </button>
+          }
+        </div>
+
+        <!-- Navegación entre páginas -->
+        <div class="flex items-center gap-1">
+          <span class="text-slate-400 text-xs mr-2">{{ auditLogs().length }} registros</span>
+
+          <button
+            mat-icon-button
+            [disabled]="!canGoPrev()"
+            (click)="onPrevPage()"
+            title="Página anterior"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <span class="px-3 py-1 rounded-md bg-slate-100 text-xs font-medium min-w-[100px] text-center">
+            Página {{ page() }} de {{ totalPages() }}
+          </span>
+
+          <button
+            mat-icon-button
+            [disabled]="!canGoNext()"
+            (click)="onNextPage()"
+            title="Página siguiente"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>
