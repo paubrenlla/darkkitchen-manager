@@ -23,9 +23,12 @@ public class PromotionService(
             date = date.Value.Date.AddDays(1).AddSeconds(-1);
         }
 
-        IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
-        DateTime dateToFilter = date ?? DateTime.Now;
-        IEnumerable<Promotion> filtered = promotions.Where(p => p.IsVigente(dateToFilter));
+        IEnumerable<Promotion> filtered = _promotionRepository.GetAll();
+
+        if(date.HasValue)
+        {
+            filtered = filtered.Where(p => p.IsVigente(date.Value));
+        }
 
         if(!string.IsNullOrWhiteSpace(line))
         {
