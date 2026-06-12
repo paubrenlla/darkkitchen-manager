@@ -59,11 +59,17 @@ export const routes: Routes = [
         path: 'product-importer',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
-          import('./features/product-importer/components/product-importer/product-importer.component').then(
-            (m) => m.ProductImporterComponent,
-          ),
+          import('./features/product-importer/components/product-importer/product-importer.component')
+            .then(m => m.ProductImporterComponent)
       },
-    ],
+      {
+        path: 'reports',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/reports/components/reports-dashboard/reports-dashboard.component')
+            .then(m => m.ReportsDashboardComponent)
+      }
+    ]
   },
   {
     path: '',
