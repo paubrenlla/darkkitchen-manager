@@ -10,10 +10,10 @@ public class PromotionTests
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        return new List<Product>
-        {
+        return
+        [
             new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, [new ProductImage("img.jpg", 100000)])
-        };
+        ];
     }
 
     [TestMethod]
