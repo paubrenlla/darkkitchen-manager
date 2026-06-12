@@ -72,6 +72,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'users',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/users/components/user-list/user-list.component').then(
+            (m) => m.UserListComponent,
+          ),
+      },
+      {
         path: 'product-importer',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
