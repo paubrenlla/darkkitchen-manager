@@ -235,4 +235,16 @@ public class PromotionTests
 
         Assert.IsFalse(clone.IsActive);
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void CreatePromotion_WithNoProducts_ShouldThrowException()
+    {
+        new Promotion(
+            "Promo",
+            10,
+            DateTime.Today,
+            DateTime.Today.AddDays(5),
+            []);
+    }
 }
