@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
@@ -23,6 +24,21 @@ public class PromotionsControllerTests
         SetCallerContext("admin@test.com");
     }
 
+    private static Product CreateTestProduct()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+
+        return new Product(
+            "BURG01",
+            "Hamburguesa Clasica",
+            "Hamburguesa clasica con queso cheddar",
+            line,
+            category,
+            150m,
+            [new ProductImage("img.jpg", 100000)]);
+    }
+
     private void SetCallerContext(string email)
     {
         var claims = new List<Claim> { new(ClaimTypes.Email, email) };
@@ -41,7 +57,7 @@ public class PromotionsControllerTests
             discount,
             new DateTime(2026, 1, 1),
             new DateTime(2026, 12, 31),
-            []);
+            [CreateTestProduct()]);
     }
 
     [TestMethod]
