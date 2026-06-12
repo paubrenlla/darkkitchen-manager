@@ -3,6 +3,9 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/product.models';
 import { ProductFormComponent } from '../product-form/product-form.component';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +25,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatChipsModule,
     MatTooltipModule,
     MatDialogModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './product-list.component.html',
 })
@@ -45,6 +51,11 @@ export class ProductListComponent implements OnInit {
 
   isLoading = this.productService.isLoading;
   errorMessage = signal<string | null>(null);
+
+  // Filter signals
+  filterName = signal('');
+  filterLine = signal('');
+  filterCategory = signal('');
 
   displayedColumns = ['code', 'name', 'line', 'category', 'price', 'status', 'actions'];
 
@@ -98,11 +109,26 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+  onSearch(): void {
+    this.loadProducts();
+  }
+
+  onClear(): void {
+    this.filterName.set('');
+    this.filterLine.set('');
+    this.filterCategory.set('');
+    this.loadProducts();
+  }
+
   private loadProducts(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.productService.getAll().subscribe({
+    const name = this.filterName().trim() || undefined;
+    const line = this.filterLine().trim() || undefined;
+    const category = this.filterCategory().trim() || undefined;
+
+    this.productService.getAll(name, line, category).subscribe({
       next: (data) => {
         this.productService.products.set(data);
         this.isLoading.set(false);

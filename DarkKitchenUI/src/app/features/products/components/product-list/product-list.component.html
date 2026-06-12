@@ -10,6 +10,38 @@
         Nuevo producto
       </button>
     </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="flex flex-wrap items-center gap-4 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+      <mat-form-field appearance="outline" class="w-full sm:w-64" subscriptSizing="dynamic">
+        <mat-label>Nombre</mat-label>
+        <input matInput type="text" [ngModel]="filterName()" (ngModelChange)="filterName.set($event)" placeholder="Ej: Hamburguesa" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+        <mat-label>Línea</mat-label>
+        <input matInput type="text" [ngModel]="filterLine()" (ngModelChange)="filterLine.set($event)" placeholder="Ej: Alimentos" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">horizontal_rule</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+        <mat-label>Categoría</mat-label>
+        <input matInput type="text" [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)" placeholder="Ej: Hamburguesas" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">category</mat-icon>
+      </mat-form-field>
+
+      <div class="flex gap-2 w-full sm:w-auto sm:ml-auto">
+        <button mat-flat-button color="primary" (click)="onSearch()" class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]" [disabled]="isLoading()">
+          <mat-icon>filter_list</mat-icon>
+          Filtrar
+        </button>
+        <button mat-stroked-button (click)="onClear()" class="!rounded-xl !py-5 !px-6 h-[48px]" [disabled]="isLoading()">
+          <mat-icon>clear_all</mat-icon>
+          Limpiar
+        </button>
+      </div>
+    </div>
   }
 
   @if (isLoading()) {
