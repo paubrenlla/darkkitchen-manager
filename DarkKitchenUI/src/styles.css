@@ -6,6 +6,15 @@ html, body, button, input, select, textarea {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }
 
+:root {
+  --brand-color: #4f46e5;
+  --brand-color-hover: #3c34d0;
+  --background-color: #e0e7ff;
+
+  --text-color: #111827;
+  --border-color: #d1d5db;
+}
+
 .mdc-notched-outline__leading,
 .mdc-notched-outline__notch,
 .mdc-notched-outline__trailing {
