@@ -1,0 +1,120 @@
+<div class="p-6">
+
+  <div class="mb-6 flex items-center justify-between">
+
+    <h1
+      class="text-2xl font-semibold"
+      style="color: var(--brand-color);">
+      Promociones
+    </h1>
+
+    <button
+      mat-raised-button
+      (click)="onCreate()"
+      class="transition-opacity duration-200 hover:opacity-90"
+      style="background-color: var(--brand-color); color: #ffffff;">
+      Nueva promoción
+    </button>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="flex justify-center py-8">
+      <mat-spinner />
+    </div>
+
+  } @else if (errorMessage()) {
+
+    <div
+      class="rounded-lg border p-4"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      {{ errorMessage() }}
+    </div>
+
+  } @else if (promotionList.length === 0) {
+
+    <div
+      class="rounded-lg border p-6 text-center"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      No hay promociones registradas.
+    </div>
+
+  } @else {
+
+    <div
+      class="overflow-hidden rounded-lg border"
+      style="border-color: var(--border-color);">
+
+      <table class="w-full border-collapse">
+
+        <thead
+          style="background-color: var(--background-color);">
+
+        <tr>
+          <th class="p-4 text-left">Nombre</th>
+          <th class="p-4 text-left">Descuento</th>
+          <th class="p-4 text-left">Inicio</th>
+          <th class="p-4 text-left">Fin</th>
+          <th class="p-4 text-left">Productos</th>
+          <th class="p-4 text-left">Acciones</th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (promotion of promotionList; track promotion.id) {
+
+            <tr
+              class="border-t"
+              style="border-color: var(--border-color);">
+
+              <td class="p-4">
+                {{ promotion.name }}
+              </td>
+
+              <td class="p-4">
+                {{ promotion.discountPercentage }}%
+              </td>
+
+              <td class="p-4">
+                {{ promotion.startDate | date:'dd/MM/yyyy' }}
+              </td>
+
+              <td class="p-4">
+                {{ promotion.endDate | date:'dd/MM/yyyy' }}
+              </td>
+
+              <td class="p-4">
+                {{ promotion.products.length }}
+              </td>
+
+              <td class="p-4">
+                <button
+                  mat-button
+                  (click)="onEdit(promotion)"
+                  style="color: var(--brand-color);">
+                  Editar
+                </button>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>
