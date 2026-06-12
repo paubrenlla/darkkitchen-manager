@@ -95,7 +95,11 @@ public class DomainEventPublisherTests
         using var provider = BuildProvider(mockRepo.Object);
         var publisher = provider.GetRequiredService<IDomainEventPublisher>();
 
-        var newPromo = new Promotion("SUMMER26", 20, DateTime.Now, DateTime.Now.AddDays(7), []);
+        var line = new ProductLine("Combos");
+        var category = new ProductCategory("Hamburguesas");
+        var product = new Product("BURG01", "Hamburguesa Clásica", "Hamburguesa clásica con queso", line, category, 150m, [new ProductImage("img.jpg", 1000)]);
+
+        var newPromo = new Promotion("SUMMER26", 20, DateTime.Now, DateTime.Now.AddDays(7), [product]);
         typeof(Promotion).GetProperty("Id")!.SetValue(newPromo, Guid.NewGuid());
 
         var domainEvent = new EntityCreatedEvent<Promotion>

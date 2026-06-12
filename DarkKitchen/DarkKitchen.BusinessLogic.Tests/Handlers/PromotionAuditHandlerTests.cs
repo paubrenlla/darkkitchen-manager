@@ -26,7 +26,10 @@ public class PromotionAuditHandlerTests
     {
         _mockAuditRepository.Setup(r => r.Save(It.IsAny<AuditLog>()));
 
-        var promo = new Promotion("PROMO_SUMMER", 10, DateTime.Now, DateTime.Now.AddDays(1), []);
+        var line = new ProductLine("Burgers");
+        var category = new ProductCategory("Food");
+        var product = new Product("BURG01", "Hamburguesa", "This is a valid product description with at least 20 characters", line, category, 100m, [new ProductImage("img.jpg", 1000)]);
+        var promo = new Promotion("PROMO_SUMMER", 10, DateTime.Now, DateTime.Now.AddDays(1), [product]);
         var domainEvent = new EntityCreatedEvent<Promotion>
         {
             EntityId = Guid.NewGuid(),
