@@ -103,6 +103,14 @@ export const routes: Routes = [
             (m) => m.PromotionListComponent,
           ),
       },
+      {
+        path: 'delivery-types',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/shipping/components/shipping-type-list/shipping-type-list.component').then(
+            (m) => m.ShippingTypeListComponent,
+          ),
+      },
     ],
   },
   {
