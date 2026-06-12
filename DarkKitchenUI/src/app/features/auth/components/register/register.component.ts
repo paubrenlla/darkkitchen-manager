@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UserService } from '../../../users/services/user.service';
-import { RegisterRequest } from '../../../users/models/user.models';
+import { UserCreateRequest, UserResponse } from '../../../users/models/user.models';
 
 import { parseBackendErrors } from '../../../../core/utils/error-parser';
 
@@ -51,7 +51,7 @@ export class RegisterComponent {
       return;
     }
 
-    const registerData: RegisterRequest = {
+    const registerData: UserCreateRequest = {
       name: this.name,
       surname: this.surname,
       email: this.email,
@@ -64,8 +64,8 @@ export class RegisterComponent {
     this.errorMessage.set(null);
     this.fieldErrors.set({});
 
-    this.userService.postUser(registerData).subscribe({
-      next: (response) => {
+    this.userService.create(registerData).subscribe({
+      next: (_response: UserResponse) => {
         this.isLoading.set(false);
         this.router.navigate(['/login']);
       },
