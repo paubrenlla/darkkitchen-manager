@@ -1,0 +1,104 @@
+<div class="p-6">
+
+  <div class="mb-6 flex items-center justify-between">
+
+    <h1
+      class="text-2xl font-semibold"
+      style="color: var(--brand-color);">
+      Tipos de Envío
+    </h1>
+
+    <button
+      mat-raised-button
+      (click)="openCreateDialog()"
+      class="transition-opacity duration-200 hover:opacity-90"
+      style="background-color: var(--brand-color); color: #ffffff;">
+      Nuevo tipo de envío
+    </button>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="flex justify-center py-8">
+      <mat-spinner />
+    </div>
+
+  } @else if (errorMessage()) {
+
+    <div
+      class="rounded-lg border p-4"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      {{ errorMessage() }}
+    </div>
+
+  } @else if (shippingTypes().length === 0) {
+
+    <div
+      class="rounded-lg border p-6 text-center"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      No hay tipos de envío registrados.
+    </div>
+
+  } @else {
+
+    <div
+      class="overflow-hidden rounded-lg border"
+      style="border-color: var(--border-color);">
+
+      <table class="w-full border-collapse">
+
+        <thead style="background-color: var(--background-color);">
+          <tr>
+            <th class="p-4 text-left">Nombre</th>
+            <th class="p-4 text-left">Costo</th>
+            <th class="p-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (s of shippingTypes(); track s.id) {
+
+            <tr
+              class="border-t"
+              style="border-color: var(--border-color);">
+
+              <td class="p-4">{{ s.name }}</td>
+
+              <td class="p-4">${{ s.cost }}</td>
+
+              <td class="p-4 text-right">
+                <button
+                  mat-icon-button
+                  (click)="openEditDialog(s)"
+                  style="color: var(--brand-color);">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="onDelete(s)"
+                  style="color: #e11d48;">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>
