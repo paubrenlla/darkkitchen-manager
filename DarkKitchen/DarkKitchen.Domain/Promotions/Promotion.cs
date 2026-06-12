@@ -18,6 +18,7 @@ public class Promotion
         ValidateName(name);
         ValidateDiscountPercentage(discountPercentage);
         ValidateDates(startDate, endDate);
+        ValidateProducts(products);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -95,5 +96,13 @@ public class Promotion
         }
 
         return clone;
+    }
+
+    private static void ValidateProducts(List<Product> products)
+    {
+        if(products == null || products.Count == 0)
+        {
+            throw new ArgumentException("A promotion must contain at least one product.");
+        }
     }
 }
