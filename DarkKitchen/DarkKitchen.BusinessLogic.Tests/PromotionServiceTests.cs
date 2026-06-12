@@ -165,11 +165,9 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void CreatePromotion_NoProducts_CreatesPromotionSuccessfully()
+    public void CreatePromotion_NoProducts_ThrowsArgumentException()
     {
         SetupProductGetAll();
-        SetupPromotionAdd();
-        SetupPublishCreated();
 
         var request = new PromotionCreateRequest
         {
@@ -180,13 +178,9 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        var result = _promotionService.CreatePromotion(request, "admin@test.com");
-
-        Assert.AreEqual("Promo Sin Productos", result.Name);
-        Assert.AreEqual(0, result.Products.Count);
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.CreatePromotion(request, "admin@test.com"));
         _mockProductRepository.VerifyAll();
-        _mockPromotionRepository.VerifyAll();
-        _mockPublisher.VerifyAll();
     }
 
     [TestMethod]
@@ -374,12 +368,10 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void UpdatePromotion_RemovingProduct_DesassociatesItCorrectly()
+    public void UpdatePromotion_RemovingProduct_ThrowsArgumentException()
     {
         SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
         SetupProductGetAll();
-        SetupPromotionUpdate();
-        SetupPublishModified();
 
         var request = new PromotionCreateRequest
         {
@@ -390,12 +382,10 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        var result = _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com");
-
-        Assert.AreEqual(0, result.Products.Count);
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com"));
         _mockPromotionRepository.VerifyAll();
         _mockProductRepository.VerifyAll();
-        _mockPublisher.VerifyAll();
     }
 
     [TestMethod]
@@ -499,7 +489,12 @@ public class PromotionServiceTests
     public void GetPromotions_DateWithoutTime_ShouldAdjustToEndOfDay()
     {
         var date = new DateTime(2024, 5, 15);
-        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59), []);
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
+        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59),
+            [product]);
         SetupPromotionGetAll([promo]);
 
         var result = _promotionService.GetPromotions(date, null, null);
