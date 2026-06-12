@@ -48,6 +48,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'my-orders',
+        canActivate: [roleGuard(['Cliente'])],
+        loadComponent: () =>
+          import('./features/orders/components/my-orders/my-orders.component').then(
+            (m) => m.MyOrdersComponent,
+          ),
+      },
+      {
+        path: 'catalog',
+        canActivate: [roleGuard(['Cliente'])],
+        loadComponent: () =>
+          import('./features/catalog/components/client-catalog/catalog.component').then(
+            (m) => m.CatalogComponent,
+          ),
+      },
+      {
         path: 'audit-logs',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
@@ -59,17 +75,19 @@ export const routes: Routes = [
         path: 'product-importer',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
-          import('./features/product-importer/components/product-importer/product-importer.component')
-            .then(m => m.ProductImporterComponent)
+          import('./features/product-importer/components/product-importer/product-importer.component').then(
+            (m) => m.ProductImporterComponent,
+          ),
       },
       {
         path: 'reports',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
-          import('./features/reports/components/reports-dashboard/reports-dashboard.component')
-            .then(m => m.ReportsDashboardComponent)
-      }
-    ]
+          import('./features/reports/components/reports-dashboard/reports-dashboard.component').then(
+            (m) => m.ReportsDashboardComponent,
+          ),
+      },
+    ],
   },
   {
     path: '',
