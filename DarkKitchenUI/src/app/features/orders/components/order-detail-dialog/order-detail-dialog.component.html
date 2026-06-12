@@ -1,0 +1,100 @@
+<div class="w-[580px]">
+  <h2 mat-dialog-title class="text-lg font-bold text-slate-800 px-6 pt-6 pb-0">
+    Detalle del pedido
+  </h2>
+
+  <mat-dialog-content class="!px-6 !pt-4 !pb-2 max-h-[70vh] overflow-y-auto">
+    @if (isLoading()) {
+      <div class="flex justify-center py-10">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+        {{ errorMessage() }}
+      </div>
+    } @else if (order()) {
+      <div class="flex flex-col gap-5">
+
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-slate-800">Pedido #{{ order()!.orderNumber }}</h3>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                [class]="getStatusClass(order()!.status)">
+            {{ order()!.status }}
+          </span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-slate-400 uppercase">Fecha</span>
+            <span class="text-slate-700">{{ order()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-slate-400 uppercase">Tipo de envío</span>
+            <span class="text-slate-700">{{ order()!.deliveryType }}</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1 text-sm">
+          <span class="text-xs font-semibold text-slate-400 uppercase mb-1">Dirección</span>
+          <span class="text-slate-700">
+            {{ order()!.address.street }} {{ order()!.address.number }}
+            @if (order()!.address.apartment) {
+              , Apto {{ order()!.address.apartment }}
+            }
+          </span>
+          <span class="text-slate-500">{{ order()!.address.city }}, {{ order()!.address.country }}</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Productos</span>
+          @for (item of order()!.items; track item.productId) {
+            <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-sm">
+              <div class="flex flex-col">
+                <span class="font-medium text-slate-800">
+                  {{ item.productName ?? ('Producto ' + item.productId.substring(0, 8)) }}
+                </span>
+                <span class="text-xs text-slate-400">
+                  x{{ item.quantity }} · ${{ item.price }} c/u
+                  @if (item.appliedPromotion) {
+                    · <span class="text-emerald-600 font-medium">{{ item.appliedPromotion }}</span>
+                  }
+                </span>
+              </div>
+              <span class="font-semibold text-slate-700">${{ item.itemTotal }}</span>
+            </div>
+          }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="flex flex-col gap-1 text-sm items-end">
+          <div class="flex justify-between w-48">
+            <span class="text-slate-500">Subtotal</span>
+            <span class="text-slate-700">${{ order()!.subtotal }}</span>
+          </div>
+          <div class="flex justify-between w-48">
+            <span class="text-slate-500">IVA (22%)</span>
+            <span class="text-slate-700">${{ order()!.tax }}</span>
+          </div>
+          <div class="flex justify-between w-48">
+            <span class="text-slate-500">Envío</span>
+            <span class="text-slate-700">${{ order()!.shippingCost }}</span>
+          </div>
+          <div class="flex justify-between w-48 font-bold text-base mt-1 pt-2 border-t border-slate-200">
+            <span class="text-slate-800">Total</span>
+            <span class="text-slate-800">${{ order()!.total }}</span>
+          </div>
+        </div>
+
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="!px-6 !pb-5 !pt-4">
+    <button mat-button (click)="close()" class="text-slate-500">Cerrar</button>
+  </mat-dialog-actions>
+</div>
