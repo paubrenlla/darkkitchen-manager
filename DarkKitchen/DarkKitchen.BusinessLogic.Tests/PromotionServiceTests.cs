@@ -165,31 +165,6 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void CreatePromotion_NoProducts_CreatesPromotionSuccessfully()
-    {
-        SetupProductGetAll();
-        SetupPromotionAdd();
-        SetupPublishCreated();
-
-        var request = new PromotionCreateRequest
-        {
-            Name = "Promo Sin Productos",
-            DiscountPercentage = 10,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            ProductCodes = []
-        };
-
-        var result = _promotionService.CreatePromotion(request, "admin@test.com");
-
-        Assert.AreEqual("Promo Sin Productos", result.Name);
-        Assert.AreEqual(0, result.Products.Count);
-        _mockProductRepository.VerifyAll();
-        _mockPromotionRepository.VerifyAll();
-        _mockPublisher.VerifyAll();
-    }
-
-    [TestMethod]
     public void GetPromotions_NoFilters_ReturnsAllPromotions()
     {
         SetupPromotionGetAll();
@@ -374,81 +349,100 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void UpdatePromotion_RemovingProduct_DesassociatesItCorrectly()
-    {
-        SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
-        SetupProductGetAll();
-        SetupPromotionUpdate();
-        SetupPublishModified();
-
-        var request = new PromotionCreateRequest
-        {
-            Name = "Black Friday",
-            DiscountPercentage = 10,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            ProductCodes = []
-        };
-
-        var result = _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com");
-
-        Assert.AreEqual(0, result.Products.Count);
-        _mockPromotionRepository.VerifyAll();
-        _mockProductRepository.VerifyAll();
-        _mockPublisher.VerifyAll();
-    }
-
-    [TestMethod]
-    public void GetPromotions_NoDateProvided_ReturnsOnlyCurrentlyActivePromotions()
+    public void GetPromotions_NoDateProvided_ReturnsAllPromotions()
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
+        var product = new Product(
+            "BURG01",
+            "Hamburguesa Clasica",
+            "Hamburguesa clasica con queso cheddar",
+            line,
+            category,
+            150m,
+            [new ProductImage("burg01.jpg", 110000)]);
 
-        var activePromo = new Promotion("Vigente", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
-        var expiredPromo = new Promotion("Vencida", 20, new DateTime(2020, 1, 1), new DateTime(2020, 12, 31), [product]);
+        var activePromo = new Promotion(
+            "Vigente",
+            10,
+            DateTime.Now.AddDays(-1),
+            DateTime.Now.AddDays(10),
+            [product]);
+
+        var expiredPromo = new Promotion(
+            "Vencida",
+            20,
+            new DateTime(2020, 1, 1),
+            new DateTime(2020, 12, 31),
+            [product]);
+
         SetupPromotionGetAll([activePromo, expiredPromo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("Vigente", result[0].Name);
+        Assert.AreEqual(2, result.Count);
         _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
-    public void GetPromotions_NoDateProvided_ExcludesFuturePromotions()
+    public void GetPromotions_NoDateProvided_IncludesFuturePromotions()
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
+        var product = new Product(
+            "BURG01",
+            "Hamburguesa Clasica",
+            "Hamburguesa clasica con queso cheddar",
+            line,
+            category,
+            150m,
+            [new ProductImage("burg01.jpg", 110000)]);
 
-        var futurePromo = new Promotion("Futura", 15, DateTime.Now.AddDays(5), DateTime.Now.AddDays(15), [product]);
+        var futurePromo = new Promotion(
+            "Futura",
+            15,
+            DateTime.Now.AddDays(5),
+            DateTime.Now.AddDays(15),
+            [product]);
+
         SetupPromotionGetAll([futurePromo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
-        Assert.AreEqual(0, result.Count);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Futura", result[0].Name);
         _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
-    public void GetPromotions_InactivePromotion_IsExcluded()
+    public void GetPromotions_NoDateProvided_IncludesInactivePromotions()
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
+        var product = new Product(
+            "BURG01",
+            "Hamburguesa Clasica",
+            "Hamburguesa clasica con queso cheddar",
+            line,
+            category,
+            150m,
+            [new ProductImage("burg01.jpg", 110000)]);
 
-        var promo = new Promotion("Promo Inactiva", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
+        var promo = new Promotion(
+            "Promo Inactiva",
+            10,
+            DateTime.Now.AddDays(-1),
+            DateTime.Now.AddDays(10),
+            [product]);
+
         promo.Deactivate();
+
         SetupPromotionGetAll([promo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
-        Assert.AreEqual(0, result.Count);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Promo Inactiva", result[0].Name);
         _mockPromotionRepository.VerifyAll();
     }
 
@@ -499,11 +493,64 @@ public class PromotionServiceTests
     public void GetPromotions_DateWithoutTime_ShouldAdjustToEndOfDay()
     {
         var date = new DateTime(2024, 5, 15);
-        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59), []);
+        var line = new ProductLine("Burgers");
+        var category = new ProductCategory("Food");
+        var product = new Product("BURG01", "Hamburguesa", "This is a valid product description with at least 20 characters", line, category, 100m, [new ProductImage("img.jpg", 1000)]);
+        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59), [product]);
         SetupPromotionGetAll([promo]);
 
         var result = _promotionService.GetPromotions(date, null, null);
 
         Assert.AreEqual(1, result.Count());
+    }
+
+    [TestMethod]
+    public void CreatePromotion_NoProducts_ThrowsArgumentException()
+    {
+        SetupProductGetAll();
+
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.CreatePromotion(
+                request,
+                "admin@test.com"));
+
+        _mockProductRepository.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_NoProducts_ThrowsArgumentException()
+    {
+        SetupPromotionGetById(
+            _testPromotions[0].Id,
+            _testPromotions[0]);
+
+        SetupProductGetAll();
+
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo",
+            DiscountPercentage = 10,
+            StartDate = new DateTime(2025, 1, 1),
+            EndDate = new DateTime(2025, 12, 31),
+            ProductCodes = []
+        };
+
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.UpdatePromotion(
+                _testPromotions[0].Id,
+                request,
+                "admin@test.com"));
+
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
     }
 }
