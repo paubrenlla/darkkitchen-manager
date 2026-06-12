@@ -58,7 +58,8 @@ export class DashboardComponent {
     if (role === 'Cliente') {
       items.push(
         {label: 'Ver Catálogo', icon: 'restaurant_menu', route: 'catalog'},
-        {label: 'Mis Pedidos', icon: 'receipt_long', route: 'my-orders'}
+        {label: 'Mis Pedidos', icon: 'receipt_long', route: 'my-orders'},
+        { label: 'Promociones', icon: 'auto_awesome', route: 'promotions-catalog' }
       );
     }
 

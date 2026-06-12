@@ -1,0 +1,153 @@
+<div>
+
+  <div class="mb-6">
+    <h1
+      class="text-2xl font-semibold"
+      style="color: var(--brand-color);">
+      Promociones vigentes
+    </h1>
+    <p class="text-sm text-slate-400 mt-1">Descuentos disponibles en este momento</p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+
+    <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+      <mat-label>Fecha vigencia</mat-label>
+      <input
+        matInput
+        type="date"
+        [ngModel]="filterDate()"
+        (ngModelChange)="filterDate.set($event)"
+        (keyup.enter)="onSearch()">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+      <mat-label>Línea</mat-label>
+      <input
+        matInput
+        type="text"
+        [ngModel]="filterLine()"
+        (ngModelChange)="filterLine.set($event)"
+        placeholder="Ej: Alimentos"
+        (keyup.enter)="onSearch()">
+      <mat-icon matPrefix class="text-slate-400 mr-2">horizontal_rule</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-72" subscriptSizing="dynamic">
+      <mat-label>Código de producto</mat-label>
+      <input
+        matInput
+        type="text"
+        [ngModel]="filterProductCode()"
+        (ngModelChange)="filterProductCode.set($event)"
+        placeholder="Ej: BURG01"
+        (keyup.enter)="onSearch()">
+      <mat-icon matPrefix class="text-slate-400 mr-2">qr_code</mat-icon>
+    </mat-form-field>
+
+    <div class="flex gap-2 w-full sm:w-auto sm:ml-auto items-center">
+      <button
+        mat-flat-button
+        (click)="onSearch()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+        [disabled]="isLoading()"
+        style="background-color: var(--brand-color); color: white;">
+        <mat-icon>filter_list</mat-icon>
+        Filtrar
+      </button>
+      <button
+        mat-stroked-button
+        (click)="onClear()"
+        class="!rounded-xl !py-5 !px-6 h-[48px]"
+        [disabled]="isLoading()"
+        style="color: var(--brand-color); border-color: var(--brand-color);">
+        <mat-icon>clear_all</mat-icon>
+        Limpiar
+      </button>
+    </div>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="flex justify-center py-8">
+      <mat-spinner />
+    </div>
+
+  } @else if (errorMessage()) {
+
+    <div class="rounded-lg border p-4 bg-rose-50 border-rose-100 text-rose-600 text-sm">
+      {{ errorMessage() }}
+    </div>
+
+  } @else if (promotions().length === 0) {
+
+    <div class="rounded-2xl border border-slate-100 p-12 text-center bg-white">
+      <mat-icon class="text-4xl text-slate-300 mb-3">local_offer</mat-icon>
+      <p class="text-slate-400 text-sm">No hay promociones vigentes en este momento.</p>
+    </div>
+
+  } @else {
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      @for (promotion of promotions(); track promotion.id) {
+
+        <div class="group relative rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden
+                    transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-slate-200">
+
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+          <div class="p-5 flex flex-col gap-4">
+
+            <div class="flex items-start justify-between gap-2">
+              <h2 class="font-semibold text-slate-800 text-base leading-snug">
+                {{ promotion.name }}
+              </h2>
+              <span
+                class="shrink-0 text-sm font-bold px-3 py-1 rounded-full"
+                style="background-color: var(--background-color); color: var(--brand-color);">
+                {{ promotion.discountPercentage }}% OFF
+              </span>
+            </div>
+
+            <div
+              class="flex items-center gap-2 text-xs rounded-xl px-3 py-2"
+              style="background-color: var(--background-color); color: var(--brand-color);">
+              <mat-icon class="!text-base flex-shrink-0" style="line-height: 1;">calendar_today</mat-icon>
+              <span>
+                {{ promotion.startDate | date:'dd/MM/yyyy' }}
+                &nbsp;→&nbsp;
+                {{ promotion.endDate | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+
+            <div>
+              <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">
+                Productos incluidos
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                @for (code of promotion.products; track code) {
+                  <span
+                    class="text-xs px-2.5 py-1 rounded-full font-mono border"
+                    style="border-color: var(--border-color); color: var(--brand-color);">
+                    {{ code }}
+                  </span>
+                }
+                @if (promotion.products.length === 0) {
+                  <span class="text-xs text-slate-400 italic">Sin productos asociados</span>
+                }
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>

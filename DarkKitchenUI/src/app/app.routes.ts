@@ -111,6 +111,14 @@ export const routes: Routes = [
             (m) => m.ShippingTypeListComponent,
           ),
       },
+      {
+        path: 'promotions-catalog',
+        canActivate: [roleGuard(['Cliente'])],
+        loadComponent: () =>
+          import('./features/promotions/components/promotion-catalog/promotion-catalog.component').then(
+            (m) => m.PromotionCatalogComponent,
+          ),
+      },
     ],
   },
   {
