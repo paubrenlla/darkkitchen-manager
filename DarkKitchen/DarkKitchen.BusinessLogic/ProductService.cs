@@ -68,9 +68,15 @@ public class ProductService(
         Product oldProduct = product.Clone();
         var images = BuildImages(request.Images);
 
-        product.UpdateDetails(request.Name, request.Description, new ProductLine(request.Line), new ProductCategory(request.Category), request.Price, images);
-        HandleActivationChange(request.IsActive, product);
+        product.UpdateDetails(
+            request.Name,
+            request.Description,
+            GetOrCreateLine(request.Line),
+            GetOrCreateCategory(request.Category),
+            request.Price,
+            images);
 
+        HandleActivationChange(request.IsActive, product);
         _productRepository.Update(id, product);
         PublishModifiedEvent(id, oldProduct, product, currentUser);
         PublishActivationEvents(id, oldProduct, product, currentUser);

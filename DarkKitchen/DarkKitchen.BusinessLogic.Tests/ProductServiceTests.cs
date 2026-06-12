@@ -205,6 +205,8 @@ public class ProductServiceTests
     {
         var productId = _testProducts[0].Id;
         SetupRepositoryGetById(productId, _testProducts[0]);
+        SetupRepositoryGetAllLines();
+        SetupRepositoryGetAllCategories();
         SetupRepositoryUpdate();
         SetupPublishModified();
 
@@ -253,6 +255,8 @@ public class ProductServiceTests
     {
         var productId = _testProducts[0].Id;
         SetupRepositoryGetById(productId, _testProducts[0]);
+        SetupRepositoryGetAllLines();
+        SetupRepositoryGetAllCategories();
         SetupRepositoryUpdate();
         SetupPublishModified();
         SetupPublishDeactivated();
@@ -284,6 +288,8 @@ public class ProductServiceTests
         var productId = _testProducts[0].Id;
         _testProducts[0].Deactivate();
         SetupRepositoryGetById(productId, _testProducts[0]);
+        SetupRepositoryGetAllLines();
+        SetupRepositoryGetAllCategories();
         SetupRepositoryUpdate();
         SetupPublishModified();
         SetupPublishActivated();
@@ -315,6 +321,8 @@ public class ProductServiceTests
         var productId = _testProducts[0].Id;
         var expectedOldPrice = _testProducts[0].Price;
         SetupRepositoryGetById(productId, _testProducts[0]);
+        SetupRepositoryGetAllLines();
+        SetupRepositoryGetAllCategories();
         SetupRepositoryUpdate();
         SetupPublishModified();
 
