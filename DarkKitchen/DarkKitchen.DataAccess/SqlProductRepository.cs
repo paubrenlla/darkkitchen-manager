@@ -43,10 +43,23 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
                            .FirstOrDefault(p => p.Id == id)
                        ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
-        var line = _context.ProductLines.FirstOrDefault(l => l.Name == product.Line.Name)
-                   ?? product.Line;
-        var category = _context.ProductCategories.FirstOrDefault(c => c.Name == product.Category.Name)
-                       ?? product.Category;
+        var line = _context.ProductLines
+            .FirstOrDefault(l => l.Name == product.Line.Name);
+
+        if(line == null)
+        {
+            line = new ProductLine(product.Line.Name);
+            _context.ProductLines.Add(line);
+        }
+
+        var category = _context.ProductCategories
+            .FirstOrDefault(c => c.Name == product.Category.Name);
+
+        if(category == null)
+        {
+            category = new ProductCategory(product.Category.Name);
+            _context.ProductCategories.Add(category);
+        }
 
         var newImages = product.Images
             .Select(i => new ProductImage(i.Url, i.SizeInBytes))
