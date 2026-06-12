@@ -175,8 +175,7 @@
           }
         </div>
 
-        <div class="pt-4 flex gap-3">
-
+        <div class="pt-4 flex gap-3 justify-end">
           <button
             type="button"
             mat-stroked-button
@@ -188,16 +187,15 @@
             type="submit"
             mat-raised-button
             style="
-              background-color: var(--brand-color);
-              color: white;
-            ">
+      background-color: var(--brand-color);
+      color: white;
+    ">
             @if (isEditMode) {
               Guardar cambios
             } @else {
               Crear promoción
             }
           </button>
-
         </div>
 
       </form>
