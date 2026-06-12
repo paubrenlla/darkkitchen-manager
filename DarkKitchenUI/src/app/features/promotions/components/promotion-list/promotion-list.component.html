@@ -1,7 +1,6 @@
-<div class="p-6">
+<div class="p-3">
 
   <div class="mb-6 flex items-center justify-between">
-
     <h1
       class="text-2xl font-semibold"
       style="color: var(--brand-color);">
@@ -9,12 +8,71 @@
     </h1>
 
     <button
-      mat-raised-button
+      mat-flat-button
       (click)="onCreate()"
       class="transition-opacity duration-200 hover:opacity-90"
       style="background-color: var(--brand-color); color: #ffffff;">
+      <mat-icon>add</mat-icon>
       Nueva promoción
     </button>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl border">
+
+    <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+      <mat-label>Fecha vigencia</mat-label>
+      <input
+        matInput
+        type="date"
+        [ngModel]="filterDate()"
+        (ngModelChange)="filterDate.set($event)"
+        (keyup.enter)="onSearch()">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+      <mat-label>Línea</mat-label>
+      <input
+        matInput
+        type="text"
+        [ngModel]="filterLine()"
+        (ngModelChange)="filterLine.set($event)"
+        placeholder="Ej: Alimentos"
+        (keyup.enter)="onSearch()">
+      <mat-icon matPrefix class="text-slate-400 mr-2">horizontal_rule</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-72" subscriptSizing="dynamic">
+      <mat-label>Código de producto</mat-label>
+      <input
+        matInput
+        type="text"
+        [ngModel]="filterProductCode()"
+        (ngModelChange)="filterProductCode.set($event)"
+        placeholder="Ej: BURG01"
+        (keyup.enter)="onSearch()">
+      <mat-icon matPrefix class="text-slate-400 mr-2">qr_code</mat-icon>
+    </mat-form-field>
+
+    <div class="flex gap-2 w-full sm:w-auto sm:ml-auto items-center">
+      <button
+        mat-flat-button
+        (click)="onSearch()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+        [disabled]="isLoading()"
+        style="background-color: var(--brand-color); color: white;">
+        <mat-icon>filter_list</mat-icon>
+        Filtrar
+      </button>
+      <button
+        mat-stroked-button
+        (click)="onClear()"
+        class="!rounded-xl !py-5 !px-6 h-[48px]"
+        [disabled]="isLoading()"
+        style="color: var(--brand-color); border-color: var(--brand-color);">
+        <mat-icon>clear_all</mat-icon>
+        Limpiar
+      </button>
+    </div>
 
   </div>
 
@@ -28,10 +86,7 @@
 
     <div
       class="rounded-lg border p-4"
-      style="
-        border-color: var(--border-color);
-        color: var(--text-color);
-      ">
+      style="border-color: var(--border-color); color: var(--text-color);">
       {{ errorMessage() }}
     </div>
 
@@ -39,24 +94,18 @@
 
     <div
       class="rounded-lg border p-6 text-center"
-      style="
-        border-color: var(--border-color);
-        color: var(--text-color);
-      ">
+      style="border-color: var(--border-color); color: var(--text-color);">
       No hay promociones registradas.
     </div>
 
   } @else {
 
-    <div
-      class="overflow-hidden rounded-lg border"
-      style="border-color: var(--border-color);">
+    <div class="overflow-hidden rounded-lg border w-full"
+         style="border-color: var(--border-color);">
 
       <table class="w-full border-collapse">
 
-        <thead
-          style="background-color: var(--background-color);">
-
+        <thead style="background-color: var(--background-color);">
         <tr>
           <th class="p-4 text-left">Nombre</th>
           <th class="p-4 text-left">Descuento</th>
@@ -65,50 +114,28 @@
           <th class="p-4 text-left">Productos</th>
           <th class="p-4 text-left">Acciones</th>
         </tr>
-
         </thead>
 
         <tbody>
-
           @for (promotion of promotionList; track promotion.id) {
-
             <tr
               class="border-t"
               style="border-color: var(--border-color);">
-
-              <td class="p-4">
-                {{ promotion.name }}
-              </td>
-
-              <td class="p-4">
-                {{ promotion.discountPercentage }}%
-              </td>
-
-              <td class="p-4">
-                {{ promotion.startDate | date:'dd/MM/yyyy' }}
-              </td>
-
-              <td class="p-4">
-                {{ promotion.endDate | date:'dd/MM/yyyy' }}
-              </td>
-
-              <td class="p-4">
-                {{ promotion.products.length }}
-              </td>
-
+              <td class="p-4">{{ promotion.name }}</td>
+              <td class="p-4">{{ promotion.discountPercentage }}%</td>
+              <td class="p-4">{{ promotion.startDate | date:'dd/MM/yyyy' }}</td>
+              <td class="p-4">{{ promotion.endDate | date:'dd/MM/yyyy' }}</td>
+              <td class="p-4">{{ promotion.products.length }}</td>
               <td class="p-4">
                 <button
-                  mat-button
+                  mat-icon-button
                   (click)="onEdit(promotion)"
                   style="color: var(--brand-color);">
-                  Editar
+                  <mat-icon>edit</mat-icon>
                 </button>
               </td>
-
             </tr>
-
           }
-
         </tbody>
 
       </table>

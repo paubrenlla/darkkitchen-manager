@@ -1,21 +1,28 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 
 import { PromotionService } from '../../services/promotion.service';
 import { PromotionResponse } from '../../models/promotion.models';
 import { PromotionFormComponent } from '../promotion-form/promotion-form.component';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
 @Component({
   selector: 'app-promotion-list',
   standalone: true,
   imports: [
+    FormsModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
     DatePipe,
   ],
   templateUrl: './promotion-list.component.html',
@@ -29,6 +36,10 @@ export class PromotionListComponent implements OnInit {
 
   errorMessage = signal<string | null>(null);
 
+  filterDate = signal('');
+  filterLine = signal('');
+  filterProductCode = signal('');
+
   get promotionList(): PromotionResponse[] {
     return this.promotions();
   }
@@ -37,13 +48,29 @@ export class PromotionListComponent implements OnInit {
     this.loadPromotions();
   }
 
+  onSearch(): void {
+    this.loadPromotions();
+  }
+
+  onClear(): void {
+    this.filterDate.set('');
+    this.filterLine.set('');
+    this.filterProductCode.set('');
+    this.loadPromotions();
+  }
+
   private loadPromotions(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.promotionService.getAll().subscribe({
+    const date = this.filterDate().trim() || undefined;
+    const line = this.filterLine().trim() || undefined;
+    const productCode = this.filterProductCode().trim() || undefined;
+
+    this.promotionService.getAll(date, line, productCode).subscribe({
       next: (data) => {
-        this.promotionService.promotions.set(data);
+        const safe = (data ?? []).map(p => ({ ...p, products: p.products ?? [] }));
+        this.promotionService.promotions.set(safe);
         this.isLoading.set(false);
       },
       error: () => {
