@@ -1,6 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -14,7 +13,6 @@ import { ShippingTypeFormComponent } from '../shipping-type-form/shipping-type-f
   selector: 'app-shipping-type-list',
   standalone: true,
   imports: [
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -29,8 +27,6 @@ export class ShippingTypeListComponent implements OnInit {
   shippingTypes = this.shippingTypeService.shippingTypes;
   isLoading = this.shippingTypeService.isLoading;
   errorMessage = signal<string | null>(null);
-
-  displayedColumns = ['name', 'cost', 'actions'];
 
   ngOnInit(): void {
     this.loadShippingTypes();

@@ -1,67 +1,104 @@
-<div class="p-2">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h2 class="text-xl font-bold text-slate-800">Tipos de Envío</h2>
-      <p class="text-sm text-slate-400 mt-0.5">Gestión de los tipos de envío disponibles</p>
-    </div>
-    <button mat-flat-button color="primary" (click)="openCreateDialog()" class="gap-2">
-      <mat-icon>add</mat-icon>
-      Nuevo tipo de envío
+<div class="p-6">
+
+  <div class="mb-6 flex items-center justify-between">
+
+    <h1
+      class="text-2xl font-semibold"
+      style="color: var(--brand-color);">
+      Tipos de Envío
+    </h1>
+
+    <button
+      mat-raised-button
+      (click)="openCreateDialog()"
+      class="transition-opacity duration-200 hover:opacity-90"
+      style="background-color: var(--brand-color); color: #ffffff;">
+      + Nuevo tipo de envío
     </button>
+
   </div>
 
   @if (isLoading()) {
-    <div class="flex justify-center items-center py-20">
-      <mat-spinner diameter="40"></mat-spinner>
+
+    <div class="flex justify-center py-8">
+      <mat-spinner />
     </div>
+
   } @else if (errorMessage()) {
-    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+
+    <div
+      class="rounded-lg border p-4"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
       {{ errorMessage() }}
     </div>
+
+  } @else if (shippingTypes().length === 0) {
+
+    <div
+      class="rounded-lg border p-6 text-center"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      No hay tipos de envío registrados.
+    </div>
+
   } @else {
-    <div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
-      <table mat-table [dataSource]="shippingTypes()" class="w-full">
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">
-            Nombre
-          </th>
-          <td mat-cell *matCellDef="let s" class="text-sm text-slate-800 font-medium">
-            {{ s.name }}
-          </td>
-        </ng-container>
 
-        <ng-container matColumnDef="cost">
-          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">
-            Costo
-          </th>
-          <td mat-cell *matCellDef="let s" class="text-sm text-slate-700">
-            ${{ s.cost }}
-          </td>
-        </ng-container>
+    <div
+      class="overflow-hidden rounded-lg border"
+      style="border-color: var(--border-color);">
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase text-right">
-            Acciones
-          </th>
-          <td mat-cell *matCellDef="let s" class="text-right">
-            <button mat-icon-button (click)="openEditDialog(s)" class="text-slate-500">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button (click)="onDelete(s)" class="text-rose-400">
-              <mat-icon>delete_outline</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+      <table class="w-full border-collapse">
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50 transition-colors"></tr>
+        <thead style="background-color: var(--background-color);">
+          <tr>
+            <th class="p-4 text-left">Nombre</th>
+            <th class="p-4 text-left">Costo</th>
+            <th class="p-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (s of shippingTypes(); track s.id) {
+
+            <tr
+              class="border-t"
+              style="border-color: var(--border-color);">
+
+              <td class="p-4">{{ s.name }}</td>
+
+              <td class="p-4">${{ s.cost }}</td>
+
+              <td class="p-4 text-right">
+                <button
+                  mat-icon-button
+                  (click)="openEditDialog(s)"
+                  style="color: var(--brand-color);">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="onDelete(s)"
+                  style="color: #e11d48;">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
       </table>
 
-      @if (shippingTypes().length === 0) {
-        <div class="text-center text-slate-400 text-sm py-12">
-          No hay tipos de envío registrados.
-        </div>
-      }
     </div>
+
   }
+
 </div>
