@@ -141,17 +141,28 @@ public class PromotionTests
     }
 
     [TestMethod]
-    public void UpdatePromotion_WithEmptyProducts_ShouldDesassociateAll()
+    [ExpectedException(typeof(ArgumentException))]
+    public void UpdatePromotion_WithNoProducts_ShouldThrowException()
     {
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
-        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
-            category, 150m, [new ProductImage("img.jpg", 100000)]);
-        var promotion = new Promotion("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), [product]);
+        var products = new List<Product>
+        {
+            new("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line, category, 150m, [new ProductImage("img.jpg", 100000)])
+        };
+        var promotion = new Promotion(
+            "Promo",
+            10,
+            DateTime.Today,
+            DateTime.Today.AddDays(5),
+            products);
 
-        promotion.Update("Promo", 10, DateTime.Today, DateTime.Today.AddDays(5), []);
-
-        Assert.AreEqual(0, promotion.Products.Count);
+        promotion.Update(
+            "Promo",
+            10,
+            DateTime.Today,
+            DateTime.Today.AddDays(5),
+            []);
     }
 
     [TestMethod]
