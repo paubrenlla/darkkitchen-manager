@@ -1,0 +1,131 @@
+<div class="p-2 flex flex-col gap-6">
+
+  <div>
+    <h2 class="text-xl font-bold text-slate-800">Control de cocina</h2>
+    <p class="text-sm text-slate-400 mt-0.5">Consultá y gestioná los pedidos del día</p>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-wrap gap-3 items-end">
+    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+      <mat-label>Desde *</mat-label>
+      <input matInput type="date" [(ngModel)]="fromDate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+      <mat-label>Hasta *</mat-label>
+      <input matInput type="date" [(ngModel)]="toDate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="statusFilter">
+        <mat-option value="">Todos</mat-option>
+        @for (s of statusOptions; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+      <mat-label>Dirección</mat-label>
+      <input matInput [(ngModel)]="addressFilter" placeholder="Rivera...">
+    </mat-form-field>
+
+    <div class="flex gap-2 pb-0.5">
+      <button mat-flat-button color="primary" (click)="search()">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+      @if (hasSearched()) {
+        <button mat-button (click)="clearFilters()" class="text-slate-500">
+          <mat-icon>clear</mat-icon>
+          Limpiar
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (!hasSearched()) {
+    <div class="text-center py-20 text-slate-400">
+      <mat-icon class="text-5xl mb-3">date_range</mat-icon>
+      <p class="text-sm">Ingresá un rango de fechas para ver los pedidos</p>
+    </div>
+  } @else if (isLoading()) {
+    <div class="flex justify-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+      <table mat-table [dataSource]="orders()" class="w-full">
+
+        <ng-container matColumnDef="orderNumber">
+          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">Pedido #</th>
+          <td mat-cell *matCellDef="let o" class="font-bold text-slate-800">#{{ o.orderNumber }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="client">
+          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">Cliente</th>
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-700">{{ o.clientName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">Fecha</th>
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-500">
+            {{ o.createdAt | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">Estado</th>
+          <td mat-cell *matCellDef="let o">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="getStatusClass(o.status)">
+              {{ o.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="items">
+          <th mat-header-cell *matHeaderCellDef class="text-xs font-semibold text-slate-500 uppercase">Productos</th>
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-500">{{ o.productCount }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let o">
+            <div class="flex gap-1 justify-end">
+              <button mat-icon-button matTooltip="Ver detalle"
+                      (click)="openDetail(o)"
+                      class="text-slate-400 hover:text-indigo-500">
+                <mat-icon class="text-lg">visibility</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Cambiar estado"
+                      (click)="openStatusDialog(o)"
+                      class="text-slate-400 hover:text-amber-500">
+                <mat-icon class="text-lg">sync</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-slate-50"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"></tr>
+      </table>
+
+      @if (orders().length === 0) {
+        <div class="text-center py-14 text-slate-400">
+          <mat-icon class="text-4xl mb-2">soup_kitchen</mat-icon>
+          <p class="text-sm">No hay pedidos en ese rango de fechas</p>
+        </div>
+      }
+    </div>
+  }
+
+</div>
