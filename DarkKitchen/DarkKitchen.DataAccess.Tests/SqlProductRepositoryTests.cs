@@ -208,4 +208,48 @@ public class SqlProductRepositoryTests
         Assert.IsTrue(result.Any(c => c.Name == "Parrilla"));
         Assert.IsTrue(result.Any(c => c.Name == "Categoría 2"));
     }
+
+    [TestMethod]
+    public void Update_WithNewLine_ShouldCreateLineAndPersistProduct()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        _context.ChangeTracker.Clear();
+
+        var newLine = new ProductLine("Linea Completamente Nueva");
+        var newImages = new List<ProductImage>
+        {
+            new("https://example.com/new.jpg", 60000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, newLine, _defaultCategory, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Linea Completamente Nueva", result.Line.Name);
+        Assert.IsTrue(_context.ProductLines.Any(l => l.Name == "Linea Completamente Nueva"));
+    }
+
+    [TestMethod]
+    public void Update_WithNewCategory_ShouldCreateCategoryAndPersistProduct()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        _context.ChangeTracker.Clear();
+
+        var newCategory = new ProductCategory("Categoria Completamente Nueva");
+        var newImages = new List<ProductImage>
+        {
+            new("https://example.com/new.jpg", 60000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, _defaultLine, newCategory, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Categoria Completamente Nueva", result.Category.Name);
+        Assert.IsTrue(_context.ProductCategories.Any(c => c.Name == "Categoria Completamente Nueva"));
+    }
 }
