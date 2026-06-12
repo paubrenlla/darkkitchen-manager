@@ -126,8 +126,8 @@ export class PromotionFormComponent implements OnInit {
       return;
     }
 
-    const startDate = `${this.form.value.startDate}T00:00:00.000Z`;
-    const endDate = `${this.form.value.endDate}T23:59:59.999Z`;
+    const startDate = this.form.value.startDate!;
+    const endDate = this.form.value.endDate!;
 
     if (new Date(startDate) > new Date(endDate)) {
       this.fieldErrors.set({ ...this.fieldErrors(), endDate: 'La fecha de fin debe ser posterior o igual a la fecha de inicio.' });
