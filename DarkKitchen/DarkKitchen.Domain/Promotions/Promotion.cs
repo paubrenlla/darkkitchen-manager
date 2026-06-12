@@ -43,6 +43,7 @@ public class Promotion
         ValidateName(name);
         ValidateDiscountPercentage(discount);
         ValidateDates(start, end);
+        ValidateProducts(products);
 
         Name = name;
         DiscountPercentage = discount;
