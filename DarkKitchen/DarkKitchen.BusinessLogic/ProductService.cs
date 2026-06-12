@@ -61,22 +61,28 @@ public class ProductService(
     }
 
     public Product UpdateProduct(Guid id, ProductUpdateRequest request, string currentUser)
-    {
-        Product product = _productRepository.GetById(id)
-                          ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
+{
+    Product product = _productRepository.GetById(id)
+                      ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
-        Product oldProduct = product.Clone();
-        var images = BuildImages(request.Images);
+    Product oldProduct = product.Clone();
+    var images = BuildImages(request.Images);
 
-        product.UpdateDetails(request.Name, request.Description, new ProductLine(request.Line), new ProductCategory(request.Category), request.Price, images);
-        HandleActivationChange(request.IsActive, product);
+    product.UpdateDetails(
+        request.Name,
+        request.Description,
+        GetOrCreateLine(request.Line),
+        GetOrCreateCategory(request.Category),
+        request.Price,
+        images);
 
-        _productRepository.Update(id, product);
-        PublishModifiedEvent(id, oldProduct, product, currentUser);
-        PublishActivationEvents(id, oldProduct, product, currentUser);
+    HandleActivationChange(request.IsActive, product);
+    _productRepository.Update(id, product);
+    PublishModifiedEvent(id, oldProduct, product, currentUser);
+    PublishActivationEvents(id, oldProduct, product, currentUser);
 
-        return product;
-    }
+    return product;
+}
 
     private static List<ProductImage> BuildImages(IEnumerable<ProductImageDto> imageDtos)
     {
