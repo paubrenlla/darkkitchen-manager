@@ -1,0 +1,34 @@
+<div class="w-[360px]">
+  <h2 mat-dialog-title class="text-lg font-bold text-slate-800 px-6 pt-6 pb-0">
+    Cambiar estado
+  </h2>
+
+  <mat-dialog-content class="!px-6 !pt-4 !pb-2">
+    @if (errorMessage()) {
+      <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium mb-4">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <mat-form-field appearance="outline" class="w-full minimal-input" subscriptSizing="dynamic">
+      <mat-label>Nuevo estado</mat-label>
+      <mat-select [(ngModel)]="selectedStatus">
+        @for (option of statusOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="!px-6 !pb-5 !pt-4 gap-2">
+    <button mat-button (click)="cancel()" class="text-slate-500">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="confirm()" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <mat-spinner diameter="16" class="mr-2"></mat-spinner>
+        Guardando...
+      } @else {
+        Confirmar
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

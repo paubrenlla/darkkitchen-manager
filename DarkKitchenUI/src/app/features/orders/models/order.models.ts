@@ -8,9 +8,10 @@ export interface OrderAddressResponse {
 
 export interface OrderItemDetailResponse {
   productId: string;
-  productName: string;
+  productName: string | null;
   quantity: number;
   price: number;
+  appliedPromotion: string | null;
   itemTotal: number;
 }
 
@@ -31,12 +32,13 @@ export interface OrderDetailResponse {
   clientId: string;
   createdAt: string;
   status: string;
-  subtotal: number;
-  discount: number;
-  total: number;
   deliveryType: string;
   address: OrderAddressResponse;
   items: OrderItemDetailResponse[];
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
+  total: number;
 }
 
 export interface OrderStatusUpdateRequest {
