@@ -3,3 +3,8 @@ export interface ShippingTypeResponse {
   name: string;
   cost: number;
 }
+
+export interface ShippingTypeRequest {
+  name: string;
+  cost: number;
+}
