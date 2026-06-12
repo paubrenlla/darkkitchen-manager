@@ -48,6 +48,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'my-orders',
+        canActivate: [roleGuard(['Cliente'])],
+        loadComponent: () =>
+          import('./features/orders/components/my-orders/my-orders.component').then(
+            (m) => m.MyOrdersComponent,
+          ),
+      },
+      {
+        path: 'catalog',
+        canActivate: [roleGuard(['Cliente'])],
+        loadComponent: () =>
+          import('./features/catalog/components/client-catalog/catalog.component').then(
+            (m) => m.CatalogComponent,
+          ),
+      },
+      {
         path: 'audit-logs',
         canActivate: [roleGuard(['Administrativo'])],
         loadComponent: () =>
