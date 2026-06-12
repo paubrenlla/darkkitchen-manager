@@ -87,6 +87,14 @@ export const routes: Routes = [
             (m) => m.ReportsDashboardComponent,
           ),
       },
+      {
+        path: 'promotions',
+        canActivate: [roleGuard(['Administrativo'])],
+        loadComponent: () =>
+          import('./features/promotions/components/promotion-list/promotion-list.component').then(
+            (m) => m.PromotionListComponent,
+          ),
+      },
     ],
   },
   {

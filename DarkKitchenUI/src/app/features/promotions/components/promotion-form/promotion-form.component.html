@@ -1,0 +1,205 @@
+<div class="max-w-3xl mx-auto">
+
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+
+    <h1
+      class="text-2xl font-bold mb-6"
+      style="color: var(--brand-color);">
+      @if (isEditMode) {
+        Editar Promoción
+      } @else {
+        Nueva Promoción
+      }
+    </h1>
+
+    @if (errorMessage()) {
+      <div class="mb-6 bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2">
+        <mat-icon class="text-rose-500 scale-75">error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="flex justify-center py-10">
+        <mat-spinner />
+      </div>
+    } @else {
+
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="space-y-5">
+
+        <div class="flex flex-col gap-1">
+          <mat-form-field
+            appearance="outline"
+            class="w-full"
+            subscriptSizing="dynamic">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              formControlName="name">
+          </mat-form-field>
+
+          @if (form.get('name')?.touched && form.get('name')?.invalid) {
+            @if (form.get('name')?.hasError('required')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                La promoción debe tener un nombre.
+              </span>
+            }
+            @if (form.get('name')?.hasError('minlength')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                El nombre debe tener al menos 3 caracteres.
+              </span>
+            }
+            @if (form.get('name')?.hasError('maxlength')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                El nombre no puede superar los 50 caracteres.
+              </span>
+            }
+          }
+          @if (fieldErrors()['name']) {
+            <span class="text-[10px] text-rose-500 font-medium px-1">
+              {{ fieldErrors()['name'] }}
+            </span>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <mat-form-field
+            appearance="outline"
+            class="w-full"
+            subscriptSizing="dynamic">
+            <mat-label>Descuento (%)</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="discountPercentage">
+          </mat-form-field>
+
+          @if (form.get('discountPercentage')?.touched && form.get('discountPercentage')?.invalid) {
+            @if (form.get('discountPercentage')?.hasError('required')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                El porcentaje de descuento es requerido.
+              </span>
+            }
+            @if (form.get('discountPercentage')?.hasError('min')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                El descuento debe ser mayor a 0.
+              </span>
+            }
+          }
+          @if (fieldErrors()['discountPercentage']) {
+            <span class="text-[10px] text-rose-500 font-medium px-1">
+              {{ fieldErrors()['discountPercentage'] }}
+            </span>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+
+          <div class="flex flex-col gap-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Fecha inicio</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="startDate">
+            </mat-form-field>
+            @if (form.get('startDate')?.touched && form.get('startDate')?.hasError('required')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                Fecha de inicio requerida.
+              </span>
+            }
+            @if (fieldErrors()['startDate']) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                {{ fieldErrors()['startDate'] }}
+              </span>
+            }
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Fecha fin</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="endDate">
+            </mat-form-field>
+            @if (form.get('endDate')?.touched && form.get('endDate')?.hasError('required')) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                Fecha de fin requerida.
+              </span>
+            }
+            @if (fieldErrors()['endDate']) {
+              <span class="text-[10px] text-rose-500 font-medium px-1">
+                {{ fieldErrors()['endDate'] }}
+              </span>
+            }
+          </div>
+
+        </div>
+
+        <div>
+          <h2
+            class="font-semibold mb-3 flex justify-between items-center"
+            style="color: var(--brand-color);">
+            <span>Productos</span>
+            <span
+              class="text-xs px-3 py-1 rounded-full"
+              style="
+                background-color: var(--background-color);
+                color: var(--brand-color);
+              ">
+              {{ selectedCodes.length }} seleccionados
+            </span>
+          </h2>
+
+          <div
+            class="max-h-72 overflow-y-auto rounded-xl border p-4 flex flex-col gap-2"
+            style="border-color: var(--border-color);">
+            @for (product of products(); track product.code) {
+              <mat-checkbox
+                class="block"
+                [checked]="isSelected(product.code)"
+                (change)="toggleProduct(product.code)">
+                {{ product.code }} - {{ product.name }}
+              </mat-checkbox>
+            }
+          </div>
+
+          @if (fieldErrors()['productCodes']) {
+            <div class="mt-2 text-[10px] text-rose-500 font-medium px-1">
+              {{ fieldErrors()['productCodes'] }}
+            </div>
+          }
+        </div>
+
+        <div class="pt-4 flex gap-3 justify-end">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="onCancel()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            mat-raised-button
+            style="
+      background-color: var(--brand-color);
+      color: white;
+    ">
+            @if (isEditMode) {
+              Guardar cambios
+            } @else {
+              Crear promoción
+            }
+          </button>
+        </div>
+
+      </form>
+    }
+
+  </div>
+</div>
