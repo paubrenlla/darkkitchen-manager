@@ -6,11 +6,12 @@ import {
   OrderListResponse,
   OrderDetailResponse,
   OrderStatusUpdateRequest,
-  OrderFilter
+  OrderFilter,
+  OrderCreateRequest,
 } from '../models/order.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrderService {
   private apiUrl = `${environment.apiUrl}/orders`;
@@ -22,10 +23,10 @@ export class OrderService {
 
   getAll(filter: OrderFilter = {}): Observable<OrderListResponse[]> {
     let params = new HttpParams();
-    if(filter.fromDate) params = params.set('fromDate', filter.fromDate);
-    if(filter.toDate)   params = params.set('toDate', filter.toDate);
-    if(filter.status)   params = params.set('status', filter.status);
-    if(filter.address)  params = params.set('address', filter.address);
+    if (filter.fromDate) params = params.set('fromDate', filter.fromDate);
+    if (filter.toDate) params = params.set('toDate', filter.toDate);
+    if (filter.status) params = params.set('status', filter.status);
+    if (filter.address) params = params.set('address', filter.address);
 
     return this.http.get<OrderListResponse[]>(this.apiUrl, { params });
   }
@@ -37,5 +38,9 @@ export class OrderService {
   updateStatus(id: string, status: string): Observable<OrderDetailResponse> {
     const request: OrderStatusUpdateRequest = { status };
     return this.http.patch<OrderDetailResponse>(`${this.apiUrl}/${id}/status`, request);
+  }
+
+  createOrder(request: OrderCreateRequest): Observable<OrderDetailResponse> {
+    return this.http.post<OrderDetailResponse>(this.apiUrl, request);
   }
 }

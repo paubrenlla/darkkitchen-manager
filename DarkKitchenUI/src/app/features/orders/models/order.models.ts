@@ -51,3 +51,22 @@ export interface OrderFilter {
   status?: string;
   address?: string;
 }
+
+export interface OrderAddressRequest {
+  street: string;
+  number: string;
+  apartment: string | null;
+  city: string;
+  country: string;
+}
+
+export interface OrderItemRequest {
+  productId: string;
+  quantity: number;
+}
+
+export interface OrderCreateRequest {
+  deliveryType: string;
+  address: OrderAddressRequest;
+  items: OrderItemRequest[];
+}
