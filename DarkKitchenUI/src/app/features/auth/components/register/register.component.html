@@ -1,16 +1,8 @@
-<style>
-  :host {
-    --brand-color: #4f46e5;
-    --brand-color-hover: #3c34d0;
-    --background-color: #E0E7FF;
-  }
-</style>
-
-<div class="min-h-screen bg-[var(--background-color)] flex flex-col justify-center items-center px-4 sm:px-6 antialiased py-10">
+<div class="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 antialiased">
 
   <div class="w-full max-w-[440px] space-y-8">
 
-    <div class="bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl p-7 sm:p-8 flex flex-col gap-5">
+    <div class="bg-white border border-slate-100 shadow-md rounded-2xl p-7 sm:p-8 flex flex-col gap-5">
 
       @if (errorMessage()) {
         <div class="bg-rose-50/60 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2">
@@ -22,7 +14,9 @@
       <form (ngSubmit)="onSubmit()" class="space-y-4">
 
         <div class="text-center space-y-2 mb-6 pt-1">
-          <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-sans">
+          <h1
+            class="text-2xl font-bold tracking-tight"
+            style="color: var(--brand-color);">
             ¡Bienvenido/a a Dark Kitchen!
           </h1>
           <p class="text-sm text-slate-400 font-medium">
@@ -130,17 +124,12 @@
         <div class="flex-grow border-t border-slate-100"></div>
       </div>
 
-      <div class="flex items-center justify-between text-xs font-medium px-0.5 pb-0">
+      <div class="flex items-center justify-center text-xs font-medium px-0.5 pb-0">
         <div class="flex items-center gap-1">
           <span class="text-slate-400">¿Ya tienes una cuenta?</span>
           <a routerLink="/login" [style.color]="'var(--brand-color)'" class="hover:text-slate-600 hover:underline transition-all cursor-pointer">
             Inicia sesión aquí
           </a>
-        </div>
-        <a href="#" class="text-slate-400 hover:text-slate-600 hover:underline transition-all">
-          Soporte
-        </a>
-      </div>
 
     </div>
 

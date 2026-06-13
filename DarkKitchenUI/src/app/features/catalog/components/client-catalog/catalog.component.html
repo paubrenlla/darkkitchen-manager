@@ -2,11 +2,18 @@
 
   <div class="flex justify-between items-center">
     <div>
-      <h2 class="text-xl font-bold text-slate-800">Catálogo</h2>
+      <h1
+        class="text-2xl font-bold"
+        style="color: var(--brand-color);">
+        Catálogo
+      </h1>
       <p class="text-sm text-slate-400 mt-0.5">Seleccioná los productos para tu pedido</p>
     </div>
     @if (cart().length > 0 && !showCheckout()) {
-      <button mat-flat-button color="primary" (click)="showCheckout.set(true)">
+      <button
+        mat-flat-button
+        (click)="showCheckout.set(true)"
+        style="background-color: var(--brand-color); color: white;">
         <mat-icon>shopping_cart</mat-icon>
         Ver pedido ({{ cartCount() }})
       </button>
@@ -27,7 +34,8 @@
   }
 
   @if (errorMessage()) {
-    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
       {{ errorMessage() }}
     </div>
   }
@@ -41,7 +49,7 @@
           <mat-spinner diameter="40"></mat-spinner>
         </div>
       } @else {
-        <div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+        <div class="overflow-hidden rounded-2xl bg-white shadow-md">
           @for (product of products(); track product.id) {
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
               <div class="flex flex-col gap-0.5">
@@ -151,7 +159,9 @@
           </mat-form-field>
 
           <div class="flex flex-col gap-2">
-            <button mat-flat-button color="primary"
+            <button
+              mat-flat-button
+              style="background-color: var(--brand-color); color: white;"
                     (click)="confirmOrder()"
                     [disabled]="isSubmitting()">
               @if (isSubmitting()) {
@@ -161,7 +171,10 @@
                 Confirmar pedido
               }
             </button>
-            <button mat-button (click)="clearCart()" class="text-slate-400 text-xs">
+            <button
+              mat-stroked-button
+              style="color: var(--brand-color); border-color: var(--brand-color);
+              (click)="clearCart() class="text-slate-400 text-xs">
               Vaciar carrito
             </button>
           </div>

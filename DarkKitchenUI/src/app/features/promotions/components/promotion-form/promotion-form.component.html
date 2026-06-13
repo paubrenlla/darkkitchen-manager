@@ -1,9 +1,9 @@
 <div class="max-w-3xl mx-auto">
 
-  <div class="bg-white rounded-2xl shadow-md p-8">
+  <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-8">
 
     <h1
-      class="text-2xl font-semibold"
+      class="text-2xl font-bold mb-6"
       style="color: var(--brand-color);">
       @if (isEditMode) {
         Editar Promoción
@@ -13,7 +13,7 @@
     </h1>
 
     @if (errorMessage()) {
-      <div class="mb-6 bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2">
+      <div class="mb-6 bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
         <mat-icon class="text-rose-500 scale-75">error_outline</mat-icon>
         <span>{{ errorMessage() }}</span>
       </div>
@@ -151,16 +151,16 @@
                 background-color: var(--background-color);
                 color: var(--brand-color);
               ">
-              {{ selectedCodes.length }} seleccionados
+              {{ selectedCodes.length }} producto(s)
             </span>
           </h2>
 
           <div
-            class="max-h-72 overflow-y-auto rounded-xl border p-4 flex flex-col gap-2"
+            class="max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/50 p-4 flex flex-col gap-2"
             style="border-color: var(--border-color);">
             @for (product of products(); track product.code) {
               <mat-checkbox
-                class="block"
+                class="block rounded-lg px-2 py-1 hover:bg-white transition-colors"
                 [checked]="isSelected(product.code)"
                 (change)="toggleProduct(product.code)">
                 {{ product.code }} - {{ product.name }}
@@ -179,13 +179,17 @@
           <button
             type="button"
             mat-stroked-button
-            (click)="onCancel()">
+            (click)="onCancel()"
+            style="
+            color: var(--brand-color);
+            border-color: var(--brand-color);
+          ">
             Cancelar
           </button>
 
           <button
             type="submit"
-            mat-raised-button
+            mat-flat-button
             style="
       background-color: var(--brand-color);
       color: white;
