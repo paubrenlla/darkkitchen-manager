@@ -40,3 +40,20 @@ html, body, button, input, select, textarea {
 .mdc-notched-outline--notched .mdc-notched-outline__notch {
   border-top-style: none !important;
 }
+
+.mat-mdc-menu-panel {
+  background-color: white !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 16px !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-menu-content {
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-menu-item {
+  font-family: inherit !important;
+  font-size: 15px !important;
+}
