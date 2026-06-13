@@ -7,12 +7,23 @@ html, body, button, input, select, textarea {
 }
 
 :root {
-  --brand-color: #4f46e5;
+  --brand-color: #453778;
   --brand-color-hover: #3c34d0;
-  --background-color: #e0e7ff;
+
+  --background-color: #eef2ff;
 
   --text-color: #111827;
   --border-color: #d1d5db;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(69, 55, 120, 0.04),
+      transparent 35%
+    ),
+    #f8fafc;
 }
 
 .mdc-notched-outline__leading,
