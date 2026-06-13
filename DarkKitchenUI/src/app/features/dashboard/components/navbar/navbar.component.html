@@ -1,13 +1,40 @@
-<mat-toolbar color="primary" [class]="toolbarClasses">
-  <span class="tracking-wide text-lg font-medium">Dashboard</span>
+<mat-toolbar class="flex justify-between items-center px-6 font-sans shadow-sm w-full h-16 !bg-white border-b border-slate-100">
 
-  <div class="flex items-center gap-4">
-    <span [class]="welcomeTextClasses">
-      {{ displayName() }}
-    </span>
+  <span></span>
 
-    <button mat-icon-button (click)="logout()" title="Cerrar sesión" [class]="logoutButtonClasses">
-      <mat-icon>logout</mat-icon>
+  <div class="flex items-center gap-3">
+    <span class="text-base text-slate-500 font-medium">{{ email() }}</span>
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!rounded-full !w-10 !h-10 flex items-center justify-center"
+            style="background-color: var(--background-color);">
+      <mat-icon style="color: var(--brand-color);">person</mat-icon>
     </button>
   </div>
+
+  <mat-menu #userMenu="matMenu" xPosition="before" class="!rounded-2xl">
+    <div class="px-5 py-4 border-b border-slate-100 min-w-[240px]">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+             style="background-color: var(--background-color);">
+          <mat-icon style="color: var(--brand-color);">person</mat-icon>
+        </div>
+        <div>
+          <p class="text-base font-semibold text-slate-700 leading-tight truncate max-w-[160px]">{{ email() }}</p>
+          <span
+            class="inline-block mt-2 text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+            style="background-color: var(--background-color); color: var(--brand-color);">
+            {{ role() }}
+            </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="py-1">
+      <button mat-menu-item (click)="logout()" class="!py-3 !px-5 !text-base !text-slate-600 hover:!text-rose-500">
+        <mat-icon class="!text-rose-400">logout</mat-icon>
+        <span class="font-medium">Cerrar sesión</span>
+      </button>
+    </div>
+  </mat-menu>
+
 </mat-toolbar>

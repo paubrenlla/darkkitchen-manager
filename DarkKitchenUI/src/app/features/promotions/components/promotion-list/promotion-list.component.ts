@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { PromotionService } from '../../services/promotion.service';
 import { PromotionResponse } from '../../models/promotion.models';
@@ -23,6 +24,7 @@ import { PromotionFormComponent } from '../promotion-form/promotion-form.compone
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+    MatTooltipModule,
     DatePipe,
   ],
   templateUrl: './promotion-list.component.html',
