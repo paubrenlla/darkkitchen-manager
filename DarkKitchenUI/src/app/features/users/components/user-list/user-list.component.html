@@ -13,15 +13,15 @@
     <button
       mat-flat-button
       (click)="openCreateDialog()"
-      class="transition-opacity duration-200 hover:opacity-90"
-      style="background-color: var(--brand-color); color: #ffffff;">
+      class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+      style="background-color: var(--brand-color); color: white;">
       <mat-icon>person_add</mat-icon>
       Nuevo usuario
     </button>
   </div>
 
   <!-- Filtros -->
-  <div class="flex flex-wrap items-center gap-4 mb-6 p-6 rounded-2xl bg-white shadow-md">
+  <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
     <mat-form-field appearance="outline" class="w-full sm:w-60" subscriptSizing="dynamic">
       <mat-label>Nombre</mat-label>
       <mat-icon matPrefix class="text-slate-400 mr-2">person_search</mat-icon>

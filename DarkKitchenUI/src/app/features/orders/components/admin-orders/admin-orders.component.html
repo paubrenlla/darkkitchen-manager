@@ -1,8 +1,15 @@
-<div class="p-2 flex flex-col gap-6">
+<div>
 
-  <div>
-    <h2 class="text-xl font-bold text-slate-800">Consulta de pedido</h2>
-    <p class="text-sm text-slate-400 mt-0.5">Ingresá el ID del pedido para ver su detalle</p>
+  <div class="mb-6">
+    <h1
+      class="text-2xl font-bold"
+      style="color: var(--brand-color);">
+      Consulta de pedido
+    </h1>
+
+    <p class="text-sm text-slate-400 mt-1">
+      Ingresá el ID del pedido para ver su detalle
+    </p>
   </div>
 
   <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex gap-3 items-end">
@@ -15,7 +22,9 @@
     </mat-form-field>
 
     <div class="flex gap-2 pb-0.5">
-      <button mat-flat-button color="primary" (click)="search()" [disabled]="isLoading()">
+      <button mat-flat-button (click)="search()" [disabled]="isLoading()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px] !mb-1"
+        style="background-color: var(--brand-color); color: white;">
         Buscar
       </button>
       @if (hasSearched()) {
