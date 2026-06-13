@@ -84,7 +84,7 @@ export class PromotionFormComponent implements OnInit {
         startDate: this.data.startDate.split('T')[0],
         endDate: this.data.endDate.split('T')[0],
       });
-      this.selectedCodes = this.data.products.map((p: any) => p.code || p);
+      this.selectedCodes = this.data.products;
     }
   }
 

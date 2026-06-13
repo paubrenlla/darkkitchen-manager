@@ -16,8 +16,12 @@
     class="w-48 !bg-[var(--bg-sidenav)] border-r border-[var(--border-sidenav)] flex flex-col h-full transition-all duration-200">
 
     <div class="p-5 text-center border-b border-[var(--border-header)] h-16 flex flex-col justify-center">
-      <a routerLink="/dashboard" class="no-underline">
-        <h2 class="m-0 text-lg font-bold tracking-tight text-[var(--text-brand)] leading-none">Dark Kitchen</h2>
+      <a routerLink="/dashboard" matTooltip="Ir al inicio" matTooltipPosition="right"
+         class="no-underline group cursor-pointer">
+        <h2 class="m-0 text-lg font-bold tracking-tight text-[var(--text-brand)] leading-none
+              transition-opacity group-hover:opacity-70">
+          Dark Kitchen
+        </h2>
         <span class="text-[10px] font-semibold text-[var(--text-role-badge)] block mt-1 uppercase tracking-wider leading-none">
          Panel de {{ currentUserRole() }}
         </span>

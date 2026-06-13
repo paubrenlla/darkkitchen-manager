@@ -5,6 +5,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 
@@ -24,6 +25,7 @@ interface NavItem {
     MatSidenavModule,
     MatListModule,
     MatIconModule,
+    MatTooltipModule,
     NavbarComponent
   ],
   templateUrl: './dashboard.component.html'
