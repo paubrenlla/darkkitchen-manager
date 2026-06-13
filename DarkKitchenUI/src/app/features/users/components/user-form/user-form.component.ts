@@ -53,10 +53,18 @@ export class UserFormComponent {
       this.surname = data.surname;
       this.email = data.email;
       this.role = data.role;
-      // phoneNumber from backend comes combined; prefix is managed separately on create only
-      this.phoneNumber = data.phoneNumber;
-      this.countryPrefix = '';
+      const parsed = this.parsePhone(data.phoneNumber);
+      this.countryPrefix = parsed.prefix;
+      this.phoneNumber = parsed.number;
     }
+  }
+
+  private parsePhone(combined: string): { prefix: string; number: string } {
+    const match = combined.match(/^(\+\d{1,3})(.+)$/);
+    if (match) {
+      return { prefix: match[1], number: match[2] };
+    }
+    return { prefix: '+598', number: combined };
   }
 
   onSubmit(): void {
