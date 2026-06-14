@@ -41,7 +41,7 @@ export class UserFormComponent {
   password = '';
   role = '';
 
-  readonly roles = ['Administrativo', 'Preparador', 'Cliente'];
+  readonly roles = ['Administrativo', 'Preparador'];
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -101,7 +101,7 @@ export class UserFormComponent {
       countryPrefix: this.countryPrefix.trim(),
       phoneNumber: this.phoneNumber.trim(),
       password: this.password,
-      role: this.role || undefined,
+      role: this.role || undefined, // ← si está vacío manda undefined
     };
   }
 

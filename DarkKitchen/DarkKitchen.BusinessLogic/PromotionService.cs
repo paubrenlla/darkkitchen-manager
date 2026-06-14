@@ -91,7 +91,7 @@ public class PromotionService(
 
         if(selectedProducts.Count != codes.Count)
         {
-            throw new ArgumentException("Uno o más códigos de producto no son válidos.");
+            throw new KeyNotFoundException("Uno o más códigos de producto no son válidos.");
         }
 
         return selectedProducts;
