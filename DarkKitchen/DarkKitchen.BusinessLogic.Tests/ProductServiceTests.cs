@@ -371,6 +371,23 @@ public class ProductServiceTests
     }
 
     [TestMethod]
+    public void ImportProducts_InvalidFileFormat_ShouldThrowArgumentExceptionWithFriendlyMessage()
+    {
+        var mockImporter = new Mock<IProductImporter>(MockBehavior.Strict);
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Throws(new Exception("'<' is an invalid start of a value."));
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var ex = Assert.ThrowsException<ArgumentException>(() =>
+            service.ImportProducts("Test Importer", "file.xml", "admin@darkkitchen.com"));
+
+        Assert.IsFalse(ex.Message.Contains("'<' is an invalid start"));
+        Assert.IsTrue(ex.Message.Contains("no pudo ser procesado"));
+        mockImporter.VerifyAll();
+    }
+
+    [TestMethod]
     public void ImportProducts_DuplicateCode_ShouldNotThrowButReportError()
     {
         SetupRepositoryGetAll();
