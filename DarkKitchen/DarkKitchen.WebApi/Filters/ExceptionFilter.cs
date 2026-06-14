@@ -9,7 +9,7 @@ public class ExceptionFilter : IExceptionFilter
     private static readonly Dictionary<Type, HttpStatusCode> _statusCodeMap = new()
     {
         { typeof(ArgumentException),       HttpStatusCode.BadRequest },
-        { typeof(NotSupportedException),   HttpStatusCode.BadRequest },   // ← agregar
+        { typeof(NotSupportedException),   HttpStatusCode.BadRequest },
         { typeof(KeyNotFoundException),    HttpStatusCode.NotFound },
         { typeof(InvalidOperationException), HttpStatusCode.Conflict },
         { typeof(UnauthorizedAccessException), HttpStatusCode.Unauthorized }
