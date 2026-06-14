@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
 
 import { ShippingTypeService } from '../../services/shipping-type.service';
 import { ShippingTypeResponse } from '../../models/shipping.models';
@@ -25,7 +26,7 @@ export class ShippingTypeListComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   shippingTypes = this.shippingTypeService.shippingTypes;
-  isLoading = this.shippingTypeService.isLoading;
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -69,14 +70,14 @@ export class ShippingTypeListComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.shippingTypeService.getAll().subscribe({
+    this.shippingTypeService.getAll().pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
       next: (data) => {
-        this.shippingTypeService.shippingTypes.set(data);
-        this.isLoading.set(false);
+        this.shippingTypeService.shippingTypes.set(data ?? []);
       },
       error: () => {
         this.errorMessage.set('Error al cargar los tipos de envío.');
-        this.isLoading.set(false);
       },
     });
   }

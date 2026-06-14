@@ -42,20 +42,6 @@
       {{ errorMessage() }}
     </div>
 
-  } @else if (shippingTypes().length === 0) {
-
-    <div class="rounded-2xl border border-slate-100 p-12 text-center bg-white">
-
-      <mat-icon class="text-4xl text-slate-300 mb-3">
-        local_shipping
-      </mat-icon>
-
-      <p class="text-slate-400 text-sm">
-        No hay tipos de envío registrados.
-      </p>
-
-    </div>
-
   } @else {
 
     <div class="overflow-hidden rounded-2xl bg-white shadow-md">
@@ -123,6 +109,13 @@
         </tbody>
 
       </table>
+
+      @if (shippingTypes().length === 0) {
+        <div class="p-12 text-center">
+          <mat-icon class="text-4xl text-slate-300 mb-3">local_shipping</mat-icon>
+          <p class="text-slate-400 text-sm">No hay tipos de envío registrados.</p>
+        </div>
+      }
 
     </div>
 
