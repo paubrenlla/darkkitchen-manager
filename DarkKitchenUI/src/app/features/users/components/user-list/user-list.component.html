@@ -143,18 +143,18 @@
 
             </tr>
 
+          } @empty {
+            <tr>
+              <td colspan="5" class="p-12 text-center">
+                <mat-icon class="text-4xl text-slate-300 mb-3">group_off</mat-icon>
+                <p class="text-slate-400 text-sm">No se encontraron usuarios</p>
+              </td>
+            </tr>
           }
 
         </tbody>
 
       </table>
-
-      @if (users().length === 0) {
-        <div class="text-center py-14 text-slate-400">
-          <mat-icon class="text-4xl mb-2">group_off</mat-icon>
-          <p class="text-sm">No se encontraron usuarios</p>
-        </div>
-      }
     </div>
   }
 
