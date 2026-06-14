@@ -77,7 +77,6 @@
     </div>
   } @else {
     <div class="overflow-hidden rounded-2xl bg-white shadow-md">
-      <div class="overflow-hidden rounded-2xl bg-white shadow-md w-full">
 
         <table class="w-full border-collapse">
 
@@ -183,20 +182,19 @@
 
               </tr>
 
+            } @empty {
+              <tr>
+                <td colspan="7" class="p-12 text-center">
+                  <mat-icon class="text-4xl text-slate-300 mb-3">inventory_2</mat-icon>
+                  <p class="text-slate-400 text-sm">No hay productos registrados</p>
+                </td>
+              </tr>
             }
 
           </tbody>
 
         </table>
 
-      </div>
-
-      @if (products().length === 0) {
-        <div class="rounded-2xl border border-slate-100 p-12 text-center bg-white">
-          <mat-icon class="text-4xl mb-2">inventory_2</mat-icon>
-          <p class="text-sm">No hay productos cargados</p>
-        </div>
-      }
     </div>
   }
 </div>
