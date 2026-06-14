@@ -148,7 +148,17 @@ public class ProductService(
                                         i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
                                     ?? throw new ArgumentException($"Importer '{importerName}' not found.");
 
-        IEnumerable<ProductImportDto> importedDtos = importer.ImportProducts(filePath);
+        IEnumerable<ProductImportDto> importedDtos;
+
+        try
+        {
+            importedDtos = importer.ImportProducts(filePath);
+        }
+        catch(FileNotFoundException)
+        {
+            throw new ArgumentException($"No se encontró el archivo en la ruta especificada: '{filePath}'.");
+        }
+
         var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
 
         // Optimización: Cargamos datos existentes una sola vez para evitar N+1 queries
