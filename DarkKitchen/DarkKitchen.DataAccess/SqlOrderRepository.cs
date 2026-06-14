@@ -10,6 +10,8 @@ public class SqlOrderRepository(DarkKitchenContext context) : IOrderRepository
 
     public void Add(Order order)
     {
+        var nextNumber = _context.Orders.Count() + 1;
+        order.AssignOrderNumber(nextNumber);
         _context.Orders.Add(order);
         _context.SaveChanges();
     }
