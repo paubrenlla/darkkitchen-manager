@@ -165,6 +165,11 @@
                 (change)="toggleProduct(product.code)">
                 {{ product.code }} - {{ product.name }}
               </mat-checkbox>
+            } @empty {
+              <div class="text-center py-6">
+                <mat-icon class="text-3xl text-slate-300 mb-2">inventory_2</mat-icon>
+                <p class="text-slate-400 text-sm">No hay productos registrados.</p>
+              </div>
             }
           </div>
 
