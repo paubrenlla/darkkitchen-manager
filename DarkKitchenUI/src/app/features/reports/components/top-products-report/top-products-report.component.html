@@ -2,13 +2,21 @@
   <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
     <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
       <mat-label>Desde</mat-label>
-      <input matInput type="date" [value]="fromDate" (change)="fromDate = $any($event.target).value">
+      <input
+        matInput
+        type="date"
+        [value]="fromDate"
+        (change)="onFromDateChange($event)">
       <mat-icon matPrefix class="text-slate-400 mr-2">calendar_today</mat-icon>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
       <mat-label>Hasta</mat-label>
-      <input matInput type="date" [value]="toDate" (change)="toDate = $any($event.target).value">
+      <input
+        matInput
+        type="date"
+        [value]="toDate"
+        (change)="onToDateChange($event)">
       <mat-icon matPrefix class="text-slate-400 mr-2">calendar_today</mat-icon>
     </mat-form-field>
 
