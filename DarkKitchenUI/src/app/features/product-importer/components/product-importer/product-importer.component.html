@@ -86,10 +86,15 @@
 
       <div class="p-6 flex items-center justify-between border-b" style="background-color: var(--background-color); border-color: var(--border-color);">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center" 
-               [ngClass]="importResult()!.failed === 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'">
-            <mat-icon>{{ importResult()!.failed === 0 ? 'check_circle' : 'warning' }}</mat-icon>
-          </div>
+          @if (importResult()!.failed === 0) {
+            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          } @else {
+            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-amber-100 text-amber-600">
+              <mat-icon>warning</mat-icon>
+            </div>
+          }
           <div>
             <h3 class="text-lg font-bold text-slate-800">Resumen de Importación</h3>
             <p class="text-sm text-slate-500">Plugin: {{ selectedImporter() }}</p>
