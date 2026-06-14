@@ -204,8 +204,16 @@ export class AuditLogListComponent implements OnInit {
           this.auditLogService.auditLogs.set(logs);
           this.isLoading.set(false);
         },
-        error: () => {
-          this.errorMessage.set('No se pudieron cargar las auditorías.');
+        error: (err) => {
+          const entityIdError = err?.error?.errors?.entityId?.[0];
+          const globalError = err?.error?.error;
+          if (entityIdError) {
+            this.errorMessage.set('El ID de entidad no tiene un formato válido. Debe ser un UUID (ej: 550e8400-e29b-41d4-a716-446655440000).');
+          } else if (globalError) {
+            this.errorMessage.set(globalError);
+          } else {
+            this.errorMessage.set('No se pudieron cargar las auditorías.');
+          }
           this.isLoading.set(false);
         },
       });
