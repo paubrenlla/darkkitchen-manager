@@ -60,12 +60,21 @@
         <div class="flex flex-col gap-1">
           <div class="grid grid-cols-3 gap-3 items-start">
 
-            <mat-form-field appearance="outline" class="w-full minimal-input" subscriptSizing="dynamic">
-              <mat-label>País</mat-label>
-              <mat-select name="countryPrefix" [(ngModel)]="countryPrefix" required>
-                <mat-option value="+598">Uruguay</mat-option>
-              </mat-select>
-            </mat-form-field>
+              <mat-form-field
+                appearance="outline"
+                class="w-full minimal-input"
+                subscriptSizing="dynamic">
+
+                <mat-label>Prefijo</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  name="countryPrefix"
+                  [(ngModel)]="countryPrefix"
+                  required>
+
+              </mat-form-field>
 
             <mat-form-field appearance="outline" class="col-span-2 minimal-input" subscriptSizing="dynamic">
               <mat-label>Teléfono</mat-label>
