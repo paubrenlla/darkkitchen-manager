@@ -16,7 +16,7 @@ import { TopProductResponse } from '../../models/report.models';
     MatIconModule,
     MatProgressSpinnerModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
   ],
   templateUrl: './top-products-report.component.html',
 })
@@ -41,7 +41,12 @@ export class TopProductsReportComponent {
   }
   search(): void {
     if (!this.fromDate || !this.toDate) {
-      this.errorMessage.set('Por favor, selecciona un rango de fechas.');
+      this.errorMessage.set('Por favor, seleccioná un rango de fechas.');
+      return;
+    }
+
+    if (new Date(this.fromDate) > new Date(this.toDate)) {
+      this.errorMessage.set('La fecha de inicio no puede ser posterior a la fecha de fin.');
       return;
     }
 
@@ -61,7 +66,7 @@ export class TopProductsReportComponent {
       error: () => {
         this.errorMessage.set('Ocurrió un error al cargar el reporte.');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 }
