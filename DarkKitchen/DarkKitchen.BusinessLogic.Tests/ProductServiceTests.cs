@@ -355,6 +355,22 @@ public class ProductServiceTests
     }
 
     [TestMethod]
+    public void ImportProducts_FileNotFound_ShouldThrowArgumentException()
+    {
+        var mockImporter = new Mock<IProductImporter>(MockBehavior.Strict);
+        mockImporter.Setup(i => i.Name).Returns("Test Importer");
+        mockImporter.Setup(i => i.ImportProducts(It.IsAny<string>())).Throws<FileNotFoundException>();
+
+        var service = new ProductService(_mockRepository.Object, _mockEventPublisher.Object, [mockImporter.Object]);
+
+        var ex = Assert.ThrowsException<ArgumentException>(() =>
+            service.ImportProducts("Test Importer", "ruta/inexistente.json", "admin@darkkitchen.com"));
+
+        Assert.IsTrue(ex.Message.Contains("ruta/inexistente.json"));
+        mockImporter.VerifyAll();
+    }
+
+    [TestMethod]
     public void ImportProducts_DuplicateCode_ShouldNotThrowButReportError()
     {
         SetupRepositoryGetAll();
