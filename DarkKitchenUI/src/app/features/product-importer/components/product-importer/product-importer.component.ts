@@ -1,6 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { ProductImporterService } from '../../services/product-importer.service';
 import { ProductImportRequest, ProductImportResponse } from '../../models/product-importer.models';
 import { ProductResponse } from '../../../products/models/product.models';
@@ -23,7 +22,6 @@ import { parseBackendErrors } from '../../../../core/utils/error-parser';
   selector: 'app-product-importer',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatCardModule,
     MatFormFieldModule,
