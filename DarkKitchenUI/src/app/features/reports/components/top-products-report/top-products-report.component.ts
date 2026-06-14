@@ -1,13 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { ReportService } from '../../services/report.service';
 import { TopProductResponse } from '../../models/report.models';
@@ -16,23 +12,19 @@ import { TopProductResponse } from '../../models/report.models';
   selector: 'app-top-products-report',
   standalone: true,
   imports: [
-    FormsModule,
-    MatTableModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule
+    MatInputModule
   ],
   templateUrl: './top-products-report.component.html',
 })
 export class TopProductsReportComponent {
   private reportService = inject(ReportService);
 
-  fromDate: Date | null = null;
-  toDate: Date | null = null;
+  fromDate = '';
+  toDate = '';
 
   displayedColumns = ['code', 'name', 'quantitySold'];
   products = signal<TopProductResponse[]>([]);
@@ -51,7 +43,10 @@ export class TopProductsReportComponent {
     this.products.set([]);
     this.hasSearched.set(true);
 
-    this.reportService.getTopProducts(this.fromDate, this.toDate).subscribe({
+    const from = new Date(this.fromDate);
+    const to = new Date(this.toDate);
+
+    this.reportService.getTopProducts(from, to).subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
