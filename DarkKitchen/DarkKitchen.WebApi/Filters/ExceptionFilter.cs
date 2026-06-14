@@ -25,12 +25,12 @@ public class ExceptionFilter : IExceptionFilter
         if(matched.Key != null)
         {
             context.Result = new ObjectResult(new { error = context.Exception.Message })
-                { StatusCode = (int)matched.Value };
+            { StatusCode = (int)matched.Value };
         }
         else
         {
             context.Result = new ObjectResult(new { error = "Ocurrió un error inesperado." })
-                { StatusCode = (int)HttpStatusCode.InternalServerError };
+            { StatusCode = (int)HttpStatusCode.InternalServerError };
         }
 
         context.ExceptionHandled = true;
