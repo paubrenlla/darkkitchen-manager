@@ -66,12 +66,12 @@ public class Product
     {
         if(string.IsNullOrWhiteSpace(code) || code.Length < 5 || code.Length > 20)
         {
-            throw new ArgumentException("Code must be between 5 and 20 alphanumeric characters.");
+            throw new ArgumentException("El código debe tener entre 5 y 20 caracteres alfanuméricos.");
         }
 
         if(!Regex.IsMatch(code, @"^[a-zA-Z0-9]+$"))
         {
-            throw new ArgumentException("Code must contain only alphanumeric characters.");
+            throw new ArgumentException("El código solo puede contener caracteres alfanuméricos.");
         }
     }
 
@@ -79,7 +79,7 @@ public class Product
     {
         if(string.IsNullOrWhiteSpace(name) || name.Length < 10 || name.Length > 50)
         {
-            throw new ArgumentException("Name must be between 10 and 50 characters.");
+            throw new ArgumentException("El nombre debe tener entre 10 y 50 caracteres.");
         }
     }
 
@@ -87,7 +87,7 @@ public class Product
     {
         if(string.IsNullOrWhiteSpace(description) || description.Length < 20 || description.Length > 500)
         {
-            throw new ArgumentException("Description must be between 20 and 500 characters.");
+            throw new ArgumentException("La descripción debe tener entre 20 y 500 caracteres.");
         }
     }
 
@@ -95,7 +95,7 @@ public class Product
     {
         if(line == null)
         {
-            throw new ArgumentException("Product line is required.");
+            throw new ArgumentException("La línea del producto es obligatoria.");
         }
     }
 
@@ -103,7 +103,7 @@ public class Product
     {
         if(category == null)
         {
-            throw new ArgumentException("Product category is required.");
+            throw new ArgumentException("La categoría del producto es obligatoria.");
         }
     }
 
@@ -111,7 +111,7 @@ public class Product
     {
         if(price <= 0)
         {
-            throw new ArgumentException("Price must be greater than zero.");
+            throw new ArgumentException("El precio debe ser mayor a cero.");
         }
     }
 
@@ -119,7 +119,7 @@ public class Product
     {
         if(images == null || images.Count < MinImages || images.Count > MaxImages)
         {
-            throw new ArgumentException($"Product must have between {MinImages} and {MaxImages} images.");
+            throw new ArgumentException($"El producto debe tener entre {MinImages} y {MaxImages} imágenes.");
         }
     }
 

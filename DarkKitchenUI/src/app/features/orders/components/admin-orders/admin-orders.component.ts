@@ -77,4 +77,22 @@ export class AdminOrdersComponent {
     };
     return classes[status] ?? 'bg-slate-50 text-slate-600 border border-slate-200';
   }
+
+  isCancellable(status: string): boolean {
+    return status === 'Pending';
+  }
+
+  cancelOrder(): void {
+    const currentOrder = this.order();
+    if (!currentOrder) return;
+
+    this.orderService.updateStatus(currentOrder.id, 'Cancelado').subscribe({
+      next: (updated) => {
+        this.order.update((o) => (o ? { ...o, status: updated.status } : null));
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.error || 'No se pudo cancelar el pedido.');
+      },
+    });
+  }
 }

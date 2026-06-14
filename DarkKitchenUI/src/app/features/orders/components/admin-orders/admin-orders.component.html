@@ -1,27 +1,34 @@
-<div class="p-2 flex flex-col gap-6">
+<div>
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold" style="color: var(--brand-color)">Consulta de pedido</h1>
 
-  <div>
-    <h2 class="text-xl font-bold text-slate-800">Consulta de pedido</h2>
-    <p class="text-sm text-slate-400 mt-0.5">Ingresá el ID del pedido para ver su detalle</p>
+    <p class="text-sm text-slate-400 mt-1">Ingresá el ID del pedido para ver su detalle</p>
   </div>
 
   <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex gap-3 items-end">
     <mat-form-field appearance="outline" class="minimal-input flex-1" subscriptSizing="dynamic">
       <mat-label>ID del pedido</mat-label>
-      <input matInput [(ngModel)]="orderId"
-             placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-             (keydown.enter)="search()">
+      <input
+        matInput
+        [(ngModel)]="orderId"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        (keydown.enter)="search()"
+      />
       <mat-icon matSuffix class="text-slate-400">search</mat-icon>
     </mat-form-field>
 
     <div class="flex gap-2 pb-0.5">
-      <button mat-flat-button color="primary" (click)="search()" [disabled]="isLoading()">
+      <button
+        mat-flat-button
+        (click)="search()"
+        [disabled]="isLoading()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px] !mb-1"
+        style="background-color: var(--brand-color); color: white"
+      >
         Buscar
       </button>
       @if (hasSearched()) {
-        <button mat-button (click)="clear()" class="text-slate-500">
-          Limpiar
-        </button>
+        <button mat-button (click)="clear()" class="text-slate-500">Limpiar</button>
       }
     </div>
   </div>
@@ -36,13 +43,22 @@
     </div>
   } @else if (order()) {
     <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-5">
-
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold text-slate-800">Pedido #{{ order()!.orderNumber }}</h3>
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-              [class]="getStatusClass(order()!.status)">
-          {{ order()!.status }}
-        </span>
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+            [class]="getStatusClass(order()!.status)"
+          >
+            {{ order()!.status }}
+          </span>
+          @if (isCancellable(order()!.status)) {
+            <button mat-stroked-button color="warn" (click)="cancelOrder()">
+              <mat-icon>cancel</mat-icon>
+              Cancelar pedido
+            </button>
+          }
+        </div>
       </div>
 
       <mat-divider></mat-divider>
@@ -50,7 +66,7 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold text-slate-400 uppercase">Fecha</span>
-          <span class="text-slate-700">{{ order()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span class="text-slate-700">{{ order()!.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
         </div>
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold text-slate-400 uppercase">Tipo de envío</span>
@@ -59,14 +75,18 @@
       </div>
 
       <div class="flex flex-col gap-1 text-sm">
-        <span class="text-xs font-semibold text-slate-400 uppercase mb-1">Dirección de entrega</span>
+        <span class="text-xs font-semibold text-slate-400 uppercase mb-1"
+          >Dirección de entrega</span
+        >
         <span class="text-slate-700">
           {{ order()!.address.street }} {{ order()!.address.number }}
           @if (order()!.address.apartment) {
             , Apto {{ order()!.address.apartment }}
           }
         </span>
-        <span class="text-slate-500">{{ order()!.address.city }}, {{ order()!.address.country }}</span>
+        <span class="text-slate-500"
+          >{{ order()!.address.city }}, {{ order()!.address.country }}</span
+        >
       </div>
 
       <mat-divider></mat-divider>
@@ -74,10 +94,12 @@
       <div class="flex flex-col gap-2">
         <span class="text-xs font-semibold text-slate-400 uppercase">Productos</span>
         @for (item of order()!.items; track item.productId) {
-          <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-sm">
+          <div
+            class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-sm"
+          >
             <div class="flex flex-col">
               <span class="font-medium text-slate-800">
-                {{ item.productName ?? ('Producto ' + item.productId.substring(0, 8)) }}
+                {{ item.productName ?? 'Producto ' + item.productId.substring(0, 8) }}
               </span>
               <span class="text-xs text-slate-400">
                 x{{ item.quantity }} · ${{ item.price }} c/u
@@ -106,13 +128,13 @@
           <span class="text-slate-500">Envío</span>
           <span class="text-slate-700">${{ order()!.shippingCost }}</span>
         </div>
-        <div class="flex justify-between w-48 font-bold text-base mt-1 pt-2 border-t border-slate-200">
+        <div
+          class="flex justify-between w-48 font-bold text-base mt-1 pt-2 border-t border-slate-200"
+        >
           <span class="text-slate-800">Total</span>
           <span class="text-slate-800">${{ order()!.total }}</span>
         </div>
       </div>
-
     </div>
   }
-
 </div>

@@ -4,10 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
 
 import { ShippingTypeService } from '../../services/shipping-type.service';
 import { ShippingTypeResponse } from '../../models/shipping.models';
 import { ShippingTypeFormComponent } from '../shipping-type-form/shipping-type-form.component';
+import { ShippingTypeDeleteConfirmComponent } from './shipping-type-delete-confirm.component';
 
 @Component({
   selector: 'app-shipping-type-list',
@@ -25,7 +27,7 @@ export class ShippingTypeListComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   shippingTypes = this.shippingTypeService.shippingTypes;
-  isLoading = this.shippingTypeService.isLoading;
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -54,14 +56,27 @@ export class ShippingTypeListComponent implements OnInit {
     });
   }
 
-  onDelete(shippingType: ShippingTypeResponse): void {
-    if (!confirm(`¿Eliminar el tipo de envío "${shippingType.name}"?`)) return;
+  openDeleteDialog(shippingType: ShippingTypeResponse): void {
+    const ref = this.dialog.open(
+      ShippingTypeDeleteConfirmComponent,
+      {
+        data: shippingType,
+      }
+    );
 
-    this.shippingTypeService.delete(shippingType.id).subscribe({
-      next: () => this.loadShippingTypes(),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage.set(err.error?.error || 'No se pudo eliminar el tipo de envío.');
-      },
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.shippingTypeService.delete(shippingType.id).subscribe({
+        next: () => this.loadShippingTypes(),
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage.set(
+            err.error?.error || 'No se pudo eliminar el tipo de envío.'
+          );
+        },
+      });
     });
   }
 
@@ -69,14 +84,14 @@ export class ShippingTypeListComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.shippingTypeService.getAll().subscribe({
+    this.shippingTypeService.getAll().pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
       next: (data) => {
-        this.shippingTypeService.shippingTypes.set(data);
-        this.isLoading.set(false);
+        this.shippingTypeService.shippingTypes.set(data ?? []);
       },
       error: () => {
         this.errorMessage.set('Error al cargar los tipos de envío.');
-        this.isLoading.set(false);
       },
     });
   }

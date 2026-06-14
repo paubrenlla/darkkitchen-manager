@@ -6,9 +6,8 @@
   <mat-dialog-content class="!px-6 !pt-4 !pb-2 max-h-[70vh] overflow-y-auto">
     <div class="flex flex-col gap-4">
       @if (errorMessage()) {
-        <div
-          class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-medium"
-        >
+        <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <mat-icon class="text-rose-500">error_outline</mat-icon>
           {{ errorMessage() }}
         </div>
       }
@@ -56,7 +55,7 @@
       <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium text-slate-600">Imágenes *</span>
-          <button mat-button type="button" (click)="addImage()" class="text-indigo-600 text-xs">
+          <button mat-button type="button" (click)="addImage()" style="color: var(--brand-color);" class="text-xs">
             <mat-icon class="text-sm scale-75">add</mat-icon>
             Agregar imagen
           </button>
@@ -100,11 +99,23 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="!px-6 !pb-5 !pt-4 gap-2">
-    <button mat-button (click)="onCancel()" class="text-slate-500">Cancelar</button>
-    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isLoading()">
+    <button
+      mat-stroked-button
+      (click)="onCancel()"
+      style="color: var(--brand-color); border-color: var(--brand-color);">
+      Cancelar
+    </button>
+
+    <button
+      mat-flat-button
+      (click)="onSubmit()"
+      [disabled]="isLoading()"
+      style="background-color: var(--brand-color); color: white;">
       @if (isLoading()) {
-        <mat-spinner diameter="16" class="mr-2"></mat-spinner>
-        Guardando...
+        <div class="flex items-center gap-2">
+          <mat-spinner diameter="16"></mat-spinner>
+          <span>Guardando...</span>
+        </div>
       } @else {
         {{ isEditMode ? 'Guardar cambios' : 'Crear producto' }}
       }

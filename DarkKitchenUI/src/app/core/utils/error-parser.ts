@@ -67,7 +67,29 @@ export function parseBackendErrors(err: HttpErrorResponse): ParsedErrors {
     else if (lowerMessage.includes('name') || lowerMessage.includes('nombre')) {
       result.fields['name'] = rawMessage;
     }
-    else if (lowerMessage.includes('phone') || lowerMessage.includes('teléfono') || lowerMessage.includes('prefix') || lowerMessage.includes('prefijo') || lowerMessage.includes('number')) {
+    else if (
+      lowerMessage.includes('invalid phone number for country prefix')
+    ) {
+      result.fields['phone'] =
+        'El número de teléfono no es válido para el prefijo ingresado.';
+    }
+    else if (
+      lowerMessage.includes('unsupported prefix') ||
+      lowerMessage.includes('unsupported country prefix') ||
+      lowerMessage.includes('no strategy') ||
+      lowerMessage.includes('strategy') ||
+      lowerMessage.includes('prefijo no soportado')
+    ) {
+      result.fields['phone'] =
+        'El prefijo ingresado no está soportado.';
+    }
+    else if (
+      lowerMessage.includes('phone') ||
+      lowerMessage.includes('teléfono') ||
+      lowerMessage.includes('prefix') ||
+      lowerMessage.includes('prefijo') ||
+      lowerMessage.includes('number')
+    ) {
       result.fields['phone'] = rawMessage;
     }
     else if (lowerMessage.includes('email') || lowerMessage.includes('correo')) {

@@ -1,23 +1,30 @@
-<div class="p-2 flex flex-col gap-6">
-  <div>
-    <h2 class="text-xl font-bold text-slate-800">Mis pedidos</h2>
-    <p class="text-sm text-slate-400 mt-0.5">Historial de tus pedidos realizados</p>
+<div>
+
+  <div class="mb-6">
+    <h1
+      class="text-2xl font-bold"
+      style="color: var(--brand-color);">
+      Mis pedidos
+    </h1>
+
+    <p class="text-sm text-slate-400 mt-1">
+      Historial de tus pedidos realizados
+    </p>
   </div>
 
-  <div
-    class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-wrap gap-3 items-end"
-  >
-    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+  <div class="flex flex-wrap items-end gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
+
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
       <mat-label>Desde</mat-label>
       <input matInput type="date" [(ngModel)]="fromDate" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
       <mat-label>Hasta</mat-label>
       <input matInput type="date" [(ngModel)]="toDate" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="minimal-input w-44" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
       <mat-label>Estado</mat-label>
       <mat-select [(ngModel)]="statusFilter">
         <mat-option value="">Todos</mat-option>
@@ -27,40 +34,61 @@
       </mat-select>
     </mat-form-field>
 
-    <div class="flex gap-2 pb-0.5">
-      <button mat-flat-button color="primary" (click)="loadOrders()">
+    <div class="flex gap-2 w-full sm:w-auto sm:ml-auto items-center">
+
+      <button
+        mat-flat-button
+        (click)="loadOrders()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+        style="background-color: var(--brand-color); color: white;">
         <mat-icon>search</mat-icon>
         Buscar
       </button>
-      <button mat-button (click)="clearFilters()" class="text-slate-500">
-        <mat-icon>clear</mat-icon>
+
+      <button
+        mat-stroked-button
+        (click)="clearFilters()"
+        class="!rounded-xl !py-5 !px-6 h-[48px]"
+        style="color: var(--brand-color); border-color: var(--brand-color);">
+        <mat-icon>clear_all</mat-icon>
         Limpiar
       </button>
+
     </div>
+
   </div>
 
   @if (errorMessage()) {
-    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm">
+
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
       {{ errorMessage() }}
     </div>
+
   }
 
   @if (isLoading()) {
+
     <div class="flex justify-center py-20">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+
   } @else {
-    <div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+
       <table mat-table [dataSource]="orders()" class="w-full">
+
         <ng-container matColumnDef="orderNumber">
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Pedido #
           </th>
-          <td mat-cell *matCellDef="let o" class="font-bold text-slate-800">
+
+          <td mat-cell *matCellDef="let o" class="font-semibold text-slate-800">
             #{{ o.orderNumber }}
           </td>
         </ng-container>
@@ -69,23 +97,27 @@
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Cliente
           </th>
-          <td mat-cell *matCellDef="let o" class="text-sm text-slate-700">{{ o.clientName }}</td>
+
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-700">
+            {{ o.clientName }}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="date">
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Fecha
           </th>
-          <td mat-cell *matCellDef="let o" class="text-sm text-slate-500">
-            {{ o.createdAt | date: 'dd/MM/yyyy' }}
+
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-600">
+            {{ o.createdAt | date:'dd/MM/yyyy' }}
           </td>
         </ng-container>
 
@@ -93,15 +125,15 @@
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Estado
           </th>
+
           <td mat-cell *matCellDef="let o">
             <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-              [class]="getStatusClass(o.status)"
-            >
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+              [class]="getStatusClass(o.status)">
               {{ o.status }}
             </span>
           </td>
@@ -111,11 +143,12 @@
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Total
           </th>
-          <td mat-cell *matCellDef="let o" class="text-sm font-semibold text-slate-800">
+
+          <td mat-cell *matCellDef="let o" class="font-semibold text-slate-800">
             ${{ o.total }}
           </td>
         </ng-container>
@@ -124,27 +157,54 @@
           <th
             mat-header-cell
             *matHeaderCellDef
-            class="text-xs font-semibold text-slate-500 uppercase"
-          >
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
             Productos
           </th>
-          <td mat-cell *matCellDef="let o" class="text-sm text-slate-500">{{ o.productCount }}</td>
+
+          <td mat-cell *matCellDef="let o">
+            <span
+              class="px-2.5 py-1 rounded-full text-xs font-medium"
+              style="
+                background-color: var(--background-color);
+                color: var(--brand-color);
+              ">
+              {{ o.productCount }}
+            </span>
+          </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-slate-50"></tr>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns">
+        </tr>
+
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
-          class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
-        ></tr>
+          class="border-b border-slate-100 last:border-0 transition-colors duration-150 hover:bg-[var(--background-color)]">
+        </tr>
+
       </table>
 
       @if (orders().length === 0) {
-        <div class="text-center py-14 text-slate-400">
-          <mat-icon class="text-4xl mb-2">receipt_long</mat-icon>
-          <p class="text-sm">No tenés pedidos registrados</p>
+
+        <div class="rounded-2xl border border-slate-100 p-12 text-center bg-white">
+
+          <mat-icon class="text-4xl text-slate-300 mb-3">
+            receipt_long
+          </mat-icon>
+
+          <p class="text-slate-400 text-sm">
+            No tenés pedidos registrados.
+          </p>
+
         </div>
+
       }
+
     </div>
+
   }
+
 </div>

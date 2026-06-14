@@ -2,14 +2,14 @@
 
   <div class="mb-6">
     <h1
-      class="text-2xl font-semibold"
+      class="text-2xl font-bold"
       style="color: var(--brand-color);">
       Promociones vigentes
     </h1>
     <p class="text-sm text-slate-400 mt-1">Descuentos disponibles en este momento</p>
   </div>
 
-  <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+  <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
 
     <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
       <mat-label>Fecha vigencia</mat-label>
@@ -76,7 +76,8 @@
 
   } @else if (errorMessage()) {
 
-    <div class="rounded-lg border p-4 bg-rose-50 border-rose-100 text-rose-600 text-sm">
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
       {{ errorMessage() }}
     </div>
 
@@ -105,7 +106,7 @@
                 {{ promotion.name }}
               </h2>
               <span
-                class="shrink-0 text-sm font-bold px-3 py-1 rounded-full"
+                class="shrink-0 text-xs font-semibold px-3 py-1 rounded-full"
                 style="background-color: var(--background-color); color: var(--brand-color);">
                 {{ promotion.discountPercentage }}% OFF
               </span>
@@ -129,7 +130,7 @@
               <div class="flex flex-wrap gap-1.5">
                 @for (code of promotion.products; track code) {
                   <span
-                    class="text-xs px-2.5 py-1 rounded-full font-mono border"
+                    class="text-xs px-2.5 py-1 rounded-full border font-medium"
                     style="border-color: var(--border-color); color: var(--brand-color);">
                     {{ code }}
                   </span>
