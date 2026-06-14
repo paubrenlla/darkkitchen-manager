@@ -16,7 +16,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { HttpErrorResponse } from '@angular/common/http';
-import { parseBackendErrors } from '../../../../core/utils/error-parser';
 
 @Component({
   selector: 'app-product-importer',
@@ -92,9 +91,10 @@ export class ProductImporterComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        const parsed = parseBackendErrors(err);
-        this.errorMessage.set(parsed.global);
-        this.fieldErrors.set(parsed.fields);
+        const message = err.error?.error
+          ?? err.error?.message
+          ?? 'Ocurrió un error al importar los productos. Verifique los datos e intente nuevamente.';
+        this.errorMessage.set(message);
       }
     });
   }
