@@ -146,7 +146,7 @@ public class ProductService(
     {
         IProductImporter importer = _importers.FirstOrDefault(i =>
                                         i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
-                                    ?? throw new ArgumentException($"Importer '{importerName}' not found.");
+                                    ?? throw new ArgumentException($"El importador '{importerName}' no existe.");
 
         IEnumerable<ProductImportDto> importedDtos;
 
@@ -157,6 +157,10 @@ public class ProductService(
         catch(FileNotFoundException)
         {
             throw new ArgumentException($"No se encontró el archivo en la ruta especificada: '{filePath}'.");
+        }
+        catch(Exception)
+        {
+            throw new ArgumentException("El archivo no pudo ser procesado. Verifique que la ruta sea correcta y que el formato sea compatible con el plugin seleccionado.");
         }
 
         var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
