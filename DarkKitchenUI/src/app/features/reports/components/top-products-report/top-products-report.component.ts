@@ -32,6 +32,13 @@ export class TopProductsReportComponent {
   errorMessage = signal<string | null>(null);
   hasSearched = signal(false);
 
+  onFromDateChange(event: Event): void {
+    this.fromDate = (event.target as HTMLInputElement).value;
+  }
+
+  onToDateChange(event: Event): void {
+    this.toDate = (event.target as HTMLInputElement).value;
+  }
   search(): void {
     if (!this.fromDate || !this.toDate) {
       this.errorMessage.set('Por favor, selecciona un rango de fechas.');
