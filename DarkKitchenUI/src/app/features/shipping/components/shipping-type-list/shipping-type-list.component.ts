@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 import { ShippingTypeService } from '../../services/shipping-type.service';
 import { ShippingTypeResponse } from '../../models/shipping.models';
 import { ShippingTypeFormComponent } from '../shipping-type-form/shipping-type-form.component';
+import { ShippingTypeDeleteConfirmComponent } from './shipping-type-delete-confirm.component';
 
 @Component({
   selector: 'app-shipping-type-list',
@@ -55,14 +56,27 @@ export class ShippingTypeListComponent implements OnInit {
     });
   }
 
-  onDelete(shippingType: ShippingTypeResponse): void {
-    if (!confirm(`¿Eliminar el tipo de envío "${shippingType.name}"?`)) return;
+  openDeleteDialog(shippingType: ShippingTypeResponse): void {
+    const ref = this.dialog.open(
+      ShippingTypeDeleteConfirmComponent,
+      {
+        data: shippingType,
+      }
+    );
 
-    this.shippingTypeService.delete(shippingType.id).subscribe({
-      next: () => this.loadShippingTypes(),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage.set(err.error?.error || 'No se pudo eliminar el tipo de envío.');
-      },
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.shippingTypeService.delete(shippingType.id).subscribe({
+        next: () => this.loadShippingTypes(),
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage.set(
+            err.error?.error || 'No se pudo eliminar el tipo de envío.'
+          );
+        },
+      });
     });
   }
 
