@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +16,6 @@ import { TopProductResponse } from '../../models/report.models';
   standalone: true,
   imports: [
     FormsModule,
-    MatTableModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
