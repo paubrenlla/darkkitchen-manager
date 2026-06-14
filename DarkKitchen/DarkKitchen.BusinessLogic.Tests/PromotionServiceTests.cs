@@ -147,7 +147,7 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void CreatePromotion_InvalidProductCode_ThrowsArgumentException()
+    public void CreatePromotion_InvalidProductCode_ThrowsKeyNotFoundException()
     {
         SetupProductGetAll();
 
@@ -160,7 +160,9 @@ public class PromotionServiceTests
             ProductCodes = ["INVALID99"]
         };
 
-        Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request, "admin@test.com"));
+        Assert.ThrowsException<KeyNotFoundException>(() =>
+            _promotionService.CreatePromotion(request, "admin@test.com"));
+
         _mockProductRepository.VerifyAll();
     }
 
@@ -347,7 +349,7 @@ public class PromotionServiceTests
     }
 
     [TestMethod]
-    public void UpdatePromotion_InvalidProductCode_ThrowsArgumentException()
+    public void UpdatePromotion_InvalidProductCode_ThrowsKeyNotFoundException()
     {
         SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
         SetupProductGetAll();
@@ -361,8 +363,9 @@ public class PromotionServiceTests
             ProductCodes = ["INVALIDO99"]
         };
 
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsException<KeyNotFoundException>(() =>
             _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com"));
+
         _mockPromotionRepository.VerifyAll();
         _mockProductRepository.VerifyAll();
     }
