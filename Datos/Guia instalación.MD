@@ -29,14 +29,14 @@
 
 Abrí DBeaver y creá una nueva conexión:
 
-1. **New Database Connection** → seleccioná **SQL Server**![alt text](image.png)
+1. **New Database Connection** → seleccioná **SQL Server**![alt text](images/image.png)
 2. Completá los datos:
    - **Host:** `localhost`
    - **Port:** `1433`
    - **Authentication:** SQL Server Authentication
    - **Username:** `SA`
    - **Password:** `MyPass@word`
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 3. Tildá **Trust Server Certificate**
 4. Hacé click en **Test Connection** para verificar y luego **Finish**
 
@@ -45,18 +45,18 @@ Abrí DBeaver y creá una nueva conexión:
 Una vez conectado:
 
 1. En el panel izquierdo expandí la conexión → **Databases** → **DarkKitchen** → **Schemas**
-2. Click derecho sobre el schema → **SQL Editor** → **Open SQL script**![alt text](image-2.png)
+2. Click derecho sobre el schema → **SQL Editor** → **Open SQL script**![alt text](images/image-2.png)
 3. Copia el contenido de DatosIniciales.sql o DatosVacios.sql y ejecuta
 
 ## Para importar plugins
 
 1. En docker desktop abri el container de la api
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 2. vas a Files -> app/Plugins y ahí se deben añadir/quitar los importadores que la quieras que la aplicación use
-![alt text](image-5.png)
+![alt text](images/image-5.png)
 
 ### Importante
 Para la ruta que te va a pedir la aplicacion, esta debe ser dentro del container.
 
 Ejemplo: /app/Samples/products_sample.csv
-![alt text](image-4.png)
+![alt text](images/image-4.png)
