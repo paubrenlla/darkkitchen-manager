@@ -49,7 +49,7 @@ export class ProductListComponent implements OnInit {
     return custom ? custom : this.productService.products();
   });
 
-  isLoading = this.productService.isLoading;
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   // Filter signals
@@ -130,7 +130,7 @@ export class ProductListComponent implements OnInit {
 
     this.productService.getAll(name, line, category).subscribe({
       next: (data) => {
-        this.productService.products.set(data);
+        this.productService.products.set(data ?? []);
         this.isLoading.set(false);
       },
       error: () => {

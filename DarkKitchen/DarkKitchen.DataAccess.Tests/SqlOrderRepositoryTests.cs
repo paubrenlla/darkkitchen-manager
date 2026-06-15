@@ -235,4 +235,19 @@ public class SqlOrderRepositoryTests
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(OrderState.Prepared, result[0].State);
     }
+
+    [TestMethod]
+    public void Add_ShouldAssignOrderNumber()
+    {
+        var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
+        var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
+        var order = new Order(Guid.NewGuid(), address, "Express", items, 50m);
+
+        _repository.Add(order);
+
+        var result = _repository.GetById(order.Id);
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.OrderNumber.HasValue);
+        Assert.AreEqual(1, result.OrderNumber);
+    }
 }

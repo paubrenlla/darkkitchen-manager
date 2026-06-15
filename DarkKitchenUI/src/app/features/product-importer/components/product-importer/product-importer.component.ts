@@ -1,6 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { ProductImporterService } from '../../services/product-importer.service';
 import { ProductImportRequest, ProductImportResponse } from '../../models/product-importer.models';
 import { ProductResponse } from '../../../products/models/product.models';
@@ -17,13 +16,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { HttpErrorResponse } from '@angular/common/http';
-import { parseBackendErrors } from '../../../../core/utils/error-parser';
 
 @Component({
   selector: 'app-product-importer',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -94,9 +91,10 @@ export class ProductImporterComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        const parsed = parseBackendErrors(err);
-        this.errorMessage.set(parsed.global);
-        this.fieldErrors.set(parsed.fields);
+        const message = err.error?.error
+          ?? err.error?.message
+          ?? 'Ocurrió un error al importar los productos. Verifique los datos e intente nuevamente.';
+        this.errorMessage.set(message);
       }
     });
   }

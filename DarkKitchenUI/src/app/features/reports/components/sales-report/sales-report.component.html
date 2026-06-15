@@ -4,21 +4,19 @@
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   } @else if (errorMessage()) {
-    <div class="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
-      <mat-icon class="text-rose-500 mt-0.5">error_outline</mat-icon>
-      <div>
-        <p class="font-semibold text-sm">Error</p>
-        <p class="text-sm mt-0.5">{{ errorMessage() }}</p>
-      </div>
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
+      {{ errorMessage() }}
     </div>
   } @else if (report()) {
 
-    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-6 flex items-center justify-between shadow-sm">
+    <div class="rounded-2xl p-5 mb-6 flex items-center justify-between shadow-sm"
+         style="background-color: var(--background-color);">
       <div>
-        <p class="text-sm text-indigo-500 font-medium uppercase tracking-wider">Gran Total General</p>
-        <p class="text-4xl font-bold text-indigo-700 mt-1">${{ report()!.grandTotal | number:'1.2-2' }}</p>
+        <p class="text-sm font-medium uppercase tracking-wider" style="color: var(--brand-color);">Gran Total General</p>
+        <p class="text-4xl font-bold mt-1" style="color: var(--brand-color);">${{ report()!.grandTotal | number:'1.2-2' }}</p>
       </div>
-      <mat-icon class="text-indigo-300 !text-6xl">monitoring</mat-icon>
+      <mat-icon class="!text-6xl opacity-30" style="color: var(--brand-color);">monitoring</mat-icon>
     </div>
 
     @if (report()!.periods.length === 0) {

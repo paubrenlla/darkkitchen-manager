@@ -101,4 +101,18 @@ public class ExceptionFilterTests
         Assert.AreEqual("Ocurrió un error inesperado.", GetErrorMessage());
         Assert.IsTrue(_context.ExceptionHandled);
     }
+
+    [TestMethod]
+    public void OnException_NotSupportedException_ShouldReturn400WithMessage()
+    {
+        _context.Exception = new NotSupportedException("El país con prefijo '+100' aún no está soportado.");
+
+        _filter.OnException(_context);
+
+        var result = _context.Result as ObjectResult;
+        Assert.IsNotNull(result);
+        Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.AreEqual("El país con prefijo '+100' aún no está soportado.", GetErrorMessage());
+        Assert.IsTrue(_context.ExceptionHandled);
+    }
 }

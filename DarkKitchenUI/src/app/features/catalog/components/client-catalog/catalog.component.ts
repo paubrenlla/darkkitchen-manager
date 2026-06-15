@@ -17,6 +17,8 @@ import { ShippingTypeService } from '../../../shipping/services/shipping-type.se
 import { ShippingTypeResponse } from '../../../shipping/models/shipping.models';
 import { OrderService } from '../../../orders/services/order.service';
 import { OrderCreateRequest } from '../../../orders/models/order.models';
+import { PromotionService } from '../../../promotions/services/promotion.service';
+import { PromotionResponse } from '../../../promotions/models/promotion.models';
 
 interface CartItem {
   product: ProductResponse;
@@ -35,28 +37,28 @@ interface CartItem {
     MatSelectModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDividerModule
+    MatDividerModule,
   ],
-  templateUrl: './catalog.component.html'
+  templateUrl: './catalog.component.html',
 })
 export class CatalogComponent implements OnInit {
   private productService = inject(ProductService);
   private shippingService = inject(ShippingTypeService);
   private orderService = inject(OrderService);
+  private promotionService = inject(PromotionService);
   private router = inject(Router);
 
   products = signal<ProductResponse[]>([]);
   shippingTypes = signal<ShippingTypeResponse[]>([]);
+  promotions = signal<PromotionResponse[]>([]);
   cart = signal<CartItem[]>([]);
 
   isLoadingProducts = signal(false);
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
   orderSuccess = signal(false);
-
   showCheckout = signal(false);
 
-  // Checkout form fields
   street = '';
   number = '';
   apartment = '';
@@ -65,29 +67,34 @@ export class CatalogComponent implements OnInit {
   selectedShippingType = '';
 
   cartTotal = computed(() =>
-    this.cart().reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+    this.cart().reduce((sum, item) => {
+      const promo = this.getBestPromotion(item.product);
+      const price = promo
+        ? item.product.price * (1 - promo.discountPercentage / 100)
+        : item.product.price;
+      return sum + price * item.quantity;
+    }, 0),
   );
 
-  cartCount = computed(() =>
-    this.cart().reduce((sum, item) => sum + item.quantity, 0)
-  );
+  cartCount = computed(() => this.cart().reduce((sum, item) => sum + item.quantity, 0));
 
   ngOnInit(): void {
     this.loadProducts();
     this.loadShippingTypes();
+    this.loadPromotions();
   }
 
   private loadProducts(): void {
     this.isLoadingProducts.set(true);
     this.productService.getAll().subscribe({
       next: (data) => {
-        this.products.set(data.filter(p => p.isActive));
+        this.products.set(data.filter((p) => p.isActive));
         this.isLoadingProducts.set(false);
       },
       error: () => {
         this.errorMessage.set('No se pudieron cargar los productos.');
         this.isLoadingProducts.set(false);
-      }
+      },
     });
   }
 
@@ -95,36 +102,58 @@ export class CatalogComponent implements OnInit {
     this.shippingService.getAll().subscribe({
       next: (data) => {
         this.shippingTypes.set(data);
-        if(data.length > 0) this.selectedShippingType = data[0].name;
-      }
+        if (data.length > 0) this.selectedShippingType = data[0].name;
+      },
     });
   }
 
+  private loadPromotions(): void {
+    const today = new Date().toISOString().split('T')[0];
+    this.promotionService.getAll(today).subscribe({
+      next: (data) => this.promotions.set(data),
+      error: () => this.promotions.set([]),
+    });
+  }
+
+  getBestPromotion(product: ProductResponse): PromotionResponse | null {
+    const applicable = this.promotions().filter((p) => p.products.includes(product.code));
+    if (!applicable.length) return null;
+    return applicable.reduce((best, p) =>
+      p.discountPercentage > best.discountPercentage ? p : best,
+    );
+  }
+
+  getDiscountedPrice(product: ProductResponse): number {
+    const promo = this.getBestPromotion(product);
+    if (!promo) return product.price;
+    return product.price * (1 - promo.discountPercentage / 100);
+  }
+
   getCartQuantity(productId: string): number {
-    return this.cart().find(i => i.product.id === productId)?.quantity ?? 0;
+    return this.cart().find((i) => i.product.id === productId)?.quantity ?? 0;
   }
 
   addToCart(product: ProductResponse): void {
-    this.cart.update(items => {
-      const existing = items.find(i => i.product.id === product.id);
-      if(existing) {
-        return items.map(i => i.product.id === product.id
-          ? { ...i, quantity: i.quantity + 1 }
-          : i);
+    this.cart.update((items) => {
+      const existing = items.find((i) => i.product.id === product.id);
+      if (existing) {
+        return items.map((i) =>
+          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i,
+        );
       }
       return [...items, { product, quantity: 1 }];
     });
   }
 
   removeFromCart(productId: string): void {
-    this.cart.update(items => {
-      const existing = items.find(i => i.product.id === productId);
-      if(existing && existing.quantity > 1) {
-        return items.map(i => i.product.id === productId
-          ? { ...i, quantity: i.quantity - 1 }
-          : i);
+    this.cart.update((items) => {
+      const existing = items.find((i) => i.product.id === productId);
+      if (existing && existing.quantity > 1) {
+        return items.map((i) =>
+          i.product.id === productId ? { ...i, quantity: i.quantity - 1 } : i,
+        );
       }
-      return items.filter(i => i.product.id !== productId);
+      return items.filter((i) => i.product.id !== productId);
     });
   }
 
@@ -134,7 +163,7 @@ export class CatalogComponent implements OnInit {
   }
 
   confirmOrder(): void {
-    if(!this.isCheckoutValid()) return;
+    if (!this.isCheckoutValid()) return;
 
     const request: OrderCreateRequest = {
       deliveryType: this.selectedShippingType,
@@ -143,12 +172,12 @@ export class CatalogComponent implements OnInit {
         number: this.number.trim(),
         apartment: this.apartment.trim() || null,
         city: this.city.trim(),
-        country: this.country.trim()
+        country: this.country.trim(),
       },
-      items: this.cart().map(i => ({
+      items: this.cart().map((i) => ({
         productId: i.product.id,
-        quantity: i.quantity
-      }))
+        quantity: i.quantity,
+      })),
     };
 
     this.isSubmitting.set(true);
@@ -164,16 +193,16 @@ export class CatalogComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(err.error?.error || 'No se pudo crear el pedido.');
-      }
+      },
     });
   }
 
   private isCheckoutValid(): boolean {
-    if(!this.street || !this.number || !this.city || !this.country) {
+    if (!this.street || !this.number || !this.city || !this.country) {
       this.errorMessage.set('Completá todos los campos de dirección obligatorios.');
       return false;
     }
-    if(!this.selectedShippingType) {
+    if (!this.selectedShippingType) {
       this.errorMessage.set('Seleccioná un tipo de envío.');
       return false;
     }

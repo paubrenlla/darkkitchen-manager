@@ -8,18 +8,24 @@ public class ExceptionFilter : IExceptionFilter
 {
     private static readonly Dictionary<Type, HttpStatusCode> _statusCodeMap = new()
     {
-        { typeof(ArgumentException),          HttpStatusCode.BadRequest },
-        { typeof(KeyNotFoundException),       HttpStatusCode.NotFound },
-        { typeof(InvalidOperationException),  HttpStatusCode.Conflict },
+        { typeof(ArgumentException),       HttpStatusCode.BadRequest },
+        { typeof(NotSupportedException),   HttpStatusCode.BadRequest },
+        { typeof(KeyNotFoundException),    HttpStatusCode.NotFound },
+        { typeof(InvalidOperationException), HttpStatusCode.Conflict },
         { typeof(UnauthorizedAccessException), HttpStatusCode.Unauthorized }
     };
 
     public void OnException(ExceptionContext context)
     {
-        if(_statusCodeMap.TryGetValue(context.Exception.GetType(), out var statusCode))
+        var exceptionType = context.Exception.GetType();
+
+        var matched = _statusCodeMap
+            .FirstOrDefault(kvp => kvp.Key.IsAssignableFrom(exceptionType));
+
+        if(matched.Key != null)
         {
             context.Result = new ObjectResult(new { error = context.Exception.Message })
-            { StatusCode = (int)statusCode };
+            { StatusCode = (int)matched.Value };
         }
         else
         {

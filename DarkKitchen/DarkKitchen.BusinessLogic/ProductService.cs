@@ -1,3 +1,4 @@
+using DarkKitchen.BusinessLogic.Plugins;
 using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.IBusinessLogic;
@@ -144,14 +145,35 @@ public class ProductService(
 
     public ProductImportResponse ImportProducts(string importerName, string filePath, string currentUser)
     {
-        IProductImporter importer = _importers.FirstOrDefault(i =>
-                                        i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
-                                    ?? throw new ArgumentException($"Importer '{importerName}' not found.");
+        IProductImporter? importer = _importers.FirstOrDefault(i =>
+            i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase));
 
-        IEnumerable<ProductImportDto> importedDtos = importer.ImportProducts(filePath);
+        if(importer == null)
+        {
+            var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+            importer = PluginLoader
+                .LoadFromPath(pluginsPath)
+                .FirstOrDefault(i => i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
+                ?? throw new ArgumentException($"El importador '{importerName}' no existe.");
+        }
+
+        IEnumerable<ProductImportDto> importedDtos;
+
+        try
+        {
+            importedDtos = importer.ImportProducts(filePath);
+        }
+        catch(FileNotFoundException)
+        {
+            throw new ArgumentException($"No se encontró el archivo en la ruta especificada: '{filePath}'.");
+        }
+        catch(Exception)
+        {
+            throw new ArgumentException("El archivo no pudo ser procesado. Verifique que la ruta sea correcta y que el formato sea compatible con el plugin seleccionado.");
+        }
+
         var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
 
-        // Optimización: Cargamos datos existentes una sola vez para evitar N+1 queries
         var existingCodes = _productRepository.GetAll().Select(p => p.Code).ToHashSet();
         var existingLines = _productRepository.GetAllLines()
             .GroupBy(l => l.Name.Trim().ToLower())
@@ -169,18 +191,14 @@ public class ProductService(
                     throw new ArgumentException($"Product with code {dto.Code} already exists.");
                 }
 
-                // Obtener o crear línea (usando caché en memoria)
                 var lineNameKey = dto.LineName!.Trim().ToLower();
-
                 if(!existingLines.TryGetValue(lineNameKey, out ProductLine? line))
                 {
                     line = new ProductLine(dto.LineName!.Trim());
                     existingLines[lineNameKey] = line;
                 }
 
-                // Obtener o crear categoría (usando caché en memoria)
                 var categoryNameKey = dto.CategoryName!.Trim().ToLower();
-
                 if(!existingCategories.TryGetValue(categoryNameKey, out ProductCategory? category))
                 {
                     category = new ProductCategory(dto.CategoryName!.Trim());
@@ -201,7 +219,7 @@ public class ProductService(
                     images);
 
                 _productRepository.Add(product);
-                existingCodes.Add(dto.Code!); // Agregamos al caché para evitar duplicados en el mismo archivo
+                existingCodes.Add(dto.Code!);
 
                 var domainEvent = new EntityCreatedEvent<Product>
                 {
