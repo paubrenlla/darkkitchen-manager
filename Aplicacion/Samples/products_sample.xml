@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Products>
+  <Product>
+    <Code>XML01</Code>
+    <Name>Hamburguesa de Ternera XML</Name>
+    <Description>Hamburguesa artesanal importada desde un sistema externo via XML.</Description>
+    <Line>Combo burgers</Line>
+    <Category>Parrilla</Category>
+    <Price>420.00</Price>
+    <Images>
+      <Image>
+        <Url>https://img.com/xml_burger.jpg</Url>
+        <Size>102400</Size>
+      </Image>
+    </Images>
+  </Product>
+  <Product>
+    <Code>XML02</Code>
+    <Name>Limonada Menta XML</Name>
+    <Description>Refrescante bebida importada mediante el plugin de terceros.</Description>
+    <Line>Bebidas</Line>
+    <Category>Bebidas</Category>
+    <Price>180.00</Price>
+    <Images>
+      <Image>
+        <Url>https://img.com/xml_lemon.jpg</Url>
+        <Size>50000</Size>
+      </Image>
+    </Images>
+  </Product>
+</Products>

@@ -1,4 +1,0 @@
-Code,Name,Description,Line,Category,Price,ImageUrls,ImageSizes
-CSV01,Producto desde CSV,Este es un producto cargado desde un archivo de texto separado por comas.,Desayunos,Bebidas,120.50,https://img.com/csv.jpg,50000
-CSV02,Segundo Producto CSV,Otra descripcion lo suficientemente larga para que pase el dominio.,Desayunos,Bebidas,200.00,https://img.com/1.jpg;https://img.com/2.jpg,100;200
-CSV_FAIL,Corto,Error,Línea,Categoría,-50,https://img.com/fail.jpg,0
