@@ -6,6 +6,7 @@
 USE DarkKitchen;
 
 -- Limpiar datos existentes
+DELETE FROM ShippingTypes;
 DELETE FROM PromotionProducts;
 DELETE FROM OrderItems;
 DELETE FROM Orders;
