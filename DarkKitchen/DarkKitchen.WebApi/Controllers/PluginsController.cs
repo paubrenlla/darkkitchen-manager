@@ -1,18 +1,18 @@
-using DarkKitchen.Plugin.Contracts;
+using DarkKitchen.IBusinessLogic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DarkKitchen.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PluginsController(IEnumerable<IProductImporter> importers) : ControllerBase
+public class PluginsController(IPluginService pluginService) : ControllerBase
 {
-    private readonly IEnumerable<IProductImporter> _importers = importers;
+    private readonly IPluginService _pluginService = pluginService;
 
     [HttpGet("importers")]
     public IActionResult GetImporters()
     {
-        var importerNames = _importers.Select(i => i.Name).ToList();
-        return Ok(importerNames);
+        var names = _pluginService.GetAvailableImporters().ToList();
+        return Ok(names);
     }
 }

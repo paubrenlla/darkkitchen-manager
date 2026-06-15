@@ -82,19 +82,20 @@ public class PluginLoaderExtensionsTests
     {
         Directory.CreateDirectory(_tempFolder);
 
-        // Usamos la DLL real de nuestro JsonImporter para la prueba
         var validDllPath = typeof(DarkKitchen.Plugin.JsonImporter.JsonProductImporter).Assembly.Location;
         File.Copy(validDllPath, Path.Combine(_tempFolder, "DarkKitchen.Plugin.JsonImporter.dll"));
 
         _services.AddProductImportersPlugins(_tempFolder);
 
-        // Debería haber registrado 1 servicio (IProductImporter -> JsonProductImporter)
         Assert.AreEqual(1, _services.Count);
 
         var descriptor = _services.FirstOrDefault();
         Assert.IsNotNull(descriptor);
         Assert.AreEqual(typeof(IProductImporter), descriptor.ServiceType);
-        Assert.AreEqual(typeof(DarkKitchen.Plugin.JsonImporter.JsonProductImporter), descriptor.ImplementationType);
+        Assert.IsNotNull(descriptor.ImplementationFactory);
         Assert.AreEqual(ServiceLifetime.Scoped, descriptor.Lifetime);
+
+        var instance = descriptor.ImplementationFactory(null!);
+        Assert.IsInstanceOfType(instance, typeof(DarkKitchen.Plugin.JsonImporter.JsonProductImporter));
     }
 }
