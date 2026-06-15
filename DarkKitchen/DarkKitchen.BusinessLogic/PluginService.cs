@@ -1,16 +1,13 @@
 ﻿using DarkKitchen.BusinessLogic.Plugins;
 using DarkKitchen.IBusinessLogic;
 
-public class PluginService : IPluginService
+public class PluginService(string pluginsPath) : IPluginService
 {
-    private readonly string _pluginsPath;
+    private readonly string _pluginsPath = pluginsPath;
 
     public PluginService()
-        : this(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins")) { }
-
-    public PluginService(string pluginsPath)
+        : this(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"))
     {
-        _pluginsPath = pluginsPath;
     }
 
     public IEnumerable<string> GetAvailableImporters()

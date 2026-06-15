@@ -1,5 +1,4 @@
-﻿using DarkKitchen.BusinessLogic;
-using DarkKitchen.Plugin.JsonImporter;
+﻿using DarkKitchen.Plugin.JsonImporter;
 
 namespace DarkKitchen.BusinessLogic.Tests;
 
