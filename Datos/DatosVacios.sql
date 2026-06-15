@@ -3,7 +3,7 @@
 -- Contraseña del admin: ValidP@ssw0rd!8X
 -- =============================================
 
-USE DarkKitchenDB;
+USE DarkKitchen;
 
 -- Limpiar datos existentes
 DELETE FROM PromotionProducts;
