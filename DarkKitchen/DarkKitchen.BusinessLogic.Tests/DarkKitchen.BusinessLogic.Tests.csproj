@@ -23,5 +23,6 @@
     <ProjectReference Include="..\DarkKitchen.Domain\DarkKitchen.Domain.csproj" />
     <ProjectReference Include="..\DarkKitchen.Models\DarkKitchen.Models.csproj" />
     <ProjectReference Include="..\DarkKitchen.IDataAccess\DarkKitchen.IDataAccess.csproj" />
+    <ProjectReference Include="..\DarkKitchen.Plugin.JsonImporter\DarkKitchen.Plugin.JsonImporter.csproj" />
   </ItemGroup>
 </Project>
