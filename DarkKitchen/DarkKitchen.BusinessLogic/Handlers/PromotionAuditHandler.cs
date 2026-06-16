@@ -34,22 +34,22 @@ public class PromotionAuditHandler(IAuditRepository auditRepository) :
 
         if(old.Name != @new.Name)
         {
-            sb.AppendLine($"Name cambió de '{old.Name}' a '{@new.Name}'");
+            sb.AppendLine($"Nombre cambió de '{old.Name}' a '{@new.Name}'");
         }
 
         if(old.DiscountPercentage != @new.DiscountPercentage)
         {
-            sb.AppendLine($"DiscountPercentage cambió de '{old.DiscountPercentage}' a '{@new.DiscountPercentage}'");
+            sb.AppendLine($"Porcentaje de descuento cambió de '{old.DiscountPercentage}' a '{@new.DiscountPercentage}'");
         }
 
         if(old.StartDate != @new.StartDate)
         {
-            sb.AppendLine($"StartDate cambió de '{old.StartDate}' a '{@new.StartDate}'");
+            sb.AppendLine($"Fecha de inicio cambió de '{old.StartDate}' a '{@new.StartDate}'");
         }
 
         if(old.EndDate != @new.EndDate)
         {
-            sb.AppendLine($"EndDate cambió de '{old.EndDate}' a '{@new.EndDate}'");
+            sb.AppendLine($"Fecha de fin cambió de '{old.EndDate}' a '{@new.EndDate}'");
         }
 
         if(!old.Products.Select(p => p.Code).SequenceEqual(@new.Products.Select(p => p.Code)))

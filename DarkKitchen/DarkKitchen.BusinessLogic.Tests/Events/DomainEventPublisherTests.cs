@@ -55,7 +55,7 @@ public class DomainEventPublisherTests
         publisher.Publish(domainEvent);
 
         mockRepo.Verify(r => r.Save(It.Is<AuditLog>(log =>
-            log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
+            log.ChangeDescription.Contains("Nombre cambió de 'Old Valid Name' a 'New Valid Name'"))), Times.Once);
         mockRepo.VerifyAll();
     }
 

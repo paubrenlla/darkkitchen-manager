@@ -69,12 +69,12 @@ public class ProductAuditHandlerTests
         _handler.Handle(domainEvent);
 
         _mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
-            log.ChangeDescription.Contains("Name cambió de 'Old Valid Name' a 'New Valid Name'") &&
-            log.ChangeDescription.Contains("Description cambió de 'Old description that is long enough' a 'New description that is long enough'") &&
-            log.ChangeDescription.Contains("Price cambió de '100' a '150'") &&
-            log.ChangeDescription.Contains("IsActive cambió de 'True' a 'False'") &&
-            log.ChangeDescription.Contains("Line cambió de 'Old Line' a 'New Line'") &&
-            log.ChangeDescription.Contains("Category cambió de 'Old Cat' a 'New Cat'") &&
+            log.ChangeDescription.Contains("Nombre cambió de 'Old Valid Name' a 'New Valid Name'") &&
+            log.ChangeDescription.Contains("Descripción cambió de 'Old description that is long enough' a 'New description that is long enough'") &&
+            log.ChangeDescription.Contains("Precio cambió de '100' a '150'") &&
+            log.ChangeDescription.Contains("Estado activo cambió de 'True' a 'False'") &&
+            log.ChangeDescription.Contains("Línea cambió de 'Old Line' a 'New Line'") &&
+            log.ChangeDescription.Contains("Categoría cambió de 'Old Cat' a 'New Cat'") &&
             log.ChangeDescription.Contains("Las imágenes del producto fueron modificadas."))), Times.Once);
         _mockAuditRepository.VerifyAll();
     }

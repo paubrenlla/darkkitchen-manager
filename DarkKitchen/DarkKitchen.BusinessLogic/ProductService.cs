@@ -44,7 +44,7 @@ public class ProductService(
     {
         if(_productRepository.GetAll().Any(p => p.Code == request.Code))
         {
-            throw new ArgumentException($"Product with code {request.Code} already exists.");
+            throw new ArgumentException($"Ya existe un producto con el código {request.Code}.");
         }
 
         var images = BuildImages(request.Images);
@@ -145,93 +145,21 @@ public class ProductService(
 
     public ProductImportResponse ImportProducts(string importerName, string filePath, string currentUser)
     {
-        IProductImporter? importer = _importers.FirstOrDefault(i =>
-            i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase));
+        var importer = ResolveImporter(importerName);
+        var importedDtos = LoadDtos(importer, filePath).ToList();
 
-        if(importer == null)
-        {
-            var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
-            importer = PluginLoader
-                .LoadFromPath(pluginsPath)
-                .FirstOrDefault(i => i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
-                ?? throw new ArgumentException($"El importador '{importerName}' no existe.");
-        }
-
-        IEnumerable<ProductImportDto> importedDtos;
-
-        try
-        {
-            importedDtos = importer.ImportProducts(filePath);
-        }
-        catch(FileNotFoundException)
-        {
-            throw new ArgumentException($"No se encontró el archivo en la ruta especificada: '{filePath}'.");
-        }
-        catch(Exception)
-        {
-            throw new ArgumentException("El archivo no pudo ser procesado. Verifique que la ruta sea correcta y que el formato sea compatible con el plugin seleccionado.");
-        }
-
-        var response = new ProductImportResponse { TotalProcessed = importedDtos.Count() };
-
+        var response = new ProductImportResponse { TotalProcessed = importedDtos.Count };
         var existingCodes = _productRepository.GetAll().Select(p => p.Code).ToHashSet();
         var existingLines = _productRepository.GetAllLines()
-            .GroupBy(l => l.Name.Trim().ToLower())
-            .ToDictionary(g => g.Key, g => g.First());
+            .GroupBy(l => l.Name.Trim().ToLower()).ToDictionary(g => g.Key, g => g.First());
         var existingCategories = _productRepository.GetAllCategories()
-            .GroupBy(c => c.Name.Trim().ToLower())
-            .ToDictionary(g => g.Key, g => g.First());
+            .GroupBy(c => c.Name.Trim().ToLower()).ToDictionary(g => g.Key, g => g.First());
 
-        foreach(ProductImportDto dto in importedDtos)
+        foreach(var dto in importedDtos)
         {
             try
             {
-                if(existingCodes.Contains(dto.Code!))
-                {
-                    throw new ArgumentException($"Product with code {dto.Code} already exists.");
-                }
-
-                var lineNameKey = dto.LineName!.Trim().ToLower();
-                if(!existingLines.TryGetValue(lineNameKey, out ProductLine? line))
-                {
-                    line = new ProductLine(dto.LineName!.Trim());
-                    existingLines[lineNameKey] = line;
-                }
-
-                var categoryNameKey = dto.CategoryName!.Trim().ToLower();
-                if(!existingCategories.TryGetValue(categoryNameKey, out ProductCategory? category))
-                {
-                    category = new ProductCategory(dto.CategoryName!.Trim());
-                    existingCategories[categoryNameKey] = category;
-                }
-
-                List<ProductImage> images = dto.Images?
-                    .Select(i => new ProductImage(i.Url!, i.SizeInBytes))
-                    .ToList() ?? [];
-
-                var product = new Product(
-                    dto.Code!,
-                    dto.Name!,
-                    dto.Description!,
-                    line,
-                    category,
-                    dto.Price,
-                    images);
-
-                _productRepository.Add(product);
-                existingCodes.Add(dto.Code!);
-
-                var domainEvent = new EntityCreatedEvent<Product>
-                {
-                    EntityId = product.Id,
-                    EntityName = nameof(Product),
-                    ResponsibleUser = currentUser,
-                    NewState = product
-                };
-                _eventPublisher.Publish(domainEvent);
-
-                response.ImportedProducts.Add(new ProductResponse(product));
-                response.Successful++;
+                ImportSingleProduct(dto, existingCodes, existingLines, existingCategories, response, currentUser);
             }
             catch(Exception ex)
             {
@@ -241,6 +169,84 @@ public class ProductService(
         }
 
         return response;
+    }
+
+    private IProductImporter ResolveImporter(string importerName)
+    {
+        var importer = _importers.FirstOrDefault(i =>
+            i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase));
+
+        if(importer != null)
+        {
+            return importer;
+        }
+
+        var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+        return PluginLoader
+                   .LoadFromPath(pluginsPath)
+                   .FirstOrDefault(i => i.Name.Equals(importerName, StringComparison.OrdinalIgnoreCase))
+               ?? throw new ArgumentException($"El importador '{importerName}' no existe.");
+    }
+
+    private IEnumerable<ProductImportDto> LoadDtos(IProductImporter importer, string filePath)
+    {
+        try
+        {
+            return importer.ImportProducts(filePath);
+        }
+        catch(FileNotFoundException)
+        {
+            throw new ArgumentException($"No se encontró el archivo en la ruta especificada: '{filePath}'.");
+        }
+        catch(Exception)
+        {
+            throw new ArgumentException("El archivo no pudo ser procesado. Verifique que la ruta sea correcta y que el formato sea compatible con el plugin seleccionado.");
+        }
+    }
+
+    private void ImportSingleProduct(
+        ProductImportDto dto,
+        HashSet<string> existingCodes,
+        Dictionary<string, ProductLine> existingLines,
+        Dictionary<string, ProductCategory> existingCategories,
+        ProductImportResponse response,
+        string currentUser)
+    {
+        if(existingCodes.Contains(dto.Code!))
+        {
+            throw new ArgumentException($"Ya existe un producto con el código {dto.Code}.");
+        }
+
+        var lineKey = dto.LineName!.Trim().ToLower();
+        if(!existingLines.TryGetValue(lineKey, out var line))
+        {
+            line = new ProductLine(dto.LineName!.Trim());
+            existingLines[lineKey] = line;
+        }
+
+        var categoryKey = dto.CategoryName!.Trim().ToLower();
+        if(!existingCategories.TryGetValue(categoryKey, out var category))
+        {
+            category = new ProductCategory(dto.CategoryName!.Trim());
+            existingCategories[categoryKey] = category;
+        }
+
+        var images = dto.Images?.Select(i => new ProductImage(i.Url!, i.SizeInBytes)).ToList() ?? [];
+        var product = new Product(dto.Code!, dto.Name!, dto.Description!, line, category, dto.Price, images);
+
+        _productRepository.Add(product);
+        existingCodes.Add(dto.Code!);
+
+        _eventPublisher.Publish(new EntityCreatedEvent<Product>
+        {
+            EntityId = product.Id,
+            EntityName = nameof(Product),
+            ResponsibleUser = currentUser,
+            NewState = product
+        });
+
+        response.ImportedProducts.Add(new ProductResponse(product));
+        response.Successful++;
     }
 
     private ProductLine GetOrCreateLine(string name)

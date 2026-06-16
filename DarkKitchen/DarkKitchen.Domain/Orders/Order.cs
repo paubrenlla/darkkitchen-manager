@@ -43,7 +43,9 @@ public class Order
 
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     public decimal Subtotal => _items.Sum(i => i.CalculateItemTotal());
-    public decimal Tax => Subtotal * 0.22m;
+
+    private const decimal TaxRate = 0.22m;
+    public decimal Tax => Subtotal * TaxRate;
     public decimal Total => Subtotal + Tax + ShippingCost;
 
     public void TransitionTo(OrderState newState)
