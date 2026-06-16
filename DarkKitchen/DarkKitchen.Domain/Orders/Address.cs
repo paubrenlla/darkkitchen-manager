@@ -26,7 +26,7 @@ public class Address
     {
         if(string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException($"{fieldName} is required.");
+            throw new ArgumentException($"El campo {fieldName} es obligatorio.");
         }
     }
 }

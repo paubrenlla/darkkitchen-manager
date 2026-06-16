@@ -56,7 +56,7 @@ public class Promotion
     {
         if(string.IsNullOrWhiteSpace(name) || name.Length < 3 || name.Length > 50)
         {
-            throw new ArgumentException("Name must be between 3 and 50 characters.");
+            throw new ArgumentException("El nombre debe tener entre 3 y 50 caracteres.");
         }
     }
 
@@ -64,7 +64,7 @@ public class Promotion
     {
         if(startDate > endDate)
         {
-            throw new ArgumentException("Start date must be before or equal to end date.");
+            throw new ArgumentException("La fecha de inicio debe ser anterior o igual a la fecha de fin.");
         }
     }
 
@@ -72,7 +72,7 @@ public class Promotion
     {
         if(discountPercentage <= 0)
         {
-            throw new ArgumentException("Discount percentage must be greater than zero.");
+            throw new ArgumentException("El porcentaje de descuento debe ser mayor a cero.");
         }
     }
 
@@ -103,7 +103,7 @@ public class Promotion
     {
         if(products == null || products.Count == 0)
         {
-            throw new ArgumentException("A promotion must contain at least one product.");
+            throw new ArgumentException("La promoción debe contener al menos un producto.");
         }
     }
 }

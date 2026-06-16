@@ -49,7 +49,7 @@ public class User
     {
         if(string.IsNullOrWhiteSpace(name) || name.Length < 1)
         {
-            throw new ArgumentException("Name must have at least 1 character.");
+            throw new ArgumentException("El nombre debe tener al menos 1 carácter.");
         }
     }
 
@@ -57,7 +57,7 @@ public class User
     {
         if(string.IsNullOrWhiteSpace(surname) || surname.Length < 3 || surname.Length > 25)
         {
-            throw new ArgumentException("Surname must be between 3 and 25 characters.");
+            throw new ArgumentException("El apellido debe tener entre 3 y 25 caracteres.");
         }
     }
 
@@ -67,7 +67,7 @@ public class User
 
         if(string.IsNullOrWhiteSpace(email) || !emailRegex.IsMatch(email))
         {
-            throw new ArgumentException("Invalid email format.");
+            throw new ArgumentException("El formato del email es inválido.");
         }
     }
 
@@ -75,32 +75,32 @@ public class User
     {
         if(string.IsNullOrWhiteSpace(password) || password.Length < 15 || password.Length > 25)
         {
-            throw new ArgumentException("Password must be between 15 and 25 characters.");
+            throw new ArgumentException("La contraseña debe tener entre 15 y 25 caracteres.");
         }
 
         if(!Regex.IsMatch(password, @"[A-Z]"))
         {
-            throw new ArgumentException("Password must contain at least one uppercase letter.");
+            throw new ArgumentException("La contraseña debe contener al menos una letra mayúscula.");
         }
 
         if(!Regex.IsMatch(password, @"[a-z]"))
         {
-            throw new ArgumentException("Password must contain at least one lowercase letter.");
+            throw new ArgumentException("La contraseña debe contener al menos una letra minúscula.");
         }
 
         if(!Regex.IsMatch(password, @"[0-9]"))
         {
-            throw new ArgumentException("Password must contain at least one number.");
+            throw new ArgumentException("La contraseña debe contener al menos un número.");
         }
 
         if(!Regex.IsMatch(password, @"[^a-zA-Z0-9]"))
         {
-            throw new ArgumentException("Password must contain at least one symbol.");
+            throw new ArgumentException("La contraseña debe contener al menos un símbolo.");
         }
 
         if(HasSequentialChars(password))
         {
-            throw new ArgumentException("Password cannot contain sequences.");
+            throw new ArgumentException("La contraseña no puede contener secuencias.");
         }
     }
 

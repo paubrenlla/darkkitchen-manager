@@ -44,7 +44,7 @@ public class ProductService(
     {
         if(_productRepository.GetAll().Any(p => p.Code == request.Code))
         {
-            throw new ArgumentException($"Product with code {request.Code} already exists.");
+            throw new ArgumentException($"Ya existe un producto con el código {request.Code}.");
         }
 
         var images = BuildImages(request.Images);
@@ -214,7 +214,7 @@ public class ProductService(
     {
         if(existingCodes.Contains(dto.Code!))
         {
-            throw new ArgumentException($"Product with code {dto.Code} already exists.");
+            throw new ArgumentException($"Ya existe un producto con el código {dto.Code}.");
         }
 
         var lineKey = dto.LineName!.Trim().ToLower();

@@ -36,32 +36,32 @@ public class ProductAuditHandler(IAuditRepository auditRepository) :
 
         if(old.Name != @new.Name)
         {
-            sb.AppendLine($"Name cambió de '{old.Name}' a '{@new.Name}'");
+            sb.AppendLine($"Nombre cambió de '{old.Name}' a '{@new.Name}'");
         }
 
         if(old.Description != @new.Description)
         {
-            sb.AppendLine($"Description cambió de '{old.Description}' a '{@new.Description}'");
+            sb.AppendLine($"Descripción cambió de '{old.Description}' a '{@new.Description}'");
         }
 
         if(old.Price != @new.Price)
         {
-            sb.AppendLine($"Price cambió de '{old.Price}' a '{@new.Price}'");
+            sb.AppendLine($"Precio cambió de '{old.Price}' a '{@new.Price}'");
         }
 
         if(old.IsActive != @new.IsActive)
         {
-            sb.AppendLine($"IsActive cambió de '{old.IsActive}' a '{@new.IsActive}'");
+            sb.AppendLine($"Estado activo cambió de '{old.IsActive}' a '{@new.IsActive}'");
         }
 
         if(old.Line.Name != @new.Line.Name)
         {
-            sb.AppendLine($"Line cambió de '{old.Line.Name}' a '{@new.Line.Name}'");
+            sb.AppendLine($"Línea cambió de '{old.Line.Name}' a '{@new.Line.Name}'");
         }
 
         if(old.Category.Name != @new.Category.Name)
         {
-            sb.AppendLine($"Category cambió de '{old.Category.Name}' a '{@new.Category.Name}'");
+            sb.AppendLine($"Categoría cambió de '{old.Category.Name}' a '{@new.Category.Name}'");
         }
 
         if(!old.Images.Select(i => i.Url).SequenceEqual(@new.Images.Select(i => i.Url)))
