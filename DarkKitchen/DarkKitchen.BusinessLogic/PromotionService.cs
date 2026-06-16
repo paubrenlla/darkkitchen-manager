@@ -25,7 +25,7 @@ public class PromotionService(
 
         IEnumerable<Promotion> promotions = _promotionRepository.GetAll();
         DateTime dateToFilter = date ?? DateTime.Now;
-        IEnumerable<Promotion> filtered = promotions.Where(p => p.IsVigente(dateToFilter));
+        IEnumerable<Promotion> filtered = promotions.Where(p => p.IsStillActive(dateToFilter));
 
         if(!string.IsNullOrWhiteSpace(line))
         {
@@ -100,7 +100,7 @@ public class PromotionService(
     public (string? PromotionName, decimal Discount) GetBestPromotionForProduct(Guid productId, DateTime date)
     {
         var activePromos = _promotionRepository.GetAll()
-            .Where(p => p.IsVigente(date) && p.Products.Any(prod => prod.Id == productId))
+            .Where(p => p.IsStillActive(date) && p.Products.Any(prod => prod.Id == productId))
             .ToList();
 
         if(!activePromos.Any())

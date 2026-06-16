@@ -226,7 +226,7 @@ public class PromotionTests
         var products = CreateDefaultProducts();
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
 
-        Assert.IsTrue(promotion.IsVigente(DateTime.Today.AddDays(2)));
+        Assert.IsTrue(promotion.IsStillActive(DateTime.Today.AddDays(2)));
     }
 
     [TestMethod]
@@ -235,7 +235,7 @@ public class PromotionTests
         var products = CreateDefaultProducts();
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
 
-        Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(-1)));
+        Assert.IsFalse(promotion.IsStillActive(DateTime.Today.AddDays(-1)));
     }
 
     [TestMethod]
@@ -244,7 +244,7 @@ public class PromotionTests
         var products = CreateDefaultProducts();
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
 
-        Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(10)));
+        Assert.IsFalse(promotion.IsStillActive(DateTime.Today.AddDays(10)));
     }
 
     [TestMethod]
@@ -254,7 +254,7 @@ public class PromotionTests
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
         promotion.Deactivate();
 
-        Assert.IsFalse(promotion.IsVigente(DateTime.Today.AddDays(2)));
+        Assert.IsFalse(promotion.IsStillActive(DateTime.Today.AddDays(2)));
     }
 
     [TestMethod]
@@ -263,7 +263,7 @@ public class PromotionTests
         var products = CreateDefaultProducts();
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
 
-        Assert.IsTrue(promotion.IsVigente(DateTime.Today));
+        Assert.IsTrue(promotion.IsStillActive(DateTime.Today));
     }
 
     [TestMethod]
@@ -272,7 +272,7 @@ public class PromotionTests
         var products = CreateDefaultProducts();
         var promotion = new Promotion("Promo Valida", 10, DateTime.Today, DateTime.Today.AddDays(5), products);
 
-        Assert.IsTrue(promotion.IsVigente(DateTime.Today.AddDays(5)));
+        Assert.IsTrue(promotion.IsStillActive(DateTime.Today.AddDays(5)));
     }
 
     [TestMethod]

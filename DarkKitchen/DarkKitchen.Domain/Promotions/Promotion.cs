@@ -81,7 +81,7 @@ public class Promotion
         IsActive = false;
     }
 
-    public bool IsVigente(DateTime date)
+    public bool IsStillActive(DateTime date)
     {
         return IsActive && date >= StartDate && date <= EndDate;
     }
