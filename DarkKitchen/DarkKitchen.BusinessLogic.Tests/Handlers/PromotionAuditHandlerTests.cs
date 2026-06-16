@@ -74,10 +74,10 @@ public class PromotionAuditHandlerTests
         _handler.Handle(domainEvent);
 
         _mockAuditRepository.Verify(r => r.Save(It.Is<AuditLog>(log =>
-            log.ChangeDescription.Contains("Name cambió de 'Old Name Long Enough' a 'New Name Long Enough'") &&
-            log.ChangeDescription.Contains("DiscountPercentage cambió de '10' a '20'") &&
-            log.ChangeDescription.Contains("StartDate cambió de") &&
-            log.ChangeDescription.Contains("EndDate cambió de") &&
+            log.ChangeDescription.Contains("Nombre cambió de 'Old Name Long Enough' a 'New Name Long Enough'") &&
+            log.ChangeDescription.Contains("Porcentaje de descuento cambió de '10' a '20'") &&
+            log.ChangeDescription.Contains("Fecha de inicio cambió de") &&
+            log.ChangeDescription.Contains("Fecha de fin cambió de") &&
             log.ChangeDescription.Contains("La lista de productos de la promoción fue modificada."))), Times.Once);
         _mockAuditRepository.VerifyAll();
     }

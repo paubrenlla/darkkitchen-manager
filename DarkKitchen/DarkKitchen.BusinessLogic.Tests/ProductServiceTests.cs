@@ -416,7 +416,7 @@ public class ProductServiceTests
         Assert.AreEqual(0, result.Successful);
         Assert.AreEqual(1, result.Failed);
         Assert.AreEqual(1, result.Errors.Count);
-        Assert.IsTrue(result.Errors[0].Contains("already exists"));
+        Assert.IsTrue(result.Errors[0].Contains("Ya existe un producto"));
         _mockRepository.VerifyAll();
         mockImporter.VerifyAll();
     }
