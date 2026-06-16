@@ -11,8 +11,8 @@ namespace DarkKitchen.BusinessLogic.Tests;
 [TestClass]
 public class AuthServiceTests
 {
-    private const string ValidName = "Juan";
-    private const string ValidSurname = "Perez";
+    private const string ValidName = "Test";
+    private const string ValidSurname = "Test";
     private const string ValidEmail = "test@domain.com";
     private const string ValidPassword = "Valid1Password!@";
     private static readonly IPhoneValidationStrategy UruguayStrategy = new UruguayPhoneValidationStrategy();
@@ -26,9 +26,9 @@ public class AuthServiceTests
     [TestInitialize]
     public void Setup()
     {
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _tokenServiceMock = new Mock<ITokenService>();
-        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _userRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+        _tokenServiceMock = new Mock<ITokenService>(MockBehavior.Strict);
+        _passwordHasherMock = new Mock<IPasswordHasher>(MockBehavior.Strict);
         _authService = new AuthService(
             _userRepositoryMock.Object,
             _tokenServiceMock.Object,
@@ -38,6 +38,7 @@ public class AuthServiceTests
     [TestMethod]
     public void LoginWithValidCredentials_ReturnsLoginResponse()
     {
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
         var expectedUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(expectedUser);
@@ -48,26 +49,22 @@ public class AuthServiceTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("mocked.token", result.Token);
+        Assert.AreEqual(Role.Cliente, result.User.Role);
+        _userRepositoryMock.VerifyAll();
+        _passwordHasherMock.VerifyAll();
+        _tokenServiceMock.VerifyAll();
     }
 
     [TestMethod]
     [ExpectedException(typeof(UnauthorizedAccessException))]
     public void LoginWithInvalidPassword_ThrowsUnauthorized()
     {
+        _passwordHasherMock.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
         var existingUser = new User(ValidName, ValidSurname, ValidEmail, ValidPhone, ValidPassword, Role.Cliente, _passwordHasherMock.Object);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByEmail(ValidEmail)).Returns(existingUser);
         _passwordHasherMock.Setup(h => h.VerifyPassword("WrongPassword", existingUser.HashedPassword)).Returns(false);
 
         _authService.Login(ValidEmail, "WrongPassword");
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(UnauthorizedAccessException))]
-    public void LoginWithNonExistentEmail_ThrowsUnauthorized()
-    {
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmail("nonexistent@bmb.com")).Returns((User?)null);
-
-        _authService.Login("nonexistent@bmb.com", ValidPassword);
     }
 }

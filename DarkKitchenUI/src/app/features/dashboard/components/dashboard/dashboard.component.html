@@ -1,0 +1,111 @@
+<mat-sidenav-container style="
+  --bg-container: #f8fafc;
+  --bg-sidenav: #ffffff;
+  --bg-main-content: transparent;
+  --border-sidenav: var(--border-color);
+  --border-header: #eef2f7;
+  --text-brand: var(--brand-color);
+  --text-role-badge: #94a3b8;
+  --text-item-default: #475569;
+  --text-icon-default: #94a3b8;
+  --bg-item-active: var(--background-color);
+  --text-item-active: var(--brand-color);
+  " class="h-screen w-full font-sans !bg-[var(--bg-container)]">
+
+  <mat-sidenav mode="side" opened
+    class="w-48 !bg-[var(--bg-sidenav)] border-r border-[var(--border-sidenav)] flex flex-col h-full transition-all duration-200">
+
+    <div class="p-5 text-center border-b border-[var(--border-header)] h-16 flex flex-col justify-center">
+      <a routerLink="/dashboard" matTooltip="Ir al inicio" matTooltipPosition="right"
+         class="no-underline group cursor-pointer">
+        <h2 class="m-0 text-lg font-bold tracking-tight text-[var(--text-brand)] leading-none
+              transition-opacity group-hover:opacity-70">
+          Dark Kitchen
+        </h2>
+        <span class="text-[10px] font-semibold text-[var(--text-role-badge)] block mt-1 uppercase tracking-wider leading-none">
+         Panel de {{ currentUserRole() }}
+        </span>
+      </a>
+    </div>
+
+    <mat-nav-list class="pt-2 px-2">
+      @for (item of menuItems(); track item.route) {
+      <a mat-list-item [routerLink]="[item.route]"
+        routerLinkActive="!bg-[var(--bg-item-active)] !text-[var(--text-item-active)] font-semibold shadow-sm"
+        class="my-0.5 rounded-md overflow-hidden transition-all duration-150 text-[var(--text-item-default)] block">
+        <mat-icon matListItemIcon class="!text-[var(--text-icon-default)] transition-colors">{{ item.icon }}</mat-icon>
+        <span matListItemTitle class="text-xs tracking-wide">{{ item.label }}</span>
+      </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="flex flex-col h-full overflow-hidden">
+
+    <app-navbar></app-navbar>
+
+    <main class="p-6 overflow-y-auto flex-1 !bg-[var(--bg-main-content)] relative">
+
+      <router-outlet #outlet="outlet"></router-outlet>
+
+      @if (!outlet.isActivated) {
+      <div class="h-full flex flex-col max-w-5xl mx-auto animation-fade-in">
+
+        <!-- Welcome Banner -->
+        <div
+          class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-800 p-8 sm:p-10 text-white shadow-xl mb-8 border border-white/10">
+          <!-- Decorative background elements -->
+          <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          <div class="absolute bottom-0 left-20 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl"></div>
+
+          <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div>
+              <p class="text-indigo-200 text-sm font-semibold tracking-widest uppercase mb-2">
+                {{ currentDate() }}
+              </p>
+              <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+                {{ greeting() }} <span class="inline-block animate-wave">👋</span>
+              </h1>
+              <p class="text-indigo-100 text-base max-w-lg leading-relaxed">
+                Bienvenido al panel central de Dark Kitchen. Seleccioná una herramienta del menú para comenzar a
+                gestionar o revisá tus accesos rápidos a continuación.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Access Grid -->
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <mat-icon class="text-indigo-500 text-sm w-5 h-5 flex items-center justify-center">bolt</mat-icon>
+            Accesos Rápidos
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            @for (item of menuItems(); track item.route) {
+            <a [routerLink]="[item.route]"
+              class="group flex flex-col p-5 bg-white rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-indigo-200 transition-all duration-300 cursor-pointer relative overflow-hidden">
+
+              <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity">
+              </div>
+
+              <div
+                class="w-12 h-12 rounded-xl bg-slate-50 group-hover:bg-indigo-50 flex items-center justify-center mb-4 transition-colors">
+                <mat-icon class="text-slate-400 group-hover:text-indigo-600 transition-colors">{{ item.icon
+                  }}</mat-icon>
+              </div>
+
+              <h3 class="font-semibold text-slate-800 text-sm mb-1">{{ item.label }}</h3>
+              <p class="text-xs text-slate-400">Ir a la sección →</p>
+            </a>
+            }
+          </div>
+        </div>
+
+      </div>
+      }
+
+    </main>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

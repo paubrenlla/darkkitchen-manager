@@ -1,7 +1,11 @@
-﻿namespace DarkKitchen.Models.DTOs;
+﻿using System.Diagnostics.CodeAnalysis;
+using DarkKitchen.Domain.Users;
 
-public class LoginResponse
+namespace DarkKitchen.Models.DTOs;
+
+[method: SetsRequiredMembers]
+public class LoginResponse(LoginResult result)
 {
-    public required string Token { get; set; }
-    public required string Role { get; set; }
+    public required string Token { get; set; } = result.Token;
+    public required string Role { get; set; } = result.User.Role.ToString();
 }

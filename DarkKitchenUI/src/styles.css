@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, button, input, select, textarea {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+:root {
+  --brand-color: #453778;
+  --brand-color-hover: #3c34d0;
+
+  --background-color: #eef2ff;
+
+  --text-color: #111827;
+  --border-color: #d1d5db;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(69, 55, 120, 0.04),
+      transparent 35%
+    ),
+    #f8fafc;
+}
+
+.mdc-notched-outline__leading,
+.mdc-notched-outline__notch,
+.mdc-notched-outline__trailing {
+  border-top-style: solid !important;
+  border-bottom-style: solid !important;
+}
+
+.mdc-notched-outline__leading {
+  border-left-style: solid !important;
+  border-right-style: none !important;
+}
+
+.mdc-notched-outline__notch {
+  border-left-style: none !important;
+  border-right-style: none !important;
+}
+
+.mdc-notched-outline__trailing {
+  border-left-style: none !important;
+  border-right-style: solid !important;
+}
+
+.mdc-notched-outline--notched .mdc-notched-outline__notch {
+  border-top-style: none !important;
+}
+
+.mat-mdc-menu-panel {
+  background-color: white !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 16px !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-menu-content {
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-menu-item {
+  font-family: inherit !important;
+  font-size: 15px !important;
+}

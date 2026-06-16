@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <Target Name="CopyPluginToWebApi" AfterTargets="Build">
+        <MakeDir Directories="..\DarkKitchen.WebApi\bin\$(Configuration)\$(TargetFramework)\Plugins\" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\DarkKitchen.WebApi\bin\$(Configuration)\$(TargetFramework)\Plugins\" />
+    </Target>
+
+</Project>

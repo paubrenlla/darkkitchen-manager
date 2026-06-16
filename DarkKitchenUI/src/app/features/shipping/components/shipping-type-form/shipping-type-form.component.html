@@ -1,0 +1,61 @@
+<div class="max-w-3xl mx-auto">
+  <h2
+    mat-dialog-title
+    class="text-xl font-bold px-6 pt-6 pb-0"
+    style="color: var(--brand-color);">
+    {{ isEditMode ? 'Editar tipo de envío' : 'Nuevo tipo de envío' }}
+  </h2>
+
+  <mat-dialog-content class="!px-6 !pt-4 !pb-2">
+    <div class="flex flex-col gap-4">
+      @if (errorMessage()) {
+        <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <mat-icon class="text-rose-500">error_outline</mat-icon>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+        <mat-label>Nombre *</mat-label>
+        <input matInput [(ngModel)]="name" placeholder="Ej: Envío estándar" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+        <mat-label>Costo de envío *</mat-label>
+        <input matInput type="number" [(ngModel)]="cost" placeholder="0" min="0" />
+        <span matPrefix class="text-slate-400 text-sm px-2">$</span>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="!px-6 !pb-5 !pt-4 flex justify-end gap-2">
+    <button
+      mat-stroked-button
+      (click)="onCancel()"
+      [disabled]="isLoading()"
+        style="
+        color: var(--brand-color);
+        border-color: var(--brand-color);
+      ">
+      Cancelar
+    </button>
+    <button
+      mat-flat-button
+      style="
+      background-color: var(--brand-color);
+      color: white;
+      "
+      (click)="onSubmit()"
+      [disabled]="isLoading() || !name.trim() || cost === null || cost < 0"
+    >
+      @if (isLoading()) {
+        <div class="flex items-center gap-2">
+          <mat-spinner diameter="16"></mat-spinner>
+          <span>Guardando...</span>
+        </div>
+      } @else {
+        {{ isEditMode ? 'Guardar cambios' : 'Crear tipo de envío' }}
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

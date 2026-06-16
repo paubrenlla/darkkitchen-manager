@@ -22,8 +22,8 @@ public class OrderEnricherTests
     [TestInitialize]
     public void Setup()
     {
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _productRepositoryMock = new Mock<IProductRepository>();
+        _userRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+        _productRepositoryMock = new Mock<IProductRepository>(MockBehavior.Strict);
         _enricher = new OrderEnricher(_userRepositoryMock.Object, _productRepositoryMock.Object);
 
         _address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
@@ -42,34 +42,37 @@ public class OrderEnricherTests
     [TestMethod]
     public void EnrichForClient_ShouldIncludeClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual("Juan Sosa", result.ClientName);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void EnrichForClient_WhenUserNotFound_ShouldReturnEmptyClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns((User?)null);
 
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(string.Empty, result.ClientName);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void EnrichForClient_ShouldNotIncludeItems()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(0, result.Items.Count);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
@@ -80,30 +83,33 @@ public class OrderEnricherTests
             new OrderItem(_product.Id, 2, 150m),
             new OrderItem(Guid.NewGuid(), 3, 100m),
         };
-        var order = new Order(_clientId, _address, DeliveryType.Express, items, 0m);
+        var order = new Order(_clientId, _address, "Express", items, 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
 
         var result = _enricher.EnrichForClient(order);
 
         Assert.AreEqual(5, result.ProductCount);
+        _userRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void EnrichForPreparador_ShouldIncludeClientName()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 1, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 1, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(_product.Id)).Returns(_product);
 
         var result = _enricher.EnrichForPreparador(order);
 
         Assert.AreEqual("Juan Sosa", result.ClientName);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void EnrichForPreparador_ShouldIncludeItemsWithProductDetails()
     {
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(_product.Id, 2, 150m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(_product.Id, 2, 150m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(_product.Id)).Returns(_product);
 
@@ -113,13 +119,15 @@ public class OrderEnricherTests
         Assert.AreEqual("BURG01", result.Items[0].ProductCode);
         Assert.AreEqual("Hamburguesa Clasica", result.Items[0].ProductName);
         Assert.AreEqual(2, result.Items[0].Quantity);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 
     [TestMethod]
     public void EnrichForPreparador_WhenProductNotFound_ShouldUseEmptyStrings()
     {
         var unknownProductId = Guid.NewGuid();
-        var order = new Order(_clientId, _address, DeliveryType.Express, [new OrderItem(unknownProductId, 1, 100m)], 0m);
+        var order = new Order(_clientId, _address, "Express", [new OrderItem(unknownProductId, 1, 100m)], 0m);
         _userRepositoryMock.Setup(r => r.GetById(_clientId)).Returns(_user);
         _productRepositoryMock.Setup(r => r.GetById(unknownProductId)).Returns((Product?)null);
 
@@ -128,5 +136,7 @@ public class OrderEnricherTests
         Assert.AreEqual(1, result.Items.Count);
         Assert.AreEqual(string.Empty, result.Items[0].ProductCode);
         Assert.AreEqual(string.Empty, result.Items[0].ProductName);
+        _userRepositoryMock.VerifyAll();
+        _productRepositoryMock.VerifyAll();
     }
 }

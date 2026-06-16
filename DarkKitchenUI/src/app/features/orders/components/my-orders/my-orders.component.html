@@ -1,0 +1,210 @@
+<div>
+
+  <div class="mb-6">
+    <h1
+      class="text-2xl font-bold"
+      style="color: var(--brand-color);">
+      Mis pedidos
+    </h1>
+
+    <p class="text-sm text-slate-400 mt-1">
+      Historial de tus pedidos realizados
+    </p>
+  </div>
+
+  <div class="flex flex-wrap items-end gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
+
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
+      <mat-label>Desde</mat-label>
+      <input matInput type="date" [(ngModel)]="fromDate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
+      <mat-label>Hasta</mat-label>
+      <input matInput type="date" [(ngModel)]="toDate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-44" subscriptSizing="dynamic">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="statusFilter">
+        <mat-option value="">Todos</mat-option>
+        @for (s of statusOptions; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="flex gap-2 w-full sm:w-auto sm:ml-auto items-center">
+
+      <button
+        mat-flat-button
+        (click)="loadOrders()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+        style="background-color: var(--brand-color); color: white;">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+
+      <button
+        mat-stroked-button
+        (click)="clearFilters()"
+        class="!rounded-xl !py-5 !px-6 h-[48px]"
+        style="color: var(--brand-color); border-color: var(--brand-color);">
+        <mat-icon>clear_all</mat-icon>
+        Limpiar
+      </button>
+
+    </div>
+
+  </div>
+
+  @if (errorMessage()) {
+
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
+      {{ errorMessage() }}
+    </div>
+
+  }
+
+  @if (isLoading()) {
+
+    <div class="flex justify-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+  } @else {
+
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+
+      <table mat-table [dataSource]="orders()" class="w-full">
+
+        <ng-container matColumnDef="orderNumber">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Pedido #
+          </th>
+
+          <td mat-cell *matCellDef="let o" class="font-semibold text-slate-800">
+            #{{ o.orderNumber }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="client">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Cliente
+          </th>
+
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-700">
+            {{ o.clientName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Fecha
+          </th>
+
+          <td mat-cell *matCellDef="let o" class="text-sm text-slate-600">
+            {{ o.createdAt | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Estado
+          </th>
+
+          <td mat-cell *matCellDef="let o">
+            <span
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+              [class]="getStatusClass(o.status)">
+              {{ o.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="total">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Total
+          </th>
+
+          <td mat-cell *matCellDef="let o" class="font-semibold text-slate-800">
+            ${{ o.total }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="items">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-sm font-semibold text-slate-800"
+            style="background-color: var(--background-color);">
+            Productos
+          </th>
+
+          <td mat-cell *matCellDef="let o">
+            <span
+              class="px-2.5 py-1 rounded-full text-xs font-medium"
+              style="
+                background-color: var(--background-color);
+                color: var(--brand-color);
+              ">
+              {{ o.productCount }}
+            </span>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="border-b border-slate-100 last:border-0 transition-colors duration-150 hover:bg-[var(--background-color)]">
+        </tr>
+
+      </table>
+
+      @if (orders().length === 0) {
+
+        <div class="rounded-2xl border border-slate-100 p-12 text-center bg-white">
+
+          <mat-icon class="text-4xl text-slate-300 mb-3">
+            receipt_long
+          </mat-icon>
+
+          <p class="text-slate-400 text-sm">
+            No tenés pedidos registrados.
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>

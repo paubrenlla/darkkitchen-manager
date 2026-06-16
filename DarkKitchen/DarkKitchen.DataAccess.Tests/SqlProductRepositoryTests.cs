@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace DarkKitchen.DataAccess.Tests;
@@ -156,5 +156,100 @@ public class SqlProductRepositoryTests
         var result = _repository.GetById(product.Id);
         Assert.IsNotNull(result);
         Assert.IsFalse(result.IsActive);
+    }
+
+    [TestMethod]
+    public void Update_ReplaceImages_ShouldDeleteOldAndPersistNew()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        var oldImageId = product.Images[0].Id;
+
+        var newImages = new List<ProductImage>
+        {
+            new ProductImage("https://example.com/img1.jpg", 10000),
+            new ProductImage("https://example.com/img2.jpg", 20000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, product.Line, product.Category, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+
+        Assert.AreEqual(2, result.Images.Count);
+        Assert.IsFalse(result.Images.Any(i => i.Id == oldImageId));
+        Assert.IsTrue(result.Images.Any(i => i.Url == "https://example.com/img1.jpg"));
+    }
+
+    [TestMethod]
+    public void GetAllLines_ShouldReturnAllLines()
+    {
+        var line2 = new ProductLine("Línea 2");
+        _context.ProductLines.Add(line2);
+        _context.SaveChanges();
+
+        var result = _repository.GetAllLines().ToList();
+
+        Assert.AreEqual(2, result.Count); // _defaultLine + line2
+        Assert.IsTrue(result.Any(l => l.Name == "Combo burgers"));
+        Assert.IsTrue(result.Any(l => l.Name == "Línea 2"));
+    }
+
+    [TestMethod]
+    public void GetAllCategories_ShouldReturnAllCategories()
+    {
+        var cat2 = new ProductCategory("Categoría 2");
+        _context.ProductCategories.Add(cat2);
+        _context.SaveChanges();
+
+        var result = _repository.GetAllCategories().ToList();
+
+        Assert.AreEqual(2, result.Count); // _defaultCategory + cat2
+        Assert.IsTrue(result.Any(c => c.Name == "Parrilla"));
+        Assert.IsTrue(result.Any(c => c.Name == "Categoría 2"));
+    }
+
+    [TestMethod]
+    public void Update_WithNewLine_ShouldCreateLineAndPersistProduct()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        _context.ChangeTracker.Clear();
+
+        var newLine = new ProductLine("Linea Completamente Nueva");
+        var newImages = new List<ProductImage>
+        {
+            new("https://example.com/new.jpg", 60000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, newLine, _defaultCategory, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Linea Completamente Nueva", result.Line.Name);
+        Assert.IsTrue(_context.ProductLines.Any(l => l.Name == "Linea Completamente Nueva"));
+    }
+
+    [TestMethod]
+    public void Update_WithNewCategory_ShouldCreateCategoryAndPersistProduct()
+    {
+        var product = CreateProduct();
+        _repository.Add(product);
+        _context.ChangeTracker.Clear();
+
+        var newCategory = new ProductCategory("Categoria Completamente Nueva");
+        var newImages = new List<ProductImage>
+        {
+            new("https://example.com/new.jpg", 60000)
+        };
+
+        product.UpdateDetails(product.Name, product.Description, _defaultLine, newCategory, product.Price, newImages);
+        _repository.Update(product.Id, product);
+
+        var result = _repository.GetById(product.Id);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Categoria Completamente Nueva", result.Category.Name);
+        Assert.IsTrue(_context.ProductCategories.Any(c => c.Name == "Categoria Completamente Nueva"));
     }
 }

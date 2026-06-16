@@ -1,11 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+using DarkKitchen.Domain.Users;
+
 namespace DarkKitchen.Models.DTOs;
 
-public class UserCreateResponse
+[method: SetsRequiredMembers]
+public class UserCreateResponse(User user)
 {
-    public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public required string Surname { get; set; }
-    public required string Email { get; set; }
-    public required string Phone { get; set; }
-    public required string Role { get; set; }
+    public Guid Id { get; set; } = user.Id;
+    public string Name { get; set; } = user.Name;
+    public string Surname { get; set; } = user.Surname;
+    public string Email { get; set; } = user.Email;
+    public string Role { get; set; } = user.Role.ToString();
+    public string PhoneNumber { get; set; } = user.Phone.Number;
 }

@@ -1,0 +1,200 @@
+<div>
+  @if (!hideHeader()) {
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1
+          class="text-2xl font-bold"
+          style="color: var(--brand-color);">
+          Productos
+        </h1>
+
+        <p class="text-sm text-slate-400 mt-1">
+          Gestión del catálogo de productos
+        </p>
+      </div>
+
+      <button
+        mat-flat-button
+        (click)="openCreateDialog()"
+        class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+        style="background-color: var(--brand-color); color: white;">
+        <mat-icon>add</mat-icon>
+        Nuevo producto
+      </button>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="flex flex-wrap items-center gap-4 mb-6 p-4 rounded-2xl bg-white shadow-md border border-slate-100">
+      <mat-form-field appearance="outline" class="w-full sm:w-64" subscriptSizing="dynamic">
+        <mat-label>Nombre</mat-label>
+        <input matInput type="text" [ngModel]="filterName()" (ngModelChange)="filterName.set($event)" placeholder="Ej: Hamburguesa" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+        <mat-label>Línea</mat-label>
+        <input matInput type="text" [ngModel]="filterLine()" (ngModelChange)="filterLine.set($event)" placeholder="Ej: Alimentos" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">horizontal_rule</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full sm:w-48" subscriptSizing="dynamic">
+        <mat-label>Categoría</mat-label>
+        <input matInput type="text" [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)" placeholder="Ej: Hamburguesas" (keyup.enter)="onSearch()">
+        <mat-icon matPrefix class="text-slate-400 mr-2">category</mat-icon>
+      </mat-form-field>
+
+      <div class="flex gap-2 w-full sm:w-auto sm:ml-auto">
+        <button
+          mat-flat-button
+          (click)="onSearch()"
+          class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+          [disabled]="isLoading()"
+          style="background-color: var(--brand-color); color: white;">
+          <mat-icon>filter_list</mat-icon>
+          Filtrar
+        </button>
+        <button
+          mat-stroked-button
+          (click)="onClear()"
+          class="!rounded-xl !py-5 !px-6 h-[48px]"
+          [disabled]="isLoading()"
+          style="color: var(--brand-color); border-color: var(--brand-color);">
+          <mat-icon>clear_all</mat-icon>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
+      {{ errorMessage() }}
+    </div>
+  } @else {
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+
+        <table class="w-full border-collapse">
+
+          <thead style="background-color: var(--background-color);">
+          <tr>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Código</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Nombre</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Línea</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Categoría</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Precio</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800">Estado</th>
+            <th class="p-4 text-left text-sm font-semibold text-slate-800 w-28">
+              Acciones
+            </th>
+          </tr>
+          </thead>
+
+          <tbody>
+
+            @for (p of products(); track p.id) {
+
+              <tr
+                class="border-t transition-colors duration-150 hover:bg-[var(--background-color)]"
+                style="border-color: var(--border-color);">
+
+                <td class="p-4 font-mono text-sm text-slate-600">
+                  {{ p.code }}
+                </td>
+
+                <td class="p-4 font-medium text-slate-800">
+                  {{ p.name }}
+                </td>
+
+                <td class="p-4 text-slate-600">
+                  {{ p.line }}
+                </td>
+
+                <td class="p-4 text-slate-600">
+                  {{ p.category }}
+                </td>
+
+                <td class="p-4 font-medium text-slate-700">
+                  ${{ p.price }}
+                </td>
+
+                <td class="p-4">
+
+                  @if (p.isActive) {
+
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-medium"
+                      style="
+                  background-color: #ecfdf5;
+                  color: #047857;
+                ">
+                Activo
+              </span>
+
+                  } @else {
+
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-medium"
+                      style="
+                  background-color: #f8fafc;
+                  color: #64748b;
+                ">
+                Inactivo
+              </span>
+
+                  }
+
+                </td>
+
+                <td class="p-4">
+
+                  <div class="flex gap-1">
+
+                    @if (!hideEditButton()) {
+                      <button
+                        mat-icon-button
+                        matTooltip="Editar"
+                        (click)="openEditDialog(p)"
+                        style="color: var(--brand-color);">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    }
+
+                    <button
+                      mat-icon-button
+                      [matTooltip]="p.isActive ? 'Desactivar' : 'Activar'"
+                      (click)="onToggleActive(p)"
+                      [style.color]="p.isActive ? '#e11d48' : '#10b981'">
+
+                      <mat-icon>
+                        {{ p.isActive ? 'toggle_on' : 'toggle_off' }}
+                      </mat-icon>
+
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            } @empty {
+              <tr>
+                <td colspan="7" class="p-12 text-center">
+                  <mat-icon class="text-4xl text-slate-300 mb-3">inventory_2</mat-icon>
+                  <p class="text-slate-400 text-sm">No hay productos registrados</p>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+
+        </table>
+
+    </div>
+  }
+</div>

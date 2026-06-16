@@ -18,6 +18,7 @@ public class Promotion
         ValidateName(name);
         ValidateDiscountPercentage(discountPercentage);
         ValidateDates(startDate, endDate);
+        ValidateProducts(products);
 
         Id = Guid.NewGuid();
         Name = name;
@@ -42,6 +43,7 @@ public class Promotion
         ValidateName(name);
         ValidateDiscountPercentage(discount);
         ValidateDates(start, end);
+        ValidateProducts(products);
 
         Name = name;
         DiscountPercentage = discount;
@@ -54,7 +56,7 @@ public class Promotion
     {
         if(string.IsNullOrWhiteSpace(name) || name.Length < 3 || name.Length > 50)
         {
-            throw new ArgumentException("Name must be between 3 and 50 characters.");
+            throw new ArgumentException("El nombre debe tener entre 3 y 50 caracteres.");
         }
     }
 
@@ -62,7 +64,7 @@ public class Promotion
     {
         if(startDate > endDate)
         {
-            throw new ArgumentException("Start date must be before or equal to end date.");
+            throw new ArgumentException("La fecha de inicio debe ser anterior o igual a la fecha de fin.");
         }
     }
 
@@ -70,7 +72,7 @@ public class Promotion
     {
         if(discountPercentage <= 0)
         {
-            throw new ArgumentException("Discount percentage must be greater than zero.");
+            throw new ArgumentException("El porcentaje de descuento debe ser mayor a cero.");
         }
     }
 
@@ -79,8 +81,29 @@ public class Promotion
         IsActive = false;
     }
 
-    public bool IsVigente(DateTime date)
+    public bool IsStillActive(DateTime date)
     {
         return IsActive && date >= StartDate && date <= EndDate;
+    }
+
+    public Promotion Clone()
+    {
+        var clone = new Promotion(Name, DiscountPercentage, StartDate, EndDate, new List<Product>(Products));
+        typeof(Promotion).GetProperty(nameof(Id))!.SetValue(clone, Id);
+
+        if(!IsActive)
+        {
+            clone.Deactivate();
+        }
+
+        return clone;
+    }
+
+    private static void ValidateProducts(List<Product> products)
+    {
+        if(products == null || products.Count == 0)
+        {
+            throw new ArgumentException("La promoción debe contener al menos un producto.");
+        }
     }
 }

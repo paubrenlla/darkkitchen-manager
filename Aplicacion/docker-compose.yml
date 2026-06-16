@@ -1,0 +1,41 @@
+services:
+  sql:
+    image: mcr.microsoft.com/azure-sql-edge
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=MyPass@word
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "MyPass@word" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - da2-network
+
+  api:
+    image: darkkitchen/api:latest
+    ports:
+      - "5254:8080"
+    volumes:
+      - ./Plugins:/app/Plugins
+      - ./Samples:/app/Samples
+    depends_on:
+      sql:
+        condition: service_healthy
+    networks:
+      - da2-network
+
+  frontend:
+    image: darkkitchen/frontend:latest
+    ports:
+      - "8080:80"
+    networks:
+      - da2-network
+
+networks:
+  da2-network:
+    driver: bridge

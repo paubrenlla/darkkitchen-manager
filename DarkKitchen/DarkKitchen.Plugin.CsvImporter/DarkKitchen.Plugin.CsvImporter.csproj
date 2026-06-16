@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DarkKitchen.Plugin.Contracts\DarkKitchen.Plugin.Contracts.csproj" />
+  </ItemGroup>
+
+  <!-- Automatización: Copia la DLL del plugin a la carpeta /Plugins del WebApi después de compilar -->
+    <Target Name="CopyPlugin" AfterTargets="Build">
+        <MakeDir Directories="$(SolutionDir)DarkKitchen.WebApi\bin\Debug\net8.0\Plugins\" />
+        <Copy
+                SourceFiles="$(OutputPath)$(AssemblyName).dll"
+                DestinationFolder="$(SolutionDir)DarkKitchen.WebApi\bin\Debug\net8.0\Plugins\" />
+    </Target>
+
+</Project>

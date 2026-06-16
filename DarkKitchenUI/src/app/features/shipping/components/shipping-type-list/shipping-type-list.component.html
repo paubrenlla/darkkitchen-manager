@@ -1,0 +1,124 @@
+<div>
+
+  <div class="mb-6 flex items-center justify-between">
+
+    <div>
+      <h1
+        class="text-2xl font-bold"
+        style="color: var(--brand-color);">
+        Tipos de Envío
+      </h1>
+
+      <p class="text-sm text-slate-400 mt-1">
+        Gestión de tipos de envío
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      (click)="openCreateDialog()"
+      class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+      style="background-color: var(--brand-color); color: white;">
+      <mat-icon>add</mat-icon>
+      Nuevo tipo de envío
+    </button>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="flex justify-center py-8">
+      <mat-spinner />
+    </div>
+
+  } @else if (errorMessage()) {
+
+    <div
+      class="rounded-lg border p-4"
+      style="
+        border-color: var(--border-color);
+        color: var(--text-color);
+      ">
+      {{ errorMessage() }}
+    </div>
+
+  } @else {
+
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+
+      <table class="w-full border-collapse">
+
+        <thead style="background-color: var(--background-color);">
+        <tr>
+          <th class="p-4 text-left text-sm font-semibold text-slate-800">
+            Nombre
+          </th>
+
+          <th class="p-4 text-left text-sm font-semibold text-slate-800">
+            Costo
+          </th>
+
+          <th class="w-32 p-4 text-center text-sm font-semibold text-slate-800">
+            Acciones
+          </th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+          @for (s of shippingTypes(); track s.id) {
+
+            <tr
+              class="border-t transition-colors duration-150 hover:bg-[var(--background-color)]"
+              style="border-color: var(--border-color);">
+
+              <td class="p-4">
+                {{ s.name }}
+              </td>
+
+              <td class="p-4 text-slate-700 font-medium">
+                ${{ s.cost }}
+              </td>
+
+              <td class="w-32 p-4">
+                <div class="flex justify-center gap-1">
+
+                <button
+                  mat-icon-button
+                  (click)="openEditDialog(s)"
+                  class="transition-colors"
+                  style="color: var(--brand-color);">
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  matTooltip="Eliminar"
+                  (click)="openDeleteDialog(s)"
+                  style="color: #e11d48;">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+
+                </div>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+      @if (shippingTypes().length === 0) {
+        <div class="p-12 text-center">
+          <mat-icon class="text-4xl text-slate-300 mb-3">local_shipping</mat-icon>
+          <p class="text-slate-400 text-sm">No hay tipos de envío registrados.</p>
+        </div>
+      }
+
+    </div>
+
+  }
+
+</div>

@@ -22,7 +22,7 @@ public class PhoneNumber
 
         if(!validationStrategy.IsValid(cleanNumber))
         {
-            throw new ArgumentException($"Invalid phone number for country prefix {validationStrategy.CountryPrefix}.");
+            throw new ArgumentException($"Número de teléfono inválido para el prefijo {validationStrategy.CountryPrefix}.");
         }
 
         return new PhoneNumber(prefix, cleanNumber);

@@ -10,33 +10,26 @@ public class PhoneStrategyFactoryTests
     [TestMethod]
     public void GetStrategy_ExistingPrefix_ReturnsCorrectStrategy()
     {
-        var mockStrategyUy = new Mock<IPhoneValidationStrategy>();
+        var mockStrategyUy = new Mock<IPhoneValidationStrategy>(MockBehavior.Strict);
         mockStrategyUy.Setup(s => s.CountryPrefix).Returns("+598");
 
-        var mockStrategyAr = new Mock<IPhoneValidationStrategy>();
-        mockStrategyAr.Setup(s => s.CountryPrefix).Returns("+54");
+        var mockStrategyAr = new Mock<IPhoneValidationStrategy>(MockBehavior.Strict);
 
-        var strategies = new List<IPhoneValidationStrategy>
-        {
-            mockStrategyUy.Object,
-            mockStrategyAr.Object
-        };
-
-        var factory = new PhoneStrategyFactory(strategies);
+        var factory = new PhoneStrategyFactory([mockStrategyUy.Object, mockStrategyAr.Object]);
 
         var result = factory.GetStrategy("+598");
 
         Assert.IsNotNull(result);
         Assert.AreEqual("+598", result.CountryPrefix);
         Assert.AreEqual(mockStrategyUy.Object, result);
+        mockStrategyUy.VerifyAll();
     }
 
     [TestMethod]
     [ExpectedException(typeof(NotSupportedException))]
     public void GetStrategy_NonExistingPrefix_ThrowsNotSupportedException()
     {
-        var strategies = new List<IPhoneValidationStrategy>();
-        var factory = new PhoneStrategyFactory(strategies);
+        var factory = new PhoneStrategyFactory([]);
 
         factory.GetStrategy("+1");
     }

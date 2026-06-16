@@ -1,4 +1,4 @@
-﻿using DarkKitchen.IBusinessLogic;
+using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,21 +18,36 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromQuery] string? line,
         [FromQuery] string? category)
     {
-        IEnumerable<ProductResponse> products = _productService.GetProducts(name, line, category);
-        return products.Any() ? Ok(products) : NoContent();
+        var products = _productService.GetProducts(name, line, category)
+            .Select(p => new ProductResponse(p))
+            .ToList();
+        return Ok(products);
     }
 
     [HttpPost]
     [Authorize(Roles = "Administrativo")]
     public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
     {
-        return StatusCode(StatusCodes.Status201Created, _productService.CreateProduct(request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        var product = _productService.CreateProduct(request, currentUser);
+        return StatusCode(StatusCodes.Status201Created, new ProductResponse(product));
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrativo")]
     public IActionResult UpdateProduct(Guid id, [FromBody] ProductUpdateRequest request)
     {
-        return Ok(_productService.UpdateProduct(id, request));
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        var product = _productService.UpdateProduct(id, request, currentUser);
+        return Ok(new ProductResponse(product));
+    }
+
+    [HttpPost("import")]
+    [Authorize(Roles = "Administrativo")]
+    public IActionResult ImportProducts([FromBody] ProductImportRequest request)
+    {
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
+        var results = _productService.ImportProducts(request.ImporterName, request.FilePath, currentUser);
+        return StatusCode(StatusCodes.Status201Created, results);
     }
 }

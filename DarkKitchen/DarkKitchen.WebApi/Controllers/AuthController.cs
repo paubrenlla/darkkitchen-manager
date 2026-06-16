@@ -13,7 +13,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        LoginResponse response = _authService.Login(request.Email, request.Password);
-        return Ok(response);
+        var result = _authService.Login(request.Email, request.Password);
+        return Ok(new LoginResponse(result));
     }
 }

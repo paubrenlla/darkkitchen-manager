@@ -1,0 +1,60 @@
+[
+  {
+    "Code": "MAXIMG01",
+    "Name": "Producto con Tres Imagenes",
+    "Description": "Este producto prueba el limite maximo de imagenes permitidas por el dominio (3 imagenes).",
+    "LineName": "Combo burgers",
+    "CategoryName": "Parrilla",
+    "Price": 150.00,
+    "Images": [
+      { "Url": "https://img.com/1.jpg", "SizeInBytes": 100 },
+      { "Url": "https://img.com/2.jpg", "SizeInBytes": 200 },
+      { "Url": "https://img.com/3.jpg", "SizeInBytes": 300 }
+    ]
+  },
+  {
+    "Code": "PRICE0",
+    "Name": "Producto con Precio Cero",
+    "Description": "Este producto deberia fallar porque el precio debe ser mayor a cero segun las reglas de negocio.",
+    "LineName": "Ensaladas",
+    "CategoryName": "Vegetariano",
+    "Price": 0.00,
+    "Images": [{ "Url": "https://img.com/1.jpg", "SizeInBytes": 100 }]
+  },
+  {
+    "Code": "BURG99",
+    "Name": "Hamburguesa Duplicada en Archivo",
+    "Description": "Este codigo ya existe en la base de datos o arriba en este mismo archivo. Deberia reportar error de duplicado.",
+    "LineName": "Combo burgers",
+    "CategoryName": "Parrilla",
+    "Price": 100.00,
+    "Images": [{ "Url": "https://img.com/1.jpg", "SizeInBytes": 100 }]
+  },
+  {
+    "Code": "CODE#BAD",
+    "Name": "Codigo con Caracter Especial",
+    "Description": "El dominio solo permite caracteres alfanumericos en el codigo. Este deberia fallar por el caracter '#'.",
+    "LineName": "Ensaladas",
+    "CategoryName": "Vegetariano",
+    "Price": 100.00,
+    "Images": [{ "Url": "https://img.com/1.jpg", "SizeInBytes": 100 }]
+  },
+  {
+    "Code": "LIMITS01",
+    "Name": "Este es un nombre que tiene exactamente cincuenta car",
+    "Description": "Esta descripcion tiene como objetivo probar que el sistema acepta hasta quinientos caracteres de longitud sin ningun tipo de problema. Vamos a rellenar un poco mas para que sea creible: lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.",
+    "LineName": "Ensaladas",
+    "CategoryName": "Vegetariano",
+    "Price": 999.99,
+    "Images": [{ "Url": "https://img.com/1.jpg", "SizeInBytes": 100 }]
+  },
+  {
+    "Code": "NOIMG01",
+    "Name": "Producto sin Imagenes",
+    "Description": "Este producto deberia fallar porque el dominio exige al menos una imagen (Minimo 1, Maximo 3).",
+    "LineName": "Postres",
+    "CategoryName": "Dulce",
+    "Price": 50.00,
+    "Images": []
+  }
+]

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
+using DarkKitchen.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,28 +16,21 @@ public class UserController(IUserService userService) : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
+    [AuthorizationFilter]
     public IActionResult CreateUser([FromBody] UserCreateRequest request)
     {
-        if(request.Role != null)
-        {
-            var callerRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            if(callerRole != "Administrativo")
-            {
-                return Forbid();
-            }
-        }
-
-        return StatusCode(StatusCodes.Status201Created, _userService.CreateUser(request));
+        var user = _userService.CreateUser(request);
+        return StatusCode(StatusCodes.Status201Created, new UserCreateResponse(user));
     }
 
     [HttpGet]
     [Authorize(Roles = "Administrativo")]
-    public IActionResult GetUsers(
-        [FromQuery] string? name,
-        [FromQuery] string? surname)
+    public IActionResult GetUsers([FromQuery] string? name, [FromQuery] string? surname)
     {
-        var users = _userService.GetUsers(name, surname).ToList();
-        return users.Any() ? Ok(users) : NoContent();
+        var users = _userService.GetUsers(name, surname)
+            .Select(u => new UserCreateResponse(u))
+            .ToList();
+        return Ok(users);
     }
 
     [HttpPut("{id}")]
@@ -44,7 +38,8 @@ public class UserController(IUserService userService) : ControllerBase
     public IActionResult UpdateUser(Guid id, [FromBody] UserUpdateRequest request)
     {
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        return Ok(_userService.UpdateUser(callerId, id, request));
+        var user = _userService.UpdateUser(callerId, id, request);
+        return Ok(new UserCreateResponse(user));
     }
 
     [HttpDelete("{id}")]
@@ -52,6 +47,7 @@ public class UserController(IUserService userService) : ControllerBase
     public IActionResult DeleteUser(Guid id)
     {
         var callerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        return Ok(_userService.DeleteUser(callerId, id));
+        _userService.DeleteUser(callerId, id);
+        return NoContent();
     }
 }

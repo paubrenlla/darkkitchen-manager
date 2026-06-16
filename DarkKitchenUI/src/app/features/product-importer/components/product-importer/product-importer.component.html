@@ -1,0 +1,163 @@
+<div class="p-2">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1
+        class="text-2xl font-bold"
+        style="color: var(--brand-color);">
+        Importador de Productos
+      </h1>
+      <p class="text-sm text-slate-400 mt-1">Sincroniza el catálogo usando los plugins disponibles</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (!importResult()) {
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+      <div class="p-6">
+        <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+          
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Plugin Importador</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select [value]="selectedImporter()" (selectionChange)="selectedImporter.set($event.value)" [disabled]="isLoading() || importers().length === 0">
+                @for (importer of importers(); track importer) {
+                  <mat-option [value]="importer">{{ importer }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix class="text-slate-400 mr-2">extension</mat-icon>
+            </mat-form-field>
+            @if (importers().length === 0 && !isLoading()) {
+              <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                <mat-icon class="scale-75">warning</mat-icon> No hay plugins cargados en el sistema.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Ruta del Archivo (Local Server)</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input matInput type="text" [value]="filePath()" (input)="filePath.set(fileInput.value)" #fileInput placeholder="Ej: C:\datos\productos.json" [disabled]="isLoading()">
+              <mat-icon matPrefix class="text-slate-400 mr-2">folder_open</mat-icon>
+            </mat-form-field>
+            <p class="text-xs text-slate-500 mt-1">
+              Ingresa la ruta absoluta del archivo en el servidor donde se está ejecutando la aplicación.
+            </p>
+            @if (fieldErrors()['filePath']) {
+              <span class="text-rose-500 text-xs font-medium mt-1 block animate-fade-in">
+                {{ fieldErrors()['filePath'] }}
+              </span>
+            }
+            @if (fieldErrors()['importerName']) {
+              <span class="text-rose-500 text-xs font-medium mt-1 block animate-fade-in">
+                {{ fieldErrors()['importerName'] }}
+              </span>
+            }
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex justify-end">
+            <button
+              type="submit"
+              mat-flat-button
+              class="!rounded-xl !py-5 !px-6 shadow-sm h-[48px]"
+              [disabled]="isLoading() || !selectedImporter() || !filePath()"
+              style="background-color: var(--brand-color); color: white;">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" class="mr-2 inline-block"></mat-spinner>
+              }
+              @if (!isLoading()) {
+                <mat-icon>cloud_upload</mat-icon>
+              }
+              <span>{{ isLoading() ? 'Procesando...' : 'Importar Productos' }}</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  } @else {
+    <!-- Resultados de la importación -->
+    <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+
+      <div class="p-6 flex items-center justify-between border-b" style="background-color: var(--background-color); border-color: var(--border-color);">
+        <div class="flex items-center gap-3">
+          @if (importResult()!.failed === 0) {
+            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          } @else {
+            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-amber-100 text-amber-600">
+              <mat-icon>warning</mat-icon>
+            </div>
+          }
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">Resumen de Importación</h3>
+            <p class="text-sm text-slate-500">Plugin: {{ selectedImporter() }}</p>
+          </div>
+        </div>
+        <button mat-stroked-button (click)="reset()" class="!rounded-xl !py-5 !px-6 h-[48px]"
+                style="color: var(--brand-color); border-color: var(--brand-color);">
+          <mat-icon>refresh</mat-icon> Nueva Importación
+        </button>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 text-center">
+            <p class="text-sm text-slate-500 font-medium mb-1">Total Procesados</p>
+            <p class="text-3xl font-bold text-slate-800">{{ importResult()!.totalProcessed }}</p>
+          </div>
+          <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 text-center">
+            <p class="text-sm text-emerald-600 font-medium mb-1">Exitosos</p>
+            <p class="text-3xl font-bold text-emerald-700">{{ importResult()!.successful }}</p>
+          </div>
+          <div class="bg-rose-50 rounded-xl p-4 border border-rose-100 text-center">
+            <p class="text-sm text-rose-600 font-medium mb-1">Fallidos</p>
+            <p class="text-3xl font-bold text-rose-700">{{ importResult()!.failed }}</p>
+          </div>
+        </div>
+
+        @if (importResult()!.errors.length > 0) {
+          <div class="mb-6">
+            <h4 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wider flex items-center gap-2">
+              <mat-icon class="text-rose-500 scale-75">error</mat-icon> Registro de Errores
+            </h4>
+            <div class="bg-rose-50/50 rounded-xl border border-rose-100 p-4 max-h-48 overflow-y-auto">
+              <ul class="space-y-2">
+                @for (error of importResult()!.errors; track $index) {
+                  <li class="text-sm text-rose-700 flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 flex-shrink-0"></span>
+                    <span>{{ error }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+        @if (importResult()!.importedProducts.length > 0) {
+          <div>
+            <h4 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wider flex items-center gap-2">
+              <mat-icon class="text-emerald-500 scale-75">inventory_2</mat-icon> Productos Importados
+            </h4>
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <app-product-list 
+                [customProducts]="importResult()!.importedProducts"
+                [hideHeader]="true"
+                [hideEditButton]="true"
+                (productModified)="onProductModified($event)"
+              ></app-product-list>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

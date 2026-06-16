@@ -1,4 +1,7 @@
 using System.Security.Claims;
+using DarkKitchen.Domain.Users;
+using DarkKitchen.Domain.Users.Encryptor;
+using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -19,7 +22,7 @@ public class UserControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _userServiceMock = new Mock<IUserService>();
+        _userServiceMock = new Mock<IUserService>(MockBehavior.Strict);
         _callerId = Guid.NewGuid();
         _userController = new UserController(_userServiceMock.Object);
         SetCallerContext(_callerId, "Administrativo");
@@ -42,6 +45,15 @@ public class UserControllerTests
         };
     }
 
+    private static User CreateTestUser(string name = "Lucia", string surname = "Gomez", string email = "lucia@test.com", Role role = Role.Cliente)
+    {
+        var hasher = new Mock<IPasswordHasher>();
+        hasher.Setup(h => h.HashPassword(It.IsAny<string>())).Returns("hashed");
+        var strategy = new UruguayPhoneValidationStrategy();
+        var phone = Domain.Users.PhoneNumber.Create("+598", "094111222", strategy);
+        return new User(name, surname, email, phone, "Valid1Password!@", role, hasher.Object);
+    }
+
     [TestMethod]
     public void CreateUser_Success_ReturnsCreatedAndUserData()
     {
@@ -55,70 +67,50 @@ public class UserControllerTests
             Password = "Valid1Password!@",
         };
 
-        var response = new UserCreateResponse
-        {
-            Id = Guid.NewGuid(),
-            Name = "Lucia",
-            Surname = "Gomez",
-            Email = "lucia@test.com",
-            Phone = "+598094111222",
-            Role = "Cliente",
-        };
-
-        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(response);
+        var user = CreateTestUser();
+        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(user);
 
         var result = _userController.CreateUser(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
-
         var body = result.Value as UserCreateResponse;
         Assert.IsNotNull(body);
         Assert.AreEqual("Lucia", body.Name);
         Assert.AreEqual("lucia@test.com", body.Email);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
     public void GetUsers_ReturnsOkWithList()
     {
-        List<UserCreateResponse> users =
-        [
-            new UserCreateResponse
-            {
-                Id = Guid.NewGuid(),
-                Name = "Juan",
-                Surname = "Perez",
-                Email = "juan@test.com",
-                Phone = "+598094123456",
-                Role = "Cliente",
-            },
-        ];
-
+        var users = new List<User> { CreateTestUser("Juan", "Perez", "juan@test.com") };
         _userServiceMock.Setup(s => s.GetUsers("Juan", null)).Returns(users);
 
         var result = _userController.GetUsers("Juan", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
-    public void GetUsers_NoResults_ReturnsNoContent()
+    public void GetUsers_NoResults_ReturnsOkWithEmptyList()
     {
-        _userServiceMock.Setup(s => s.GetUsers(It.IsAny<string>(), It.IsAny<string>()))
+        _userServiceMock.Setup(s => s.GetUsers(It.IsAny<string>(), It.IsAny<string?>()))
             .Returns([]);
 
-        var result = _userController.GetUsers("Inexistente", null) as NoContentResult;
+        var result = _userController.GetUsers("Inexistente", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
     public void UpdateUser_ValidRequest_ReturnsOk()
     {
         var userId = Guid.NewGuid();
-
         var request = new UserUpdateRequest
         {
             Name = "Nuevo",
@@ -129,68 +121,52 @@ public class UserControllerTests
             Role = "Administrativo",
         };
 
-        var response = new UserCreateResponse
-        {
-            Id = userId,
-            Name = "Nuevo",
-            Surname = "Nombre",
-            Email = "nuevo@test.com",
-            Phone = "+598094999888",
-            Role = "Administrativo",
-        };
-
-        _userServiceMock.Setup(s => s.UpdateUser(_callerId, userId, request)).Returns(response);
+        var user = CreateTestUser("Nuevo", "Nombre", "nuevo@test.com", Role.Administrativo);
+        _userServiceMock.Setup(s => s.UpdateUser(_callerId, userId, request)).Returns(user);
 
         var result = _userController.UpdateUser(userId, request) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
-    public void DeleteUser_ValidRequest_ReturnsOkWithUser()
+    public void DeleteUser_ValidRequest_ReturnsNoContent()
     {
         var userId = Guid.NewGuid();
-        var response = new UserCreateResponse
-        {
-            Id = userId,
-            Name = "Lucia",
-            Surname = "Gomez",
-            Email = "lucia@test.com",
-            Phone = "+598094111222",
-            Role = "Cliente",
-        };
+        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId));
 
-        _userServiceMock.Setup(s => s.DeleteUser(_callerId, userId)).Returns(response);
-
-        var result = _userController.DeleteUser(userId) as OkObjectResult;
+        var result = _userController.DeleteUser(userId) as NoContentResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(200, result.StatusCode);
-        var body = result.Value as UserCreateResponse;
-        Assert.IsNotNull(body);
-        Assert.AreEqual("Lucia", body.Name);
+        Assert.AreEqual(204, result.StatusCode);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
-    public void CreateUser_PreparadorCreatesWithRole_ReturnsForbid()
+    public void CreateUser_WithNoRoleInRequest_ReturnsCreated()
     {
-        SetCallerContext(_callerId, "Preparador");
-
+        SetCallerContext(_callerId, "Cualquiera");
         var request = new UserCreateRequest
         {
-            Name = "Carlos",
-            Surname = "Lopez",
-            Email = "carlos@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111333",
+            Name = "N",
+            Surname = "S",
+            Email = "t@t.com",
             Password = "Valid1Password!@",
-            Role = "Preparador",
+            Role = null,
+            CountryPrefix = "+598",
+            PhoneNumber = "0941",
         };
 
-        var result = _userController.CreateUser(request) as ForbidResult;
+        var user = CreateTestUser("Nolan", "Savhrina", "t@t.com");
+        _userServiceMock.Setup(s => s.CreateUser(request)).Returns(user);
+
+        var result = _userController.CreateUser(request) as ObjectResult;
 
         Assert.IsNotNull(result);
+        Assert.AreEqual(201, result.StatusCode);
+        _userServiceMock.VerifyAll();
     }
 
     [TestMethod]
@@ -224,26 +200,5 @@ public class UserControllerTests
 
         Assert.IsNotNull(attribute);
         Assert.AreEqual("Administrativo", attribute.Roles);
-    }
-
-    [TestMethod]
-    public void CreateUser_ClienteCreatesWithRole_ReturnsForbid()
-    {
-        SetCallerContext(_callerId, "Cliente");
-
-        var request = new UserCreateRequest
-        {
-            Name = "Carlos",
-            Surname = "Lopez",
-            Email = "carlos@test.com",
-            CountryPrefix = "+598",
-            PhoneNumber = "094111333",
-            Password = "Valid1Password!@",
-            Role = "Preparador",
-        };
-
-        var result = _userController.CreateUser(request) as ForbidResult;
-
-        Assert.IsNotNull(result);
     }
 }

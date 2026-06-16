@@ -1,4 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
+using DarkKitchen.Domain.Products;
+
 namespace DarkKitchen.Models.DTOs;
+
+public class ProductImageResponse
+{
+    public string Url { get; set; } = string.Empty;
+    public long SizeInBytes { get; set; }
+}
 
 public class ProductResponse
 {
@@ -9,6 +18,24 @@ public class ProductResponse
     public decimal Price { get; set; }
     public required string Line { get; set; }
     public required string Category { get; set; }
-    public required List<string> Images { get; set; }
+    public required List<ProductImageResponse> Images { get; set; }
     public bool IsActive { get; set; }
+
+    [SetsRequiredMembers]
+    public ProductResponse(Product product)
+    {
+        Id = product.Id;
+        Code = product.Code;
+        Name = product.Name;
+        Description = product.Description;
+        Price = product.Price;
+        Line = product.Line.Name;
+        Category = product.Category.Name;
+        Images = product.Images.Select(i => new ProductImageResponse
+        {
+            Url = i.Url,
+            SizeInBytes = i.SizeInBytes
+        }).ToList();
+        IsActive = product.IsActive;
+    }
 }

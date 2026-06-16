@@ -3,9 +3,10 @@
 -- Contraseña del admin: ValidP@ssw0rd!8X
 -- =============================================
 
-USE DarkKitchenDB;
+USE DarkKitchen;
 
 -- Limpiar datos existentes
+DELETE FROM ShippingTypes;
 DELETE FROM PromotionProducts;
 DELETE FROM OrderItems;
 DELETE FROM Orders;
@@ -15,6 +16,7 @@ DELETE FROM Products;
 DELETE FROM ProductLines;
 DELETE FROM ProductCategories;
 DELETE FROM Users;
+DELETE FROM AuditLogs;
 
 -- =============================================
 -- USUARIO ADMIN INICIAL

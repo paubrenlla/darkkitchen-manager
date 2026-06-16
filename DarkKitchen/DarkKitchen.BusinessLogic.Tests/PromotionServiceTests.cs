@@ -1,3 +1,4 @@
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Products;
 using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IDataAccess;
@@ -11,6 +12,7 @@ public class PromotionServiceTests
 {
     private Mock<IProductRepository> _mockProductRepository = null!;
     private Mock<IPromotionRepository> _mockPromotionRepository = null!;
+    private Mock<IDomainEventPublisher> _mockPublisher = null!;
     private PromotionService _promotionService = null!;
     private List<Product> _testProducts = null!;
     private List<Promotion> _testPromotions = null!;
@@ -18,8 +20,14 @@ public class PromotionServiceTests
     [TestInitialize]
     public void Setup()
     {
-        _mockPromotionRepository = new Mock<IPromotionRepository>();
-        _mockProductRepository = new Mock<IProductRepository>();
+        _mockPromotionRepository = new Mock<IPromotionRepository>(MockBehavior.Strict);
+        _mockProductRepository = new Mock<IProductRepository>(MockBehavior.Strict);
+        _mockPublisher = new Mock<IDomainEventPublisher>(MockBehavior.Strict);
+
+        _promotionService = new PromotionService(
+            _mockPromotionRepository.Object,
+            _mockProductRepository.Object,
+            _mockPublisher.Object);
 
         var line = new ProductLine("Combo burgers");
         var category = new ProductCategory("Parrilla");
@@ -40,20 +48,36 @@ public class PromotionServiceTests
             new Promotion("Black Friday", 10, start, end, [_testProducts[0]]),
             new Promotion("Semana de Turismo", 15, start, end, [_testProducts[1]])
         ];
-
-        _mockProductRepository.Setup(r => r.GetAll()).Returns(_testProducts);
-        _mockPromotionRepository.Setup(r => r.GetAll()).Returns(_testPromotions);
-        _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[0].Id)).Returns(_testPromotions[0]);
-        _mockPromotionRepository.Setup(r => r.GetById(_testPromotions[1].Id)).Returns(_testPromotions[1]);
-        _mockPromotionRepository.Setup(r => r.GetById(It.Is<Guid>(id => id != _testPromotions[0].Id && id != _testPromotions[1].Id))).Returns((Promotion?)null);
-        _promotionService = new PromotionService(
-            _mockPromotionRepository.Object,
-            _mockProductRepository.Object);
     }
+
+    private void SetupProductGetAll(List<Product>? products = null) =>
+        _mockProductRepository.Setup(r => r.GetAll()).Returns(products ?? _testProducts);
+
+    private void SetupPromotionGetAll(List<Promotion>? promotions = null) =>
+        _mockPromotionRepository.Setup(r => r.GetAll()).Returns(promotions ?? _testPromotions);
+
+    private void SetupPromotionGetById(Guid id, Promotion? result) =>
+        _mockPromotionRepository.Setup(r => r.GetById(id)).Returns(result);
+
+    private void SetupPromotionAdd() =>
+        _mockPromotionRepository.Setup(r => r.Add(It.IsAny<Promotion>()));
+
+    private void SetupPromotionUpdate() =>
+        _mockPromotionRepository.Setup(r => r.Update(It.IsAny<Promotion>()));
+
+    private void SetupPublishCreated() =>
+        _mockPublisher.Setup(p => p.Publish(It.IsAny<EntityCreatedEvent<Promotion>>()));
+
+    private void SetupPublishModified() =>
+        _mockPublisher.Setup(p => p.Publish(It.IsAny<EntityModifiedEvent<Promotion>>()));
 
     [TestMethod]
     public void CreatePromotion_ValidRequest_ReturnsPromotionResponse()
     {
+        SetupProductGetAll();
+        SetupPromotionAdd();
+        SetupPublishCreated();
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo Verano",
@@ -63,17 +87,24 @@ public class PromotionServiceTests
             ProductCodes = ["BURG01"]
         };
 
-        PromotionCreateResponse result = _promotionService.CreatePromotion(request);
+        var result = _promotionService.CreatePromotion(request, "admin@test.com");
 
         Assert.AreEqual("Promo Verano", result.Name);
         Assert.AreEqual(20, result.DiscountPercentage);
         Assert.AreEqual(1, result.Products.Count);
-        Assert.IsTrue(result.Products.Contains("BURG01"));
+        Assert.IsTrue(result.Products.Any(p => p.Code == "BURG01"));
+        _mockProductRepository.VerifyAll();
+        _mockPromotionRepository.VerifyAll();
+        _mockPublisher.VerifyAll();
     }
 
     [TestMethod]
     public void CreatePromotion_ValidRequest_CallsRepositoryAdd()
     {
+        SetupProductGetAll();
+        SetupPromotionAdd();
+        SetupPublishCreated();
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo Verano",
@@ -83,14 +114,43 @@ public class PromotionServiceTests
             ProductCodes = ["BURG01"]
         };
 
-        _promotionService.CreatePromotion(request);
+        _promotionService.CreatePromotion(request, "admin@test.com");
 
-        _mockPromotionRepository.Verify(r => r.Add(It.IsAny<Promotion>()), Times.Once);
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
+        _mockPublisher.VerifyAll();
     }
 
     [TestMethod]
-    public void CreatePromotion_InvalidProductCode_ThrowsArgumentException()
+    public void CreatePromotion_ValidRequest_PublishesEvent()
     {
+        SetupProductGetAll();
+        SetupPromotionAdd();
+        _mockPublisher.Setup(p => p.Publish(It.Is<EntityCreatedEvent<Promotion>>(e =>
+            e.EntityName == "Promotion" &&
+            e.NewState.Name == "Promo Verano")));
+
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(7),
+            ProductCodes = ["BURG01"]
+        };
+
+        _promotionService.CreatePromotion(request, "admin@test.com");
+
+        _mockProductRepository.VerifyAll();
+        _mockPromotionRepository.VerifyAll();
+        _mockPublisher.VerifyAll();
+    }
+
+    [TestMethod]
+    public void CreatePromotion_InvalidProductCode_ThrowsKeyNotFoundException()
+    {
+        SetupProductGetAll();
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo Verano",
@@ -100,12 +160,17 @@ public class PromotionServiceTests
             ProductCodes = ["INVALID99"]
         };
 
-        Assert.ThrowsException<ArgumentException>(() => _promotionService.CreatePromotion(request));
+        Assert.ThrowsException<KeyNotFoundException>(() =>
+            _promotionService.CreatePromotion(request, "admin@test.com"));
+
+        _mockProductRepository.VerifyAll();
     }
 
     [TestMethod]
-    public void CreatePromotion_NoProducts_CreatesPromotionSuccessfully()
+    public void CreatePromotion_NoProducts_ThrowsArgumentException()
     {
+        SetupProductGetAll();
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo Sin Productos",
@@ -115,83 +180,109 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        PromotionCreateResponse result = _promotionService.CreatePromotion(request);
-
-        Assert.AreEqual("Promo Sin Productos", result.Name);
-        Assert.AreEqual(0, result.Products.Count);
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.CreatePromotion(request, "admin@test.com"));
+        _mockProductRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_NoFilters_ReturnsAllPromotions()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(2, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByDate_ReturnsMatchingPromotions()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(DateTime.Now, null, null).ToList();
 
         Assert.AreEqual(2, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByDateOutOfRange_ReturnsEmpty()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(new DateTime(2030, 1, 1), null, null).ToList();
 
         Assert.AreEqual(0, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByLine_ReturnsMatchingPromotions()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(null, "Combo burgers", null).ToList();
 
         Assert.AreEqual(2, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByLine_NoMatches_ReturnsEmpty()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(null, "Desayunos", null).ToList();
 
         Assert.AreEqual(0, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByProductCode_ReturnsMatchingPromotion()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(null, null, "BURG01").ToList();
 
         Assert.AreEqual(1, result.Count);
-        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+        Assert.IsTrue(result[0].Products.Any(p => p.Code == "BURG01"));
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_FilterByProductCode_NoMatches_ReturnsEmpty()
     {
+        SetupPromotionGetAll();
+
         var result = _promotionService.GetPromotions(null, null, "INVALID99").ToList();
 
         Assert.AreEqual(0, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_CombinedFilters_ReturnsMatchingPromotion()
     {
-        var result = _promotionService.GetPromotions(DateTime.Now, "Combo burgers", "BURG01")
-            .ToList();
+        SetupPromotionGetAll();
+
+        var result = _promotionService.GetPromotions(DateTime.Now, "Combo burgers", "BURG01").ToList();
 
         Assert.AreEqual(1, result.Count);
-        Assert.IsTrue(result[0].Products.Contains("BURG01"));
+        Assert.IsTrue(result[0].Products.Any(p => p.Code == "BURG01"));
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void UpdatePromotion_ValidRequest_ReturnsUpdatedResponse()
     {
-        Guid promoId = _testPromotions[0].Id;
+        SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
+        SetupProductGetAll();
+        SetupPromotionUpdate();
+        SetupPublishModified();
+
         var request = new PromotionCreateRequest
         {
             Name = "Black Friday Actualizado",
@@ -201,16 +292,48 @@ public class PromotionServiceTests
             ProductCodes = ["BURG02"]
         };
 
-        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
+        var result = _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com");
 
         Assert.AreEqual("Black Friday Actualizado", result.Name);
-        Assert.AreEqual(30, result.DiscountPercentage);
-        Assert.IsTrue(result.Products.Contains("BURG02"));
+        Assert.IsTrue(result.Products.Any(p => p.Code == "BURG02"));
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
+        _mockPublisher.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_ValidRequest_PublishesEvent()
+    {
+        SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
+        SetupProductGetAll();
+        SetupPromotionUpdate();
+        _mockPublisher.Setup(p => p.Publish(It.Is<EntityModifiedEvent<Promotion>>(e =>
+            e.EntityName == "Promotion" &&
+            e.OldState.Name == "Black Friday" &&
+            e.NewState.Name == "Black Friday Actualizado")));
+
+        var request = new PromotionCreateRequest
+        {
+            Name = "Black Friday Actualizado",
+            DiscountPercentage = 30,
+            StartDate = DateTime.Now,
+            EndDate = DateTime.Now.AddDays(30),
+            ProductCodes = ["BURG02"]
+        };
+
+        _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com");
+
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
+        _mockPublisher.VerifyAll();
     }
 
     [TestMethod]
     public void UpdatePromotion_NonExistentId_ThrowsKeyNotFoundException()
     {
+        var unknownId = Guid.NewGuid();
+        SetupPromotionGetById(unknownId, null);
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo X",
@@ -221,13 +344,16 @@ public class PromotionServiceTests
         };
 
         Assert.ThrowsException<KeyNotFoundException>(() =>
-            _promotionService.UpdatePromotion(Guid.NewGuid(), request));
+            _promotionService.UpdatePromotion(unknownId, request, "admin@test.com"));
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
-    public void UpdatePromotion_InvalidProductCode_ThrowsArgumentException()
+    public void UpdatePromotion_InvalidProductCode_ThrowsKeyNotFoundException()
     {
-        Guid promoId = _testPromotions[0].Id;
+        SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
+        SetupProductGetAll();
+
         var request = new PromotionCreateRequest
         {
             Name = "Promo Valida",
@@ -237,14 +363,19 @@ public class PromotionServiceTests
             ProductCodes = ["INVALIDO99"]
         };
 
-        Assert.ThrowsException<ArgumentException>(() =>
-            _promotionService.UpdatePromotion(promoId, request));
+        Assert.ThrowsException<KeyNotFoundException>(() =>
+            _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com"));
+
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
     }
 
     [TestMethod]
-    public void UpdatePromotion_RemovingProduct_DesassociatesItCorrectly()
+    public void UpdatePromotion_RemovingProduct_ThrowsArgumentException()
     {
-        Guid promoId = _testPromotions[0].Id;
+        SetupPromotionGetById(_testPromotions[0].Id, _testPromotions[0]);
+        SetupProductGetAll();
+
         var request = new PromotionCreateRequest
         {
             Name = "Black Friday",
@@ -254,9 +385,10 @@ public class PromotionServiceTests
             ProductCodes = []
         };
 
-        PromotionCreateResponse result = _promotionService.UpdatePromotion(promoId, request);
-
-        Assert.AreEqual(0, result.Products.Count);
+        Assert.ThrowsException<ArgumentException>(() =>
+            _promotionService.UpdatePromotion(_testPromotions[0].Id, request, "admin@test.com"));
+        _mockPromotionRepository.VerifyAll();
+        _mockProductRepository.VerifyAll();
     }
 
     [TestMethod]
@@ -268,15 +400,14 @@ public class PromotionServiceTests
             category, 150m, [new ProductImage("burg01.jpg", 110000)]);
 
         var activePromo = new Promotion("Vigente", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
-        var expiredPromo =
-            new Promotion("Vencida", 20, new DateTime(2020, 1, 1), new DateTime(2020, 12, 31), [product]);
-
-        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([activePromo, expiredPromo]);
+        var expiredPromo = new Promotion("Vencida", 20, new DateTime(2020, 1, 1), new DateTime(2020, 12, 31), [product]);
+        SetupPromotionGetAll([activePromo, expiredPromo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("Vigente", result[0].Name);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
@@ -288,12 +419,12 @@ public class PromotionServiceTests
             category, 150m, [new ProductImage("burg01.jpg", 110000)]);
 
         var futurePromo = new Promotion("Futura", 15, DateTime.Now.AddDays(5), DateTime.Now.AddDays(15), [product]);
-
-        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([futurePromo]);
+        SetupPromotionGetAll([futurePromo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(0, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
@@ -306,34 +437,36 @@ public class PromotionServiceTests
 
         var promo = new Promotion("Promo Inactiva", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(10), [product]);
         promo.Deactivate();
-
-        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([promo]);
+        SetupPromotionGetAll([promo]);
 
         var result = _promotionService.GetPromotions(null, null, null).ToList();
 
         Assert.AreEqual(0, result.Count);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetBestPromotionForProduct_WithActivePromo_ReturnsNameAndDiscount()
     {
-        Guid productId = _testProducts[0].Id;
+        SetupPromotionGetAll();
 
-        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now);
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(_testProducts[0].Id, DateTime.Now);
 
         Assert.AreEqual("Black Friday", name);
         Assert.AreEqual(10m, discount);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
     public void GetBestPromotionForProduct_NoActivePromo_ReturnsNullAndZero()
     {
-        Guid productId = _testProducts[0].Id;
+        SetupPromotionGetAll();
 
-        var (name, discount) = _promotionService.GetBestPromotionForProduct(productId, DateTime.Now.AddDays(60));
+        var (name, discount) = _promotionService.GetBestPromotionForProduct(_testProducts[0].Id, DateTime.Now.AddDays(60));
 
         Assert.IsNull(name);
         Assert.AreEqual(0m, discount);
+        _mockPromotionRepository.VerifyAll();
     }
 
     [TestMethod]
@@ -344,16 +477,31 @@ public class PromotionServiceTests
         var product = new Product("SHARED01", "Producto Compartido", "Descripcion larga del producto compartido",
             line, category, 100m, [new ProductImage("shared.jpg", 120000)]);
 
-        DateTime start = DateTime.Now.AddDays(-1);
-        DateTime end = DateTime.Now.AddDays(30);
-        var promoLow = new Promotion("Promo Baja", 10, start, end, [product]);
-        var promoHigh = new Promotion("Promo Alta", 40, start, end, [product]);
-
-        _mockPromotionRepository.Setup(r => r.GetAll()).Returns([promoLow, promoHigh]);
+        var promoLow = new Promotion("Promo Baja", 10, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(30), [product]);
+        var promoHigh = new Promotion("Promo Alta", 40, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(30), [product]);
+        SetupPromotionGetAll([promoLow, promoHigh]);
 
         var (name, discount) = _promotionService.GetBestPromotionForProduct(product.Id, DateTime.Now);
 
         Assert.AreEqual("Promo Alta", name);
         Assert.AreEqual(40m, discount);
+        _mockPromotionRepository.VerifyAll();
+    }
+
+    [TestMethod]
+    public void GetPromotions_DateWithoutTime_ShouldAdjustToEndOfDay()
+    {
+        var date = new DateTime(2024, 5, 15);
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+        var product = new Product("BURG01", "Hamburguesa Clasica", "Hamburguesa clasica con queso cheddar", line,
+            category, 150m, [new ProductImage("burg01.jpg", 110000)]);
+        var promo = new Promotion("Promo", 10, new DateTime(2024, 5, 1), new DateTime(2024, 5, 15, 23, 59, 59),
+            [product]);
+        SetupPromotionGetAll([promo]);
+
+        var result = _promotionService.GetPromotions(date, null, null);
+
+        Assert.AreEqual(1, result.Count());
     }
 }

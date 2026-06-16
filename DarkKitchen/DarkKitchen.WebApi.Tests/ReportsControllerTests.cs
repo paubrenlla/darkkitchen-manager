@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -17,7 +17,7 @@ public class ReportsControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _mockReportService = new Mock<IReportService>();
+        _mockReportService = new Mock<IReportService>(MockBehavior.Strict);
         _controller = new ReportsController(_mockReportService.Object);
 
         List<Claim> claims = [new Claim(ClaimTypes.Role, "Administrativo")];
@@ -53,6 +53,7 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -67,18 +68,22 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
-    public void GetTopProducts_FromAfterTo_ReturnsBadRequest()
+    [ExpectedException(typeof(ArgumentException))]
+    public void GetTopProducts_FromAfterTo_ShouldPropagateException()
     {
         DateTime from = DateTime.Now;
         DateTime to = DateTime.Now.AddDays(-30);
 
-        var result = _controller.GetTopProducts(from, to) as BadRequestObjectResult;
+        _mockReportService.Setup(s => s.GetTopProducts(from, to))
+            .Throws(new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin."));
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
+        _controller.GetTopProducts(from, to);
+
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -105,6 +110,7 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 
     [TestMethod]
@@ -118,5 +124,6 @@ public class ReportsControllerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
+        _mockReportService.VerifyAll();
     }
 }

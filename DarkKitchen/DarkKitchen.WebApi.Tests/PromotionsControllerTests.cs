@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.IBusinessLogic;
 using DarkKitchen.Models.DTOs;
 using DarkKitchen.WebApi.Controllers;
@@ -12,128 +15,188 @@ public class PromotionsControllerTests
 {
     private PromotionsController _controller = null!;
     private Mock<IPromotionService> _mockService = null!;
-    private List<PromotionCreateResponse> _testPromotions = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockService = new Mock<IPromotionService>();
-
-        _testPromotions =
-        [
-            new PromotionCreateResponse
-            {
-                Name = "Black Friday",
-                DiscountPercentage = 10,
-                StartDate = new DateTime(2025, 1, 1),
-                EndDate = new DateTime(2025, 12, 31),
-                Products = ["BURG01"]
-            },
-            new PromotionCreateResponse
-            {
-                Name = "Semana de Turismo",
-                DiscountPercentage = 15,
-                StartDate = new DateTime(2025, 1, 1),
-                EndDate = new DateTime(2025, 12, 31),
-                Products = ["BURG02"]
-            }
-
-        ];
-
+        _mockService = new Mock<IPromotionService>(MockBehavior.Strict);
         _controller = new PromotionsController(_mockService.Object);
+        SetCallerContext("admin@test.com");
+    }
+
+    private static Product CreateTestProduct()
+    {
+        var line = new ProductLine("Combo burgers");
+        var category = new ProductCategory("Parrilla");
+
+        return new Product(
+            "BURG01",
+            "Hamburguesa Clasica",
+            "Hamburguesa clasica con queso cheddar",
+            line,
+            category,
+            150m,
+            [new ProductImage("img.jpg", 100000)]);
+    }
+
+    private void SetCallerContext(string email)
+    {
+        var claims = new List<Claim> { new(ClaimTypes.Email, email) };
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
+    }
+
+    private static Promotion CreateTestPromotion(string name = "Black Friday", int discount = 10)
+    {
+        return new Promotion(
+            name,
+            discount,
+            new DateTime(2026, 1, 1),
+            new DateTime(2026, 12, 31),
+            [CreateTestProduct()]);
     }
 
     [TestMethod]
     public void GetPromotions_NoFilters_ShouldReturnOkWithPromotions()
     {
-        _mockService.Setup(s => s.GetPromotions(null, null, null)).Returns(_testPromotions);
+        var promotions = new List<Promotion>
+        {
+            CreateTestPromotion("Black Friday", 10),
+            CreateTestPromotion("Semana de Turismo", 15),
+        };
+        _mockService.Setup(s => s.GetPromotions(null, null, null)).Returns(promotions);
 
         var result = _controller.GetPromotions(null, null, null) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
-
-        var promotions = (result.Value as IEnumerable<PromotionCreateResponse>)?.ToList();
-        Assert.IsNotNull(promotions);
-        Assert.AreEqual(2, promotions.Count);
+        var body = (result.Value as IEnumerable<PromotionCreateResponse>)?.ToList();
+        Assert.IsNotNull(body);
+        Assert.AreEqual(2, body.Count);
+        _mockService.VerifyAll();
     }
 
     [TestMethod]
     public void GetPromotions_WithFilters_ShouldPassFiltersToService()
     {
-        _mockService.Setup(s => s.GetPromotions(null, "Combo burgers", "BURG01")).Returns([_testPromotions[0]]);
+        var promotions = new List<Promotion> { CreateTestPromotion() };
+        _mockService.Setup(s => s.GetPromotions(null, "Combo burgers", "BURG01")).Returns(promotions);
 
         var result = _controller.GetPromotions(null, "Combo burgers", "BURG01") as OkObjectResult;
 
         Assert.IsNotNull(result);
-        _mockService.Verify(s => s.GetPromotions(null, "Combo burgers", "BURG01"), Times.Once);
+        _mockService.VerifyAll();
     }
 
     [TestMethod]
-    public void GetPromotions_NoResults_ShouldReturnNoContent()
+    public void GetPromotions_NoResults_ShouldReturnOkWithEmptyList()
     {
         _mockService.Setup(s => s.GetPromotions(null, "Desayunos", null)).Returns([]);
 
-        var result = _controller.GetPromotions(null, "Desayunos", null) as NoContentResult;
+        var result = _controller.GetPromotions(null, "Desayunos", null) as OkObjectResult;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(204, result.StatusCode);
+        Assert.AreEqual(200, result.StatusCode);
+        _mockService.VerifyAll();
     }
 
     [TestMethod]
-    public void CreatePromotion_ValidRequest_ShouldReturn201WithResponse()
+    public void CreatePromotion_ValidRequest_ShouldReturn201()
     {
         var request = new PromotionCreateRequest
         {
             Name = "Promo Verano",
             DiscountPercentage = 20,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            ProductCodes = ["BURG01"]
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
         };
-        var expected = new PromotionCreateResponse
-        {
-            Name = "Promo Verano",
-            DiscountPercentage = 20,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            Products = ["BURG01"]
-        };
-        _mockService.Setup(s => s.CreatePromotion(request)).Returns(expected);
+
+        var promotion = CreateTestPromotion("Promo Verano", 20);
+        _mockService.Setup(s => s.CreatePromotion(request, "admin@test.com")).Returns(promotion);
 
         var result = _controller.CreatePromotion(request) as ObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
-        Assert.AreEqual(expected, result.Value);
+        var body = result.Value as PromotionCreateResponse;
+        Assert.IsNotNull(body);
+        Assert.AreEqual("Promo Verano", body.Name);
+        Assert.AreEqual(20, body.DiscountPercentage);
+        _mockService.VerifyAll();
     }
 
     [TestMethod]
-    public void UpdatePromotion_ValidRequest_ShouldReturnOkWithResponse()
+    public void UpdatePromotion_ValidRequest_ShouldReturnOk()
     {
         var id = Guid.NewGuid();
         var request = new PromotionCreateRequest
         {
             Name = "Promo Actualizada",
             DiscountPercentage = 25,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            ProductCodes = ["BURG01"]
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
         };
-        var expected = new PromotionCreateResponse
-        {
-            Name = "Promo Actualizada",
-            DiscountPercentage = 25,
-            StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 12, 31),
-            Products = ["BURG01"]
-        };
-        _mockService.Setup(s => s.UpdatePromotion(id, request)).Returns(expected);
+
+        var promotion = CreateTestPromotion("Promo Actualizada", 25);
+        _mockService.Setup(s => s.UpdatePromotion(id, request, "admin@test.com")).Returns(promotion);
 
         var result = _controller.UpdatePromotion(id, request) as OkObjectResult;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(200, result.StatusCode);
-        Assert.AreEqual(expected, result.Value);
+        var body = result.Value as PromotionCreateResponse;
+        Assert.IsNotNull(body);
+        Assert.AreEqual("Promo Actualizada", body.Name);
+        Assert.AreEqual(25, body.DiscountPercentage);
+        _mockService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void CreatePromotion_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Verano",
+            DiscountPercentage = 20,
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var promotion = CreateTestPromotion("Promo Verano", 20);
+        _mockService.Setup(s => s.CreatePromotion(request, "Unknown")).Returns(promotion);
+
+        _controller.CreatePromotion(request);
+
+        _mockService.VerifyAll();
+    }
+
+    [TestMethod]
+    public void UpdatePromotion_WithNoUserClaims_ShouldUseUnknownUser()
+    {
+        var id = Guid.NewGuid();
+        var request = new PromotionCreateRequest
+        {
+            Name = "Promo Actualizada",
+            DiscountPercentage = 25,
+            StartDate = new DateTime(2026, 1, 1),
+            EndDate = new DateTime(2026, 12, 31),
+            ProductCodes = []
+        };
+
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+        var promotion = CreateTestPromotion("Promo Actualizada", 25);
+        _mockService.Setup(s => s.UpdatePromotion(id, request, "Unknown")).Returns(promotion);
+
+        _controller.UpdatePromotion(id, request);
+
+        _mockService.VerifyAll();
     }
 }

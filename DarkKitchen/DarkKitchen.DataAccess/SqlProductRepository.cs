@@ -1,4 +1,4 @@
-﻿using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Products;
 using DarkKitchen.IDataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,20 +43,29 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
                            .FirstOrDefault(p => p.Id == id)
                        ?? throw new KeyNotFoundException($"Producto {id} no encontrado.");
 
-        var line = _context.ProductLines.FirstOrDefault(l => l.Name == product.Line.Name)
-                   ?? product.Line;
-        var category = _context.ProductCategories.FirstOrDefault(c => c.Name == product.Category.Name)
-                       ?? product.Category;
+        var line = _context.ProductLines
+            .FirstOrDefault(l => l.Name == product.Line.Name);
 
-        foreach(var image in existing.Images.ToList())
+        if(line == null)
         {
-            _context.Set<ProductImage>().Remove(image);
+            line = new ProductLine(product.Line.Name);
+            _context.ProductLines.Add(line);
         }
 
-        foreach(var image in product.Images)
+        var category = _context.ProductCategories
+            .FirstOrDefault(c => c.Name == product.Category.Name);
+
+        if(category == null)
         {
-            _context.Set<ProductImage>().Add(new ProductImage(image.Url, image.SizeInBytes));
+            category = new ProductCategory(product.Category.Name);
+            _context.ProductCategories.Add(category);
         }
+
+        var newImages = product.Images
+            .Select(i => new ProductImage(i.Url, i.SizeInBytes))
+            .ToList();
+
+        _context.Set<ProductImage>().AddRange(newImages);
 
         existing.UpdateDetails(
             product.Name,
@@ -64,7 +73,7 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
             line,
             category,
             product.Price,
-            existing.Images.ToList());
+            newImages);
 
         if(product.IsActive)
         {
@@ -76,5 +85,15 @@ public class SqlProductRepository(DarkKitchenContext context) : IProductReposito
         }
 
         _context.SaveChanges();
+    }
+
+    public IEnumerable<ProductLine> GetAllLines()
+    {
+        return _context.ProductLines.ToList();
+    }
+
+    public IEnumerable<ProductCategory> GetAllCategories()
+    {
+        return _context.ProductCategories.ToList();
     }
 }

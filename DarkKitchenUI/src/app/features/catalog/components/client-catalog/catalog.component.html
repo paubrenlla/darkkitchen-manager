@@ -1,0 +1,217 @@
+<div class="p-2 flex flex-col gap-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold" style="color: var(--brand-color)">Catálogo</h1>
+      <p class="text-sm text-slate-400 mt-0.5">Seleccioná los productos para tu pedido</p>
+    </div>
+    @if (cart().length > 0 && !showCheckout()) {
+      <button
+        mat-flat-button
+        (click)="showCheckout.set(true)"
+        style="background-color: var(--brand-color); color: white"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+        Ver pedido ({{ cartCount() }})
+      </button>
+    }
+  </div>
+
+  @if (orderSuccess()) {
+    <div
+      class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-6 py-5 rounded-xl flex flex-col gap-3"
+    >
+      <div class="flex items-center gap-2 font-semibold">
+        <mat-icon>check_circle</mat-icon>
+        ¡Pedido realizado con éxito!
+      </div>
+      <p class="text-sm">Tu pedido fue enviado y está siendo procesado.</p>
+      <button mat-stroked-button color="primary" (click)="goToOrders()" class="self-start">
+        Ver mis pedidos
+      </button>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div
+      class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
+    >
+      <mat-icon class="text-rose-500">error_outline</mat-icon>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="flex gap-6">
+    <!-- Productos -->
+    <div class="flex-1">
+      @if (isLoadingProducts()) {
+        <div class="flex justify-center py-20">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      } @else {
+        <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+          @for (product of products(); track product.id) {
+            <div
+              class="flex items-center justify-between px-5 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
+            >
+              <div class="flex flex-col gap-0.5">
+                <span class="font-medium text-slate-800 text-sm">{{ product.name }}</span>
+                <span class="text-xs text-slate-400"
+                  >{{ product.line }} · {{ product.category }}</span
+                >
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="font-semibold text-slate-700 text-sm">${{ product.price }}</span>
+                <div class="flex items-center gap-1">
+                  @if (getCartQuantity(product.id) > 0) {
+                    <button
+                      mat-icon-button
+                      (click)="removeFromCart(product.id)"
+                      class="text-slate-400 hover:text-rose-500 !w-8 !h-8"
+                    >
+                      <mat-icon class="text-base">remove</mat-icon>
+                    </button>
+                    <span class="w-6 text-center font-semibold text-slate-800 text-sm">
+                      {{ getCartQuantity(product.id) }}
+                    </span>
+                  }
+                  <button
+                    mat-icon-button
+                    (click)="addToCart(product)"
+                    class="text-slate-400 hover:text-indigo-500 !w-8 !h-8"
+                  >
+                    <mat-icon class="text-base">add</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (products().length === 0) {
+            <div class="text-center py-14 text-slate-400">
+              <mat-icon class="text-4xl mb-2">restaurant_menu</mat-icon>
+              <p class="text-sm">No hay productos disponibles</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Panel del pedido -->
+    @if (showCheckout() && cart().length > 0) {
+      <div class="w-80 flex-shrink-0">
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-4 sticky top-4"
+        >
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-800">Tu pedido</h3>
+            <button
+              mat-icon-button
+              (click)="showCheckout.set(false)"
+              class="text-slate-400 !w-7 !h-7"
+            >
+              <mat-icon class="text-base">close</mat-icon>
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-2 text-sm">
+            @for (item of cart(); track item.product.id) {
+              <div class="flex flex-col gap-0.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-700">{{ item.product.name }} x{{ item.quantity }}</span>
+                  <span class="font-medium text-slate-800">
+                    ${{ (getDiscountedPrice(item.product) * item.quantity).toFixed(2) }}
+                  </span>
+                </div>
+                @if (getBestPromotion(item.product); as promo) {
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-emerald-600 flex items-center gap-1">
+                      <mat-icon class="text-xs !w-3 !h-3 !text-[12px]">local_offer</mat-icon>
+                      {{ promo.name }} (-{{ promo.discountPercentage }}%)
+                    </span>
+                    <span class="text-slate-400 line-through"
+                      >${{ (item.product.price * item.quantity).toFixed(2) }}</span
+                    >
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="flex justify-between font-bold text-slate-800">
+            <span>Subtotal</span>
+            <span>${{ cartTotal() }}</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <h4 class="font-semibold text-slate-700 text-sm">Dirección de entrega</h4>
+
+          <div class="flex flex-col gap-2">
+            <div class="grid grid-cols-2 gap-2">
+              <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+                <mat-label>Calle *</mat-label>
+                <input matInput [(ngModel)]="street" placeholder="Rivera" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+                <mat-label>Número *</mat-label>
+                <input matInput [(ngModel)]="number" placeholder="1234" />
+              </mat-form-field>
+            </div>
+            <mat-form-field
+              appearance="outline"
+              class="w-full minimal-input"
+              subscriptSizing="dynamic"
+            >
+              <mat-label>Apartamento</mat-label>
+              <input matInput [(ngModel)]="apartment" placeholder="3B (opcional)" />
+            </mat-form-field>
+            <div class="grid grid-cols-2 gap-2">
+              <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+                <mat-label>Ciudad *</mat-label>
+                <input matInput [(ngModel)]="city" placeholder="Montevideo" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="minimal-input" subscriptSizing="dynamic">
+                <mat-label>País *</mat-label>
+                <input matInput [(ngModel)]="country" placeholder="Uruguay" />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <mat-form-field
+            appearance="outline"
+            class="w-full minimal-input"
+            subscriptSizing="dynamic"
+          >
+            <mat-label>Tipo de envío *</mat-label>
+            <mat-select [(ngModel)]="selectedShippingType">
+              @for (type of shippingTypes(); track type.id) {
+                <mat-option [value]="type.name"> {{ type.name }} — ${{ type.cost }} </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <div class="flex flex-col gap-2">
+            <button
+              mat-flat-button
+              style="background-color: var(--brand-color); color: white"
+              (click)="confirmOrder()"
+              [disabled]="isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <mat-spinner diameter="16" class="mr-2"></mat-spinner>
+                Procesando...
+              } @else {
+                Confirmar pedido
+              }
+            </button>
+            <button mat-button type="button" (click)="clearCart()" class="text-slate-400 text-xs">
+              Vaciar carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

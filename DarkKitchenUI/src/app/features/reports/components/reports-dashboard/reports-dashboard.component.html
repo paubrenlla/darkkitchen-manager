@@ -1,0 +1,32 @@
+<div class="p-2">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1
+        class="text-2xl font-bold"
+        style="color: var(--brand-color);">
+        Reportes y Estadísticas
+      </h1>
+      <p class="text-sm text-slate-400 mt-1">Análisis de ventas y productos del sistema</p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-2xl bg-white shadow-md">
+    <mat-tab-group animationDuration="200ms" class="reports-tabs">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2 text-base">emoji_events</mat-icon>
+          Productos más vendidos
+        </ng-template>
+        <app-top-products-report></app-top-products-report>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2 text-base">bar_chart</mat-icon>
+          Reporte de ventas
+        </ng-template>
+        <app-sales-report></app-sales-report>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

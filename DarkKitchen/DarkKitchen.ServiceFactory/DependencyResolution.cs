@@ -1,9 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using DarkKitchen.BusinessLogic;
 using DarkKitchen.BusinessLogic.Auth;
+using DarkKitchen.BusinessLogic.Events;
+using DarkKitchen.BusinessLogic.Handlers;
 using DarkKitchen.BusinessLogic.PhoneNumber;
 using DarkKitchen.DataAccess;
+using DarkKitchen.Domain.Events;
 using DarkKitchen.Domain.Orders.Delivery;
+using DarkKitchen.Domain.Products;
+using DarkKitchen.Domain.Promotions;
 using DarkKitchen.Domain.Users.Encryptor;
 using DarkKitchen.Domain.Users.PhoneValidations;
 using DarkKitchen.IBusinessLogic;
@@ -38,9 +43,27 @@ public static class DependencyResolution
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPromotionRepository, SqlPromotionRepository>();
         services.AddScoped<IPromotionService, PromotionService>();
-        services.AddScoped<IShippingStrategy>(sp => new ExpressShippingStrategy(150m));
-        services.AddScoped<IShippingStrategy>(sp => new TwentyFourHoursShippingStrategy(50m));
         services.AddScoped<IShippingCostCalculator, ShippingCostCalculator>();
+        services.AddScoped<IShippingTypeRepository, SqlShippingTypeRepository>();
+        services.AddScoped<IShippingTypeService, ShippingTypeService>();
+
+        services.AddScoped<IAuditRepository, SqlAuditRepository>();
+        services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+
+        services.AddScoped<ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityCreatedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityModifiedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityDeactivatedEvent<Product>>, ProductAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityActivatedEvent<Product>>, ProductAuditHandler>();
+
+        services.AddScoped<PromotionAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityCreatedEvent<Promotion>>, PromotionAuditHandler>();
+        services.AddScoped<IAuditEventHandler<EntityModifiedEvent<Promotion>>, PromotionAuditHandler>();
+
+        services.AddScoped<IPluginService, PluginService>();
+        var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+        services.AddProductImportersPlugins(pluginsPath);
 
         return services;
     }

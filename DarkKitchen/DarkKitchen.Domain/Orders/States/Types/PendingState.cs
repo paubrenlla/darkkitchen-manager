@@ -4,6 +4,11 @@ public class PendingState : BaseOrderState
 {
     public override OrderState State => OrderState.Pending;
 
+    public override void Delay(Order order)
+    {
+        order.TransitionTo(OrderState.Delayed);
+    }
+
     public override void Prepare(Order order)
     {
         order.TransitionTo(OrderState.Prepared);

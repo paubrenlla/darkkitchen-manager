@@ -13,7 +13,7 @@ public class OrderStateTests
     {
         var address = new Address("Rivera", "1234", null, "Montevideo", "Uruguay");
         var items = new List<OrderItem> { new(Guid.NewGuid(), 1, 100m) };
-        _order = new Order(Guid.NewGuid(), address, DeliveryType.Express, items, 0m);
+        _order = new Order(Guid.NewGuid(), address, "Express", items, 0m);
     }
 
     [TestMethod]
@@ -47,9 +47,23 @@ public class OrderStateTests
     }
 
     [TestMethod]
+    public void DelayedState_State_ShouldReturnDelayed()
+    {
+        Assert.AreEqual(OrderState.Delayed, new DelayedState().State);
+    }
+
+    [TestMethod]
     public void CancelledState_State_ShouldReturnCancelled()
     {
         Assert.AreEqual(OrderState.Cancelled, new CancelledState().State);
+    }
+
+    [TestMethod]
+    public void PendingState_Delay_ShouldTransitionToDelayed()
+    {
+        new PendingState().Delay(_order);
+
+        Assert.AreEqual(OrderState.Delayed, _order.State);
     }
 
     [TestMethod]
@@ -90,11 +104,64 @@ public class OrderStateTests
     }
 
     [TestMethod]
+    public void DelayedState_Prepare_ShouldTransitionToPrepared()
+    {
+        new DelayedState().Prepare(_order);
+
+        Assert.AreEqual(OrderState.Prepared, _order.State);
+    }
+
+    [TestMethod]
+    public void DelayedState_Cancel_ShouldTransitionToCancelled()
+    {
+        new DelayedState().Cancel(_order);
+
+        Assert.AreEqual(OrderState.Cancelled, _order.State);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DelayedState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new DelayedState().Delay(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DelayedState_Ship_ShouldThrowInvalidOperationException()
+    {
+        new DelayedState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DelayedState_Deliver_ShouldThrowInvalidOperationException()
+    {
+        new DelayedState().Deliver(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DelayedState_NotDelivered_ShouldThrowInvalidOperationException()
+    {
+        new DelayedState().NotDelivered(_order);
+    }
+
+    // --- PreparedState tests ---
+
+    [TestMethod]
     public void PreparedState_Ship_ShouldTransitionToShipping()
     {
         new PreparedState().Ship(_order);
 
         Assert.AreEqual(OrderState.Shipping, _order.State);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void PreparedState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new PreparedState().Delay(_order);
     }
 
     [TestMethod]
@@ -143,6 +210,13 @@ public class OrderStateTests
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
+    public void ShippingState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new ShippingState().Delay(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
     public void ShippingState_Prepare_ShouldThrowInvalidOperationException()
     {
         new ShippingState().Prepare(_order);
@@ -160,6 +234,13 @@ public class OrderStateTests
     public void ShippingState_Ship_ShouldThrowInvalidOperationException()
     {
         new ShippingState().Ship(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void DeliveredState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new DeliveredState().Delay(_order);
     }
 
     [TestMethod]
@@ -199,6 +280,13 @@ public class OrderStateTests
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
+    public void NotDeliveredState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new NotDeliveredState().Delay(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
     public void NotDeliveredState_Prepare_ShouldThrowInvalidOperationException()
     {
         new NotDeliveredState().Prepare(_order);
@@ -230,6 +318,13 @@ public class OrderStateTests
     public void NotDeliveredState_NotDelivered_ShouldThrowInvalidOperationException()
     {
         new NotDeliveredState().NotDelivered(_order);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void CancelledState_Delay_ShouldThrowInvalidOperationException()
+    {
+        new CancelledState().Delay(_order);
     }
 
     [TestMethod]

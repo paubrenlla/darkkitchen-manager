@@ -6,18 +6,33 @@ namespace DarkKitchen.WebApi.Filters;
 
 public class ExceptionFilter : IExceptionFilter
 {
+    private static readonly Dictionary<Type, HttpStatusCode> _statusCodeMap = new()
+    {
+        { typeof(ArgumentException),       HttpStatusCode.BadRequest },
+        { typeof(NotSupportedException),   HttpStatusCode.BadRequest },
+        { typeof(KeyNotFoundException),    HttpStatusCode.NotFound },
+        { typeof(InvalidOperationException), HttpStatusCode.Conflict },
+        { typeof(UnauthorizedAccessException), HttpStatusCode.Unauthorized }
+    };
+
     public void OnException(ExceptionContext context)
     {
-        (HttpStatusCode statusCode, var message) = context.Exception switch
-        {
-            UnauthorizedAccessException ex => (HttpStatusCode.Unauthorized, ex.Message),
-            ArgumentException ex => (HttpStatusCode.BadRequest, ex.Message),
-            InvalidOperationException ex => (HttpStatusCode.BadRequest, ex.Message),
-            KeyNotFoundException ex => (HttpStatusCode.NotFound, ex.Message),
-            _ => (HttpStatusCode.InternalServerError, "Ocurrió un error inesperado.")
-        };
+        var exceptionType = context.Exception.GetType();
 
-        context.Result = new ObjectResult(new { error = message }) { StatusCode = (int)statusCode };
+        var matched = _statusCodeMap
+            .FirstOrDefault(kvp => kvp.Key.IsAssignableFrom(exceptionType));
+
+        if(matched.Key != null)
+        {
+            context.Result = new ObjectResult(new { error = context.Exception.Message })
+            { StatusCode = (int)matched.Value };
+        }
+        else
+        {
+            context.Result = new ObjectResult(new { error = "Ocurrió un error inesperado." })
+            { StatusCode = (int)HttpStatusCode.InternalServerError };
+        }
+
         context.ExceptionHandled = true;
     }
 }
