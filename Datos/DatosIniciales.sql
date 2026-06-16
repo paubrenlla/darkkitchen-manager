@@ -4,7 +4,7 @@
 -- Fechas cubiertas: enero 2026 – julio 2026
 -- =============================================
 
-USE DarkKitchenDB;
+USE DarkKitchen;
 
 -- Limpiar datos existentes
 DELETE FROM AuditLogs;

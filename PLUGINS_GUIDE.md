@@ -48,7 +48,7 @@ public class XmlProductImporter : IProductImporter
 ## 4. Despliegue e Integración
 Una vez que tu librería esté compilada:
 1. Genera el archivo `.dll` de tu proyecto.
-2. Copia la DLL en la carpeta `/Plugins` ubicada en el directorio raíz de la API ejecutada.
+2. Copia la DLL en la carpeta `/Plugins` ubicada en la carpeta /app en el container "api" en docker.
 3. El sistema detectará automáticamente el nuevo importador en el próximo inicio o mediante el endpoint `GET /api/plugins/importers`.
 
 ## 5. Consideraciones
